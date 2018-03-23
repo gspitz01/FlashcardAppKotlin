@@ -1,22 +1,21 @@
 package com.gregspitz.flashcardappkotlin.data.source
 
+import android.content.Context
 import com.gregspitz.flashcardappkotlin.SingletonHolder
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 
 /**
- * Data source for flashcards
+ * Fake local data source for testing
  */
-open class FlashcardRepository(val localDataSource: FlashcardDataSource) : FlashcardDataSource {
+class FakeFlashcardLocalDataSource(context: Context) : FlashcardDataSource {
 
-    companion object : SingletonHolder<FlashcardRepository, FlashcardDataSource>(
-            ::FlashcardRepository) {
-        fun destroyInstance() {
+    private val database : MutableMap<String, Flashcard> = mutableMapOf()
 
-        }
-    }
+    companion object : SingletonHolder<FakeFlashcardLocalDataSource, Context>(
+            ::FakeFlashcardLocalDataSource)
 
     override fun getFlashcards(callback: FlashcardDataSource.GetFlashcardsCallback) {
-        localDataSource.getFlashcards(callback)
+        callback.onFlashcardsLoaded(database.values.toList())
     }
 
     override fun getFlashcard(flashcardId: String, callback: FlashcardDataSource.GetFlashcardCallback) {
@@ -35,4 +34,7 @@ open class FlashcardRepository(val localDataSource: FlashcardDataSource) : Flash
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
+    fun addFlashcards(vararg flashcards: Flashcard) {
+        flashcards.forEach { database.put(it.id, it) }
+    }
 }

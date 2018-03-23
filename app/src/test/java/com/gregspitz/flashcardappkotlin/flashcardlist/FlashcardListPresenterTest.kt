@@ -16,15 +16,15 @@ import java.util.*
  */
 class FlashcardListPresenterTest {
 
-    val FLASHCARD_1 = Flashcard("0", "A front", "A back")
+    private val flashcard1 = Flashcard("0", "A front", "A back")
 
-    val FLASHCARD_2 = Flashcard("1", "A different front", "A different back")
+    private val flashcard2 = Flashcard("1", "A different front", "A different back")
 
-    val mFlashcardRepository : FlashcardRepository = mock()
+    private val mFlashcardRepository : FlashcardRepository = mock()
 
-    val mFlashcardListView : FlashcardListContract.View = mock()
+    private val mFlashcardListView : FlashcardListContract.View = mock()
 
-    val mCallbackArgumentCaptor = argumentCaptor<FlashcardDataSource.GetFlashcardsCallback>()
+    private val mCallbackArgumentCaptor = argumentCaptor<FlashcardDataSource.GetFlashcardsCallback>()
 
     lateinit var mFlashcardListPresenter: FlashcardListPresenter
 
@@ -75,12 +75,12 @@ class FlashcardListPresenterTest {
     @Test
     fun selectFlashcard_showsFlashcardDetails() {
         createAndStartPresenterAndSetGetFlashcardsCallbackCaptor()
-        mFlashcardListPresenter.selectFlashcard(FLASHCARD_1)
-        verify(mFlashcardListView).showFlashcardDetailsUi(FLASHCARD_1.id)
+        mFlashcardListPresenter.selectFlashcard(flashcard1)
+        verify(mFlashcardListView).showFlashcardDetailsUi(flashcard1.id)
     }
 
     private fun getTestFlashcardsList(): List<Flashcard> {
-        return Arrays.asList(FLASHCARD_1, FLASHCARD_2)
+        return Arrays.asList(flashcard1, flashcard2)
     }
 
     private fun createAndStartPresenterAndSetGetFlashcardsCallbackCaptor() {
