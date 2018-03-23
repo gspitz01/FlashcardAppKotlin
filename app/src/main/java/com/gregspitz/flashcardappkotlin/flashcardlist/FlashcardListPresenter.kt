@@ -1,5 +1,6 @@
 package com.gregspitz.flashcardappkotlin.flashcardlist
 
+import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase.GetFlashcards
@@ -17,19 +18,40 @@ class FlashcardListPresenter(private val mUseCaseHandler: UseCaseHandler,
     }
 
     override fun start() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        loadFlashcards()
     }
 
     override fun selectFlashcard(flashcard: Flashcard) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        mView.showFlashcardDetailsUi(flashcardId = flashcard.id)
     }
 
     override fun addFlashcard() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        mView.showAddFlashcard()
     }
 
     override fun loadFlashcards() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        mView.setLoadingIndicator(true)
+        mUseCaseHandler.execute(mGetFlashcards, GetFlashcards.RequestValues(),
+                object: UseCase.UseCaseCallback<GetFlashcards.ResponseValue> {
+                    override fun onSuccess(response: GetFlashcards.ResponseValue) {
+                        if (mView.isActive()) {
+                            mView.setLoadingIndicator(false)
+                            if (response.flashcards.isNotEmpty()) {
+                                mView.showFlashcards(response.flashcards)
+                            } else {
+                                mView.showNoFlashcardsToLoad()
+                            }
+                        }
+                    }
+
+                    override fun onError() {
+                        if (mView.isActive()) {
+                            mView.setLoadingIndicator(false)
+                            mView.showFailedToLoadFlashcards()
+                        }
+                    }
+
+                })
     }
 
     override fun onFlashcardClick(flashcardId: String) {

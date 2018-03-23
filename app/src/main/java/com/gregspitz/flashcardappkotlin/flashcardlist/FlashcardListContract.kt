@@ -13,6 +13,7 @@ interface FlashcardListContract {
         fun setLoadingIndicator(active: Boolean)
         fun showFlashcards(flashcards: List<Flashcard>)
         fun showFailedToLoadFlashcards()
+        fun showNoFlashcardsToLoad()
         fun showAddFlashcard()
         fun showFlashcardDetailsUi(flashcardId: String)
         fun isActive(): Boolean
