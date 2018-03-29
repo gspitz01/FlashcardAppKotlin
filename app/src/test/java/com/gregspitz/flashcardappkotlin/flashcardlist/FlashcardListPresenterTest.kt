@@ -26,7 +26,7 @@ class FlashcardListPresenterTest {
 
     private val mCallbackArgumentCaptor = argumentCaptor<FlashcardDataSource.GetFlashcardsCallback>()
 
-    lateinit var mFlashcardListPresenter: FlashcardListPresenter
+    private lateinit var mFlashcardListPresenter: FlashcardListPresenter
 
     @Before
     fun setup() {
