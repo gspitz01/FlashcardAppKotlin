@@ -19,7 +19,12 @@ class FakeFlashcardLocalDataSource(context: Context) : FlashcardDataSource {
     }
 
     override fun getFlashcard(flashcardId: String, callback: FlashcardDataSource.GetFlashcardCallback) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val flashcard = database.get(flashcardId)
+        if (flashcard == null) {
+            callback.onDataNotAvailable()
+        } else {
+            callback.onFlashcardLoaded(flashcard)
+        }
     }
 
     override fun saveFlashcard(flashcard: Flashcard, callback: FlashcardDataSource.SaveFlashcardCallback) {

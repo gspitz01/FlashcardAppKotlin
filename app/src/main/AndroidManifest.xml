@@ -18,6 +18,8 @@
         </activity>
         <activity android:name=".flashcardlist.FlashcardListActivity">
         </activity>
+        <activity android:name=".flashcarddetail.FlashcardDetailActivity">
+        </activity>
     </application>
 
 </manifest>

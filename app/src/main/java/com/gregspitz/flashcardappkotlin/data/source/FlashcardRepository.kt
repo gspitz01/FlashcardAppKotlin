@@ -20,7 +20,7 @@ open class FlashcardRepository(val localDataSource: FlashcardDataSource) : Flash
     }
 
     override fun getFlashcard(flashcardId: String, callback: FlashcardDataSource.GetFlashcardCallback) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        localDataSource.getFlashcard(flashcardId, callback)
     }
 
     override fun saveFlashcard(flashcard: Flashcard, callback: FlashcardDataSource.SaveFlashcardCallback) {

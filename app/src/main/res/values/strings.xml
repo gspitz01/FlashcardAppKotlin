@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">FlashcardAppKotlin</string>
+    <string name="failed_to_load_flashcard_text">Failed to load flashcard</string>
 </resources>
