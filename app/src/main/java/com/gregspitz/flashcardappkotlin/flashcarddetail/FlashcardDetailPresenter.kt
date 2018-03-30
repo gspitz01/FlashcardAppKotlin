@@ -25,21 +25,21 @@ class FlashcardDetailPresenter(
     }
 
     override fun loadFlashcard(flashcardId: String) {
-        view.showLoadingIndicator(true)
+        view.setLoadingIndicator(true)
 
         useCaseHandler.execute(getFlashcard, GetFlashcard.RequestValues(flashcardId),
                 object: UseCase.UseCaseCallback<GetFlashcard.ResponseValue> {
                     override fun onSuccess(response: GetFlashcard.ResponseValue) {
                         flashcard = response.flashcard
                         if (view.isActive()) {
-                            view.showLoadingIndicator(false)
+                            view.setLoadingIndicator(false)
                             view.showFlashcard(response.flashcard)
                         }
                     }
 
                     override fun onError() {
                         if (view.isActive()) {
-                            view.showLoadingIndicator(false)
+                            view.setLoadingIndicator(false)
                             view.showFailedToLoadFlashcard()
                         }
                     }

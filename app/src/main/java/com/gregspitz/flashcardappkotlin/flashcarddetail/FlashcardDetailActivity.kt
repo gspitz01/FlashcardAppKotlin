@@ -9,7 +9,7 @@ import kotlinx.android.synthetic.main.activity_flashcard_detail.*
 
 class FlashcardDetailActivity : AppCompatActivity(), FlashcardDetailContract.View {
 
-    private var active = false;
+    private var active = false
 
     private lateinit var presenter: FlashcardDetailContract.Presenter
 
@@ -28,7 +28,7 @@ class FlashcardDetailActivity : AppCompatActivity(), FlashcardDetailContract.Vie
     override fun onResume() {
         super.onResume()
         active = true
-        presenter?.start()
+        presenter.start()
     }
 
     override fun onPause() {
@@ -40,7 +40,7 @@ class FlashcardDetailActivity : AppCompatActivity(), FlashcardDetailContract.Vie
         this.presenter = presenter
     }
 
-    override fun showLoadingIndicator(active: Boolean) {
+    override fun setLoadingIndicator(active: Boolean) {
         // TODO: implement
     }
 

@@ -42,11 +42,11 @@ class FlashcardDetailPresenterTest {
         createAndStartPresenterAndSetCallbackCaptor()
 
         val inOrder = inOrder(flashcardDetailView)
-        inOrder.verify(flashcardDetailView).showLoadingIndicator(true)
+        inOrder.verify(flashcardDetailView).setLoadingIndicator(true)
         // Trigger callback
         callbackCaptor.firstValue.onFlashcardLoaded(flashcard)
 
-        inOrder.verify(flashcardDetailView).showLoadingIndicator(false)
+        inOrder.verify(flashcardDetailView).setLoadingIndicator(false)
         verify(flashcardDetailView).showFlashcard(flashcard)
     }
 
@@ -55,11 +55,11 @@ class FlashcardDetailPresenterTest {
         createAndStartPresenterAndSetCallbackCaptor()
 
         val inOrder = inOrder(flashcardDetailView)
-        inOrder.verify(flashcardDetailView).showLoadingIndicator(true)
+        inOrder.verify(flashcardDetailView).setLoadingIndicator(true)
         // Trigger callback
         callbackCaptor.firstValue.onDataNotAvailable()
 
-        inOrder.verify(flashcardDetailView).showLoadingIndicator(false)
+        inOrder.verify(flashcardDetailView).setLoadingIndicator(false)
         verify(flashcardDetailView).showFailedToLoadFlashcard()
     }
 

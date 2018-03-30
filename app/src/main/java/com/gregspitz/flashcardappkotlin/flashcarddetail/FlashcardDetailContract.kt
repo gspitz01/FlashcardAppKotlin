@@ -10,7 +10,7 @@ import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 interface FlashcardDetailContract {
     interface View : BaseView<Presenter> {
 
-        fun showLoadingIndicator(active: Boolean)
+        fun setLoadingIndicator(active: Boolean)
 
         fun showFlashcard(flashcard: Flashcard)
 
