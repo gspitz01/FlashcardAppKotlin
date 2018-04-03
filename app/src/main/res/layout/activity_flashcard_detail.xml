@@ -17,4 +17,10 @@
         android:id="@+id/flashcard_back"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+
+    <Button
+        android:id="@+id/editFlashcardButton"
+        android:text="@string/edit_flashcard_button_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 </LinearLayout>

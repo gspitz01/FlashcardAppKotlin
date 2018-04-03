@@ -42,4 +42,8 @@ class FakeFlashcardLocalDataSource(context: Context) : FlashcardDataSource {
     fun addFlashcards(vararg flashcards: Flashcard) {
         flashcards.forEach { database.put(it.id, it) }
     }
+
+    fun clearFlashcards() {
+        database.clear()
+    }
 }

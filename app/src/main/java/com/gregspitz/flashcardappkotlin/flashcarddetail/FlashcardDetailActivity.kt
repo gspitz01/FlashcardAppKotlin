@@ -1,9 +1,12 @@
 package com.gregspitz.flashcardappkotlin.flashcarddetail
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import com.gregspitz.flashcardappkotlin.Injection
 import com.gregspitz.flashcardappkotlin.R
+import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardActivity
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import kotlinx.android.synthetic.main.activity_flashcard_detail.*
 
@@ -15,6 +18,7 @@ class FlashcardDetailActivity : AppCompatActivity(), FlashcardDetailContract.Vie
 
     companion object {
         const val flashcardIntentId = "flashcard_intent_id"
+        const val noFlashcardIntentId = "-1"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +42,12 @@ class FlashcardDetailActivity : AppCompatActivity(), FlashcardDetailContract.Vie
 
     override fun setPresenter(presenter: FlashcardDetailContract.Presenter) {
         this.presenter = presenter
+        editFlashcardButton.setOnClickListener(object: View.OnClickListener {
+            override fun onClick(v: View?) {
+                this@FlashcardDetailActivity.presenter.editFlashcard()
+            }
+
+        })
     }
 
     override fun setLoadingIndicator(active: Boolean) {
@@ -50,7 +60,9 @@ class FlashcardDetailActivity : AppCompatActivity(), FlashcardDetailContract.Vie
     }
 
     override fun showEditFlashcard(flashcardId: String) {
-        // TODO: implement
+        val intent = Intent(this, AddEditFlashcardActivity::class.java)
+        intent.putExtra(AddEditFlashcardActivity.flashcardIdExtra, flashcardId)
+        startActivity(intent)
     }
 
     override fun showFailedToLoadFlashcard() {
@@ -58,7 +70,7 @@ class FlashcardDetailActivity : AppCompatActivity(), FlashcardDetailContract.Vie
     }
 
     override fun getIdFromIntent(): String {
-        return intent.getStringExtra(flashcardIntentId)
+        return intent.getStringExtra(flashcardIntentId) ?: noFlashcardIntentId
     }
 
     override fun isActive(): Boolean {
