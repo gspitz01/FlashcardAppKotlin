@@ -6,7 +6,7 @@ import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 /**
  * Data source for flashcards
  */
-open class FlashcardRepository(val localDataSource: FlashcardDataSource) : FlashcardDataSource {
+open class FlashcardRepository(private val localDataSource: FlashcardDataSource) : FlashcardDataSource {
 
     companion object : SingletonHolder<FlashcardRepository, FlashcardDataSource>(
             ::FlashcardRepository) {
@@ -24,7 +24,7 @@ open class FlashcardRepository(val localDataSource: FlashcardDataSource) : Flash
     }
 
     override fun saveFlashcard(flashcard: Flashcard, callback: FlashcardDataSource.SaveFlashcardCallback) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        localDataSource.saveFlashcard(flashcard, callback)
     }
 
     override fun deleteAllFlashcards() {

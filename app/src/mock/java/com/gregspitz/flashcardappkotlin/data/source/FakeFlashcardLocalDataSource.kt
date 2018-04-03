@@ -28,7 +28,8 @@ class FakeFlashcardLocalDataSource(context: Context) : FlashcardDataSource {
     }
 
     override fun saveFlashcard(flashcard: Flashcard, callback: FlashcardDataSource.SaveFlashcardCallback) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        database.remove(flashcard.id)
+        database[flashcard.id] = flashcard
     }
 
     override fun deleteAllFlashcards() {
@@ -40,7 +41,7 @@ class FakeFlashcardLocalDataSource(context: Context) : FlashcardDataSource {
     }
 
     fun addFlashcards(vararg flashcards: Flashcard) {
-        flashcards.forEach { database.put(it.id, it) }
+        flashcards.forEach { database[it.id] = it }
     }
 
     fun clearFlashcards() {

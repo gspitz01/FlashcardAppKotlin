@@ -17,6 +17,8 @@ interface AddEditFlashcardContract {
 
         fun showFlashcard(flashcard: Flashcard)
 
+        fun showNewFlashcard()
+
         fun showFlashcardList()
 
         fun showFailedToLoadFlashcard()

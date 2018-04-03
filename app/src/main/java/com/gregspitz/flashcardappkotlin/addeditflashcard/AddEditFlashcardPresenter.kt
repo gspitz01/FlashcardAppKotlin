@@ -21,7 +21,12 @@ class AddEditFlashcardPresenter(
     }
 
     override fun start() {
-        loadFlashcard(view.getIdFromIntent())
+        val id = view.getIdFromIntent()
+        if (id == AddEditFlashcardActivity.newFlashcardExtra) {
+            view.showNewFlashcard()
+        } else {
+            loadFlashcard(view.getIdFromIntent())
+        }
     }
 
     override fun loadFlashcard(flashcardId: String) {
