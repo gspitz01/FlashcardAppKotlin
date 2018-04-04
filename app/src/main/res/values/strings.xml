@@ -5,4 +5,5 @@
     <string name="flashcard_back_hint_text">Back</string>
     <string name="flashcard_front_hint_text">Front</string>
     <string name="save_flashcard_button_text">Save</string>
+    <string name="flashcard_list_button_text">Flashcard List</string>
 </resources>

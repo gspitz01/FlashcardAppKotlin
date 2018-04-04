@@ -28,7 +28,7 @@ open class FlashcardRepository(private val localDataSource: FlashcardDataSource)
     }
 
     override fun deleteAllFlashcards() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        localDataSource.deleteAllFlashcards()
     }
 
     override fun refreshFlashcards() {
