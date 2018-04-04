@@ -3,7 +3,11 @@ package com.gregspitz.flashcardappkotlin.flashcardlist
 import android.content.Intent
 import android.support.test.InstrumentationRegistry
 import android.support.test.espresso.Espresso.onView
+import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.assertion.ViewAssertions.matches
+import android.support.test.espresso.intent.Intents.intended
+import android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent
+import android.support.test.espresso.intent.matcher.IntentMatchers.hasExtra
 import android.support.test.espresso.intent.rule.IntentsTestRule
 import android.support.test.espresso.matcher.BoundedMatcher
 import android.support.test.espresso.matcher.ViewMatchers.*
@@ -14,8 +18,10 @@ import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.source.FakeFlashcardLocalDataSource
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
+import com.gregspitz.flashcardappkotlin.flashcarddetail.FlashcardDetailActivity
 import org.hamcrest.Description
 import org.hamcrest.Matcher
+import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.not
 import org.junit.Before
 import org.junit.Rule
@@ -54,6 +60,14 @@ class FlashcardListActivityTest {
         onView(withId(R.id.flashcard_recycler_view))
                 .check(matches(hasFlashcardFrontForPosition(1, flashcard2)))
         onView(withId(R.id.no_flashcards_to_show)).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun clickFlashcard_showsFlashcardDetails() {
+        createIntentAndLaunchActivity()
+        onView(withText(flashcard1.front)).perform(click())
+        intended(allOf(hasComponent(FlashcardDetailActivity::class.java.name),
+                hasExtra(FlashcardDetailActivity.flashcardIntentId, flashcard1.id)))
     }
 
 

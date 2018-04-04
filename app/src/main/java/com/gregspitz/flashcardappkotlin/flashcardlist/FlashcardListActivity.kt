@@ -1,5 +1,6 @@
 package com.gregspitz.flashcardappkotlin.flashcardlist
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
@@ -7,6 +8,7 @@ import android.view.View
 import com.gregspitz.flashcardappkotlin.Injection
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.flashcarddetail.FlashcardDetailActivity
 import kotlinx.android.synthetic.main.activity_flashcard_list.*
 
 class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
@@ -42,6 +44,7 @@ class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
 
     override fun setPresenter(presenter: FlashcardListContract.Presenter) {
         this.presenter = presenter
+        recyclerAdapter.setPresenter(this.presenter)
     }
 
     override fun setLoadingIndicator(active: Boolean) {
@@ -66,7 +69,9 @@ class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
     }
 
     override fun showFlashcardDetailsUi(flashcardId: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val intent = Intent(this, FlashcardDetailActivity::class.java)
+        intent.putExtra(FlashcardDetailActivity.flashcardIntentId, flashcardId)
+        startActivity(intent)
     }
 
     override fun isActive(): Boolean = active

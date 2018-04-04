@@ -73,9 +73,9 @@ class FlashcardListPresenterTest {
     }
 
     @Test
-    fun selectFlashcard_showsFlashcardDetails() {
+    fun onFlashcardClick_showsFlashcardDetails() {
         createAndStartPresenterAndSetGetFlashcardsCallbackCaptor()
-        mFlashcardListPresenter.selectFlashcard(flashcard1)
+        mFlashcardListPresenter.onFlashcardClick(flashcard1.id)
         verify(mFlashcardListView).showFlashcardDetailsUi(flashcard1.id)
     }
 

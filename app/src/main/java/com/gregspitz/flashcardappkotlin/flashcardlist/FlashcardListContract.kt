@@ -28,8 +28,6 @@ interface FlashcardListContract {
 
     interface Presenter : BasePresenter {
 
-        fun selectFlashcard(flashcard: Flashcard)
-
         fun addFlashcard()
 
         fun loadFlashcards()
