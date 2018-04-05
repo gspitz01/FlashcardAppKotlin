@@ -48,6 +48,7 @@ class FakeFlashcardLocalDataSource(context: Context) : FlashcardDataSource {
 
         database.remove(flashcard.id)
         database[flashcard.id] = flashcard
+        callback.onSaveSuccessful()
     }
 
     override fun deleteAllFlashcards() {

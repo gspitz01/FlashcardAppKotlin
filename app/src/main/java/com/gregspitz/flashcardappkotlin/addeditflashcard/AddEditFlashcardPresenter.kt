@@ -1,5 +1,6 @@
 package com.gregspitz.flashcardappkotlin.addeditflashcard
 
+import android.util.Log
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.SaveFlashcard

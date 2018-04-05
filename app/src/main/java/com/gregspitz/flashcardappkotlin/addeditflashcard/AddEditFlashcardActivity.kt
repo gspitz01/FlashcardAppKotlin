@@ -1,11 +1,14 @@
 package com.gregspitz.flashcardappkotlin.addeditflashcard
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import com.gregspitz.flashcardappkotlin.Injection
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListActivity
 import kotlinx.android.synthetic.main.activity_add_edit_flashcard.*
 
 class AddEditFlashcardActivity : AppCompatActivity(), AddEditFlashcardContract.View {
@@ -53,7 +56,12 @@ class AddEditFlashcardActivity : AppCompatActivity(), AddEditFlashcardContract.V
                 }
                 this@AddEditFlashcardActivity.presenter.saveFlashcard(flashcard!!)
             }
+        })
 
+        showFlashcardListButton.setOnClickListener(object: View.OnClickListener {
+            override fun onClick(v: View?) {
+                this@AddEditFlashcardActivity.presenter.showList()
+            }
         })
     }
 
@@ -72,7 +80,7 @@ class AddEditFlashcardActivity : AppCompatActivity(), AddEditFlashcardContract.V
     }
 
     override fun showFlashcardList() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        startActivity(Intent(this, FlashcardListActivity::class.java))
     }
 
     override fun showFailedToLoadFlashcard() {
@@ -85,11 +93,11 @@ class AddEditFlashcardActivity : AppCompatActivity(), AddEditFlashcardContract.V
     }
 
     override fun showSaveSuccessful() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        Toast.makeText(this, R.string.save_successful_toast_text, Toast.LENGTH_LONG).show()
     }
 
     override fun showSaveFailed() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        Toast.makeText(this, R.string.save_failed_toast_text, Toast.LENGTH_LONG).show()
     }
 
     override fun isActive(): Boolean {

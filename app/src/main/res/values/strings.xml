@@ -9,4 +9,7 @@
     <string name="no_flashcards_to_show_text">No flashcards to show</string>
     <string name="flashcard_game_button_text">Flashcard Game</string>
     <string name="next_flashcard_button_text">Next Flashcard</string>
+    <string name="show_flashcard_list_button_text">Show List</string>
+    <string name="save_successful_toast_text">Save Successful</string>
+    <string name="save_failed_toast_text">Save Failed!</string>
 </resources>
