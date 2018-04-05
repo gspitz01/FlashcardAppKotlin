@@ -6,6 +6,7 @@ import com.gregspitz.flashcardappkotlin.data.source.FakeFlashcardLocalDataSource
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
 import com.gregspitz.flashcardappkotlin.flashcarddetail.domain.usecase.GetFlashcard
 import com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase.GetFlashcards
+import com.gregspitz.flashcardappkotlin.randomflashcard.domain.usecase.GetRandomFlashcard
 
 /**
  * Dependency Injection object
@@ -30,5 +31,9 @@ object Injection {
 
     fun provideSaveFlashcard(context: Context) : SaveFlashcard {
         return SaveFlashcard(provideFlashcardRepository(context))
+    }
+
+    fun provideGetRandomFlashcard(context: Context) : GetRandomFlashcard {
+        return GetRandomFlashcard(provideFlashcardRepository(context))
     }
 }

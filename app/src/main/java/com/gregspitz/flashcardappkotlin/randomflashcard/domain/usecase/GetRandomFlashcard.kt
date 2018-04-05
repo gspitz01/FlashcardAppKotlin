@@ -1,5 +1,6 @@
 package com.gregspitz.flashcardappkotlin.randomflashcard.domain.usecase
 
+import android.util.Log
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
@@ -21,7 +22,7 @@ class GetRandomFlashcard(private val flashcardRepository: FlashcardRepository)
 
     class ResponseValue(val flashcard: Flashcard) : UseCase.ResponseValue
 
-    class RandomFlashcardRepoGet(
+    inner class RandomFlashcardRepoGet(
             private val flashcardId: String?,
             private val useCaseCallback: UseCaseCallback<ResponseValue>
     ) : FlashcardDataSource.GetFlashcardsCallback {

@@ -1,6 +1,7 @@
 package com.gregspitz.flashcardappkotlin.data.source
 
 import android.content.Context
+import android.util.Log
 import com.gregspitz.flashcardappkotlin.SingletonHolder
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 

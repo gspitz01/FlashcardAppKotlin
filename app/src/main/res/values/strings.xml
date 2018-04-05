@@ -6,4 +6,7 @@
     <string name="flashcard_front_hint_text">Front</string>
     <string name="save_flashcard_button_text">Save</string>
     <string name="flashcard_list_button_text">Flashcard List</string>
+    <string name="no_flashcards_to_show_text">No flashcards to show</string>
+    <string name="flashcard_game_button_text">Flashcard Game</string>
+    <string name="next_flashcard_button_text">Next Flashcard</string>
 </resources>

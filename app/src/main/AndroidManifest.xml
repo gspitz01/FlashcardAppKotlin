@@ -22,6 +22,8 @@
         </activity>
         <activity android:name=".addeditflashcard.AddEditFlashcardActivity">
         </activity>
+        <activity android:name=".randomflashcard.RandomFlashcardActivity">
+        </activity>
     </application>
 
 </manifest>
