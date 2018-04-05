@@ -61,7 +61,7 @@ class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
     }
 
     override fun showNoFlashcardsToLoad() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        no_flashcards_to_show.setText(R.string.no_flashcards_to_show_text)
     }
 
     override fun showAddFlashcard() {
