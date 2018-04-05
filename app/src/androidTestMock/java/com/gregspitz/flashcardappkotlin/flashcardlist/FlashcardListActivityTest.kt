@@ -15,6 +15,7 @@ import android.support.test.runner.AndroidJUnit4
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.gregspitz.flashcardappkotlin.R
+import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardActivity
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.source.FakeFlashcardLocalDataSource
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
@@ -34,8 +35,6 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class FlashcardListActivityTest {
 
-    // TODO: continue making these tests
-
     private val flashcard1 = Flashcard("0", "A front", "A back")
 
     private val flashcard2 = Flashcard("1", "A different front", "A different back")
@@ -48,30 +47,64 @@ class FlashcardListActivityTest {
     fun setup() {
         FlashcardRepository.destroyInstance()
         FakeFlashcardLocalDataSource.getInstance(
-                InstrumentationRegistry.getTargetContext()
-        ).addFlashcards(flashcard1, flashcard2)
+                InstrumentationRegistry.getTargetContext()).deleteAllFlashcards()
+
     }
 
     @Test
     fun flashcardRecyclerView_showsFlashcardFronts() {
-        createIntentAndLaunchActivity()
-        onView(withId(R.id.flashcard_recycler_view))
+        addFlashcardsToDataSource(flashcard1, flashcard2)
+        launchActivity()
+        onView(withId(R.id.flashcardRecyclerView))
                 .check(matches(hasFlashcardFrontForPosition(0, flashcard1)))
-        onView(withId(R.id.flashcard_recycler_view))
+        onView(withId(R.id.flashcardRecyclerView))
                 .check(matches(hasFlashcardFrontForPosition(1, flashcard2)))
-        onView(withId(R.id.no_flashcards_to_show)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.flashcardListMessages)).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun noFlashcardsToShow_showsNoFlashcardsMessage() {
+        launchActivity()
+        onView(withId(R.id.flashcardListMessages))
+                .check(matches(withText(R.string.no_flashcards_to_show_text)))
+    }
+
+    @Test
+    fun failedToLoadFlashcards_showsFailedToLoadMessage() {
+        FakeFlashcardLocalDataSource.getInstance(
+                InstrumentationRegistry.getTargetContext()).setFailure(true)
+        launchActivity()
+        onView(withId(R.id.flashcardListMessages))
+                .check(matches(withText(R.string.failed_to_load_flashcard_text)))
     }
 
     @Test
     fun clickFlashcard_showsFlashcardDetails() {
-        createIntentAndLaunchActivity()
+        addFlashcardsToDataSource(flashcard1, flashcard2)
+        launchActivity()
         onView(withText(flashcard1.front)).perform(click())
         intended(allOf(hasComponent(FlashcardDetailActivity::class.java.name),
                 hasExtra(FlashcardDetailActivity.flashcardIntentId, flashcard1.id)))
     }
 
+    @Test
+    fun clickAddFlashcardFab_showsAddEditFlashcardView() {
+        addFlashcardsToDataSource(flashcard1, flashcard2)
+        launchActivity()
+        onView(withId(R.id.addFlashcardFab)).perform(click())
+        intended(allOf(hasComponent(AddEditFlashcardActivity::class.java.name),
+                hasExtra(AddEditFlashcardActivity.flashcardIdExtra,
+                        AddEditFlashcardActivity.newFlashcardExtra)))
+    }
 
-    private fun createIntentAndLaunchActivity() {
+    private fun addFlashcardsToDataSource(vararg flashcards: Flashcard) {
+        FakeFlashcardLocalDataSource.getInstance(
+                InstrumentationRegistry.getTargetContext()
+        ).addFlashcards(*flashcards)
+    }
+
+
+    private fun launchActivity() {
         testRule.launchActivity(Intent())
     }
 

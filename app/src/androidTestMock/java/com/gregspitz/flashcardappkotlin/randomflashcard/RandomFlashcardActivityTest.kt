@@ -43,7 +43,7 @@ class RandomFlashcardActivityTest {
     fun setup() {
         FlashcardRepository.destroyInstance()
         FakeFlashcardLocalDataSource.getInstance(InstrumentationRegistry.getTargetContext())
-                .clearFlashcards()
+                .deleteAllFlashcards()
     }
 
     @Test

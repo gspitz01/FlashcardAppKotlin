@@ -62,7 +62,7 @@ class FlashcardDetailActivityTest {
     @Test
     fun noAvailableFlashcard_showsFailedToLoadFlashcard() {
         FakeFlashcardLocalDataSource.getInstance(InstrumentationRegistry.getTargetContext())
-                .clearFlashcards()
+                .deleteAllFlashcards()
         createIntentAndStartActivity()
         onView(withId(R.id.flashcard_front))
                 .check(matches(withText(R.string.failed_to_load_flashcard_text)))

@@ -7,6 +7,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import com.gregspitz.flashcardappkotlin.Injection
 import com.gregspitz.flashcardappkotlin.R
+import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardActivity
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.flashcarddetail.FlashcardDetailActivity
 import kotlinx.android.synthetic.main.activity_flashcard_list.*
@@ -23,9 +24,9 @@ class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_flashcard_list)
 
-        flashcard_recycler_view.layoutManager = LinearLayoutManager(this)
+        flashcardRecyclerView.layoutManager = LinearLayoutManager(this)
         recyclerAdapter = FlashcardRecyclerAdapter(emptyList())
-        flashcard_recycler_view.adapter = recyclerAdapter
+        flashcardRecyclerView.adapter = recyclerAdapter
 
         FlashcardListPresenter(Injection.provideUseCaseHandler(), this,
                 Injection.provideGetFlashcards(applicationContext))
@@ -45,6 +46,11 @@ class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
     override fun setPresenter(presenter: FlashcardListContract.Presenter) {
         this.presenter = presenter
         recyclerAdapter.setPresenter(this.presenter)
+        addFlashcardFab.setOnClickListener(object: View.OnClickListener {
+            override fun onClick(v: View?) {
+                this@FlashcardListActivity.presenter.addFlashcard()
+            }
+        })
     }
 
     override fun setLoadingIndicator(active: Boolean) {
@@ -52,20 +58,23 @@ class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
     }
 
     override fun showFlashcards(flashcards: List<Flashcard>) {
-        no_flashcards_to_show.visibility = View.GONE
+        flashcardListMessages.visibility = View.GONE
         recyclerAdapter.updateFlashcards(flashcards)
     }
 
     override fun showFailedToLoadFlashcards() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        flashcardListMessages.setText(R.string.failed_to_load_flashcard_text)
     }
 
     override fun showNoFlashcardsToLoad() {
-        no_flashcards_to_show.setText(R.string.no_flashcards_to_show_text)
+        flashcardListMessages.setText(R.string.no_flashcards_to_show_text)
     }
 
     override fun showAddFlashcard() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val intent = Intent(this, AddEditFlashcardActivity::class.java)
+        intent.putExtra(AddEditFlashcardActivity.flashcardIdExtra,
+                AddEditFlashcardActivity.newFlashcardExtra)
+        startActivity(intent)
     }
 
     override fun showFlashcardDetailsUi(flashcardId: String) {

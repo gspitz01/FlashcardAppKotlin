@@ -4,4 +4,5 @@
     <dimen name="flashcard_detail_view_padding">16dp</dimen>
     <dimen name="edit_flashcard_view_padding">16dp</dimen>
     <dimen name="random_flashcard_view_padding">16dp</dimen>
+    <dimen name="add_flashcard_fab_margin">16dp</dimen>
 </resources>
