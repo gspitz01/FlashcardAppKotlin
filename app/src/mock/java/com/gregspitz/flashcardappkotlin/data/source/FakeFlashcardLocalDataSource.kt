@@ -1,20 +1,14 @@
 package com.gregspitz.flashcardappkotlin.data.source
 
-import android.content.Context
-import android.util.Log
-import com.gregspitz.flashcardappkotlin.SingletonHolder
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 
 /**
  * Fake local data source for testing
  */
-class FakeFlashcardLocalDataSource(context: Context) : FlashcardDataSource {
+class FakeFlashcardLocalDataSource : FlashcardDataSource {
 
     private val database : MutableMap<String, Flashcard> = mutableMapOf()
     private var failure = false
-
-    companion object : SingletonHolder<FakeFlashcardLocalDataSource, Context>(
-            ::FakeFlashcardLocalDataSource)
 
     override fun getFlashcards(callback: FlashcardDataSource.GetFlashcardsCallback) {
         if (failure) {
@@ -57,7 +51,7 @@ class FakeFlashcardLocalDataSource(context: Context) : FlashcardDataSource {
     }
 
     override fun refreshFlashcards() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        // Don't need to implement this, handled by FlashcardRepository
     }
 
     fun addFlashcards(vararg flashcards: Flashcard) {

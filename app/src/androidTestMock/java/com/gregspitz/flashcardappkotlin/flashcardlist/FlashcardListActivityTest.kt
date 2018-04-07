@@ -14,6 +14,7 @@ import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.runner.AndroidJUnit4
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardActivity
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
@@ -39,16 +40,15 @@ class FlashcardListActivityTest {
 
     private val flashcard2 = Flashcard("1", "A different front", "A different back")
 
+    private val dataSource = FlashcardApplication.repoComponent.getFlashcardLocalDataSource()
+
     @Rule @JvmField
     val testRule = IntentsTestRule<FlashcardListActivity>(
             FlashcardListActivity::class.java, true, false)
 
     @Before
     fun setup() {
-        FlashcardRepository.destroyInstance()
-        FakeFlashcardLocalDataSource.getInstance(
-                InstrumentationRegistry.getTargetContext()).deleteAllFlashcards()
-
+        dataSource.deleteAllFlashcards()
     }
 
     @Test
@@ -71,8 +71,7 @@ class FlashcardListActivityTest {
 
     @Test
     fun failedToLoadFlashcards_showsFailedToLoadMessage() {
-        FakeFlashcardLocalDataSource.getInstance(
-                InstrumentationRegistry.getTargetContext()).setFailure(true)
+        dataSource.setFailure(true)
         launchActivity()
         onView(withId(R.id.flashcardListMessages))
                 .check(matches(withText(R.string.failed_to_load_flashcard_text)))
@@ -98,9 +97,7 @@ class FlashcardListActivityTest {
     }
 
     private fun addFlashcardsToDataSource(vararg flashcards: Flashcard) {
-        FakeFlashcardLocalDataSource.getInstance(
-                InstrumentationRegistry.getTargetContext()
-        ).addFlashcards(*flashcards)
+        dataSource.addFlashcards(*flashcards)
     }
 
 

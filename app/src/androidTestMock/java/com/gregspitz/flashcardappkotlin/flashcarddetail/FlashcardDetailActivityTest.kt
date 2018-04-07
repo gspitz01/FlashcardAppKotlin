@@ -12,6 +12,7 @@ import android.support.test.espresso.intent.rule.IntentsTestRule
 import android.support.test.espresso.matcher.ViewMatchers.withId
 import android.support.test.espresso.matcher.ViewMatchers.withText
 import android.support.test.runner.AndroidJUnit4
+import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardActivity
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
@@ -31,6 +32,8 @@ class FlashcardDetailActivityTest {
 
     private val flashcard = Flashcard("0", "Front", "Back")
 
+    private val dataSource = FlashcardApplication.repoComponent.getFlashcardLocalDataSource()
+
     @Rule @JvmField
     val testRule = IntentsTestRule<FlashcardDetailActivity>(
             FlashcardDetailActivity::class.java, true, false
@@ -38,10 +41,8 @@ class FlashcardDetailActivityTest {
 
     @Before
     fun setup() {
-        FlashcardRepository.destroyInstance()
-        FakeFlashcardLocalDataSource.getInstance(
-                InstrumentationRegistry.getTargetContext()
-        ).addFlashcards(flashcard)
+        dataSource.deleteAllFlashcards()
+        dataSource.addFlashcards(flashcard)
     }
 
     @Test
@@ -61,8 +62,7 @@ class FlashcardDetailActivityTest {
 
     @Test
     fun noAvailableFlashcard_showsFailedToLoadFlashcard() {
-        FakeFlashcardLocalDataSource.getInstance(InstrumentationRegistry.getTargetContext())
-                .deleteAllFlashcards()
+        dataSource.deleteAllFlashcards()
         createIntentAndStartActivity()
         onView(withId(R.id.flashcard_front))
                 .check(matches(withText(R.string.failed_to_load_flashcard_text)))

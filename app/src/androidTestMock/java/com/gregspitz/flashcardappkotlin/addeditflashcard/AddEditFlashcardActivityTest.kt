@@ -12,6 +12,7 @@ import android.support.test.espresso.intent.rule.IntentsTestRule
 import android.support.test.espresso.matcher.RootMatchers.withDecorView
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.runner.AndroidJUnit4
+import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.source.FakeFlashcardLocalDataSource
@@ -33,6 +34,8 @@ class AddEditFlashcardActivityTest {
 
     private val flashcard = Flashcard("0", "Front", "Back")
 
+    private val dataSource = FlashcardApplication.repoComponent.getFlashcardLocalDataSource()
+
     @Rule
     @JvmField
     val testRule = IntentsTestRule<AddEditFlashcardActivity>(AddEditFlashcardActivity::class.java,
@@ -40,10 +43,8 @@ class AddEditFlashcardActivityTest {
 
     @Before
     fun setup() {
-        FlashcardRepository.destroyInstance()
-        FakeFlashcardLocalDataSource.getInstance(
-                InstrumentationRegistry.getTargetContext()
-        ).addFlashcards(flashcard)
+        dataSource.deleteAllFlashcards()
+        dataSource.addFlashcards(flashcard)
     }
 
     @Test
@@ -86,8 +87,7 @@ class AddEditFlashcardActivityTest {
 
     @Test
     fun saveFailed_showsSaveFailedToast() {
-        FakeFlashcardLocalDataSource.getInstance(InstrumentationRegistry.getTargetContext())
-                .setFailure(true)
+        dataSource.setFailure(true)
         launchActivityWithStringIntent(flashcard.id)
         onView(withId(R.id.saveFlashcardButton)).perform(click())
         checkForToast(R.string.save_failed_toast_text)
@@ -109,8 +109,7 @@ class AddEditFlashcardActivityTest {
 
     private fun getFlashcardFromRepoById(id: String): Flashcard {
         val savedFlashcards = mutableListOf<Flashcard>()
-        FakeFlashcardLocalDataSource.getInstance(InstrumentationRegistry.getTargetContext())
-                .getFlashcard(id, object : FlashcardDataSource.GetFlashcardCallback {
+        dataSource.getFlashcard(id, object : FlashcardDataSource.GetFlashcardCallback {
                     override fun onFlashcardLoaded(flashcard: Flashcard) {
                         savedFlashcards.add(flashcard)
                     }

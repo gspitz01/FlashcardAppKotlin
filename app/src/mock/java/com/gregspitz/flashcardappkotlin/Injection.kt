@@ -7,33 +7,39 @@ import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
 import com.gregspitz.flashcardappkotlin.flashcarddetail.domain.usecase.GetFlashcard
 import com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase.GetFlashcards
 import com.gregspitz.flashcardappkotlin.randomflashcard.domain.usecase.GetRandomFlashcard
+import javax.inject.Inject
 
 /**
  * Dependency Injection object
  */
 object Injection {
 
-    fun provideFlashcardRepository(context: Context) : FlashcardRepository {
-        return FlashcardRepository.getInstance(FakeFlashcardLocalDataSource.getInstance(context))
+    // TODO: update to remove this entirely and only use Dagger
+
+    @set:Inject
+    lateinit var flashcardRepository: FlashcardRepository
+
+    init {
+        FlashcardApplication.repoComponent.inject(this)
     }
 
     fun provideUseCaseHandler() : UseCaseHandler {
         return UseCaseHandler.getInstance(UseCaseThreadPoolScheduler())
     }
 
-    fun provideGetFlashcards(context: Context) : GetFlashcards {
-        return GetFlashcards(provideFlashcardRepository(context))
+    fun provideGetFlashcards() : GetFlashcards {
+        return GetFlashcards(flashcardRepository)
     }
 
-    fun provideGetFlashcard(context: Context) : GetFlashcard {
-        return GetFlashcard(provideFlashcardRepository(context))
+    fun provideGetFlashcard() : GetFlashcard {
+        return GetFlashcard(flashcardRepository)
     }
 
-    fun provideSaveFlashcard(context: Context) : SaveFlashcard {
-        return SaveFlashcard(provideFlashcardRepository(context))
+    fun provideSaveFlashcard() : SaveFlashcard {
+        return SaveFlashcard(flashcardRepository)
     }
 
-    fun provideGetRandomFlashcard(context: Context) : GetRandomFlashcard {
-        return GetRandomFlashcard(provideFlashcardRepository(context))
+    fun provideGetRandomFlashcard() : GetRandomFlashcard {
+        return GetRandomFlashcard(flashcardRepository)
     }
 }

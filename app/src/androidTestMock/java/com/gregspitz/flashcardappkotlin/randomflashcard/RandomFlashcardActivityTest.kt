@@ -12,6 +12,7 @@ import android.support.test.espresso.matcher.ViewMatchers.withText
 import android.support.test.runner.AndroidJUnit4
 import android.view.View
 import android.widget.TextView
+import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.source.FakeFlashcardLocalDataSource
@@ -35,15 +36,15 @@ class RandomFlashcardActivityTest {
 
     private var firstText = ""
 
+    private val dataSource = FlashcardApplication.repoComponent.getFlashcardLocalDataSource()
+
     @Rule @JvmField
     val testRule = IntentsTestRule<RandomFlashcardActivity>(
             RandomFlashcardActivity::class.java, true, false)
 
     @Before
     fun setup() {
-        FlashcardRepository.destroyInstance()
-        FakeFlashcardLocalDataSource.getInstance(InstrumentationRegistry.getTargetContext())
-                .deleteAllFlashcards()
+        dataSource.deleteAllFlashcards()
     }
 
     @Test
@@ -111,9 +112,7 @@ class RandomFlashcardActivityTest {
     }
 
     private fun addFlashcardsToDataSource(vararg flashcards: Flashcard) {
-        FakeFlashcardLocalDataSource.getInstance(
-                InstrumentationRegistry.getTargetContext())
-                .addFlashcards(*flashcards)
+        dataSource.addFlashcards(*flashcards)
     }
 
     private fun launchActivity() {
