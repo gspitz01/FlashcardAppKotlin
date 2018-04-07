@@ -16,35 +16,4 @@ import java.util.concurrent.Executors
 abstract class FlashcardDatabase : RoomDatabase() {
 
     abstract fun flashcardDao(): FlashcardDao
-
-    companion object {
-        @Volatile private var instance: FlashcardDatabase? = null
-
-        fun getInstance(context: Context): FlashcardDatabase? {
-            if (instance == null) {
-                synchronized(FlashcardDatabase::class) {
-                    if (instance == null) {
-                        instance = Room.databaseBuilder(context.applicationContext,
-                                FlashcardDatabase::class.java, "flashcard.db")
-                                .addCallback(object: Callback() {
-                                    override fun onCreate(db: SupportSQLiteDatabase) {
-                                        super.onCreate(db)
-                                        Executors.newSingleThreadExecutor().execute(Runnable {
-                                            getInstance(context)!!.flashcardDao()
-                                                    .insertFlashcards(InitialData.flashcards)
-                                        })
-                                    }
-                                })
-                                .build()
-                    }
-                }
-            }
-
-            return instance
-        }
-
-        fun detroyInstance() {
-            instance = null
-        }
-    }
 }

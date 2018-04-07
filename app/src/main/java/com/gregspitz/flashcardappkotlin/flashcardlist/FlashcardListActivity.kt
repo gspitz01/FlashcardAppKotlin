@@ -29,7 +29,7 @@ class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
         flashcardRecyclerView.adapter = recyclerAdapter
 
         FlashcardListPresenter(Injection.provideUseCaseHandler(), this,
-                Injection.provideGetFlashcards(applicationContext))
+                Injection.provideGetFlashcards())
     }
 
     override fun onResume() {

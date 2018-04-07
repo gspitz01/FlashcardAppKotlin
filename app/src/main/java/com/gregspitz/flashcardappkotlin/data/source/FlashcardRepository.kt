@@ -9,11 +9,7 @@ import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 open class FlashcardRepository(private val localDataSource: FlashcardDataSource) : FlashcardDataSource {
 
     companion object : SingletonHolder<FlashcardRepository, FlashcardDataSource>(
-            ::FlashcardRepository) {
-        fun destroyInstance() {
-
-        }
-    }
+            ::FlashcardRepository)
 
     override fun getFlashcards(callback: FlashcardDataSource.GetFlashcardsCallback) {
         localDataSource.getFlashcards(callback)

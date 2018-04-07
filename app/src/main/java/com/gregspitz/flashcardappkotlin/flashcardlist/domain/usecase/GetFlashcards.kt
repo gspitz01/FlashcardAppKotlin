@@ -8,11 +8,11 @@ import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
 /**
  * A use case for retrieving all available flashcards
  */
-class GetFlashcards(private val mFlashcardRepository: FlashcardRepository)
+class GetFlashcards(private val flashcardRepository: FlashcardRepository)
     : UseCase<GetFlashcards.RequestValues, GetFlashcards.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues) {
-        mFlashcardRepository.getFlashcards(object: FlashcardDataSource.GetFlashcardsCallback {
+        flashcardRepository.getFlashcards(object: FlashcardDataSource.GetFlashcardsCallback {
             override fun onFlashcardsLoaded(flashcards: List<Flashcard>) {
                 getUseCaseCallback().onSuccess(ResponseValue(flashcards))
             }

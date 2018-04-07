@@ -28,8 +28,8 @@ class AddEditFlashcardActivity : AppCompatActivity(), AddEditFlashcardContract.V
         setContentView(R.layout.activity_add_edit_flashcard)
 
         AddEditFlashcardPresenter(Injection.provideUseCaseHandler(), this,
-                Injection.provideGetFlashcard(applicationContext),
-                Injection.provideSaveFlashcard(applicationContext))
+                Injection.provideGetFlashcard(),
+                Injection.provideSaveFlashcard())
     }
 
     override fun onResume() {

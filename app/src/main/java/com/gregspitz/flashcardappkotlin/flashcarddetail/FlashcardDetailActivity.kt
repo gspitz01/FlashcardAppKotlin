@@ -26,7 +26,7 @@ class FlashcardDetailActivity : AppCompatActivity(), FlashcardDetailContract.Vie
         setContentView(R.layout.activity_flashcard_detail)
 
         FlashcardDetailPresenter(Injection.provideUseCaseHandler(), this,
-                Injection.provideGetFlashcard(applicationContext))
+                Injection.provideGetFlashcard())
     }
 
     override fun onResume() {

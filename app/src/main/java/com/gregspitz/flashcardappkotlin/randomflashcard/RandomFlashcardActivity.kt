@@ -18,7 +18,7 @@ class RandomFlashcardActivity : AppCompatActivity(), RandomFlashcardContract.Vie
         setContentView(R.layout.activity_random_flashcard)
 
         RandomFlashcardPresenter(Injection.provideUseCaseHandler(),
-                this, Injection.provideGetRandomFlashcard(applicationContext))
+                this, Injection.provideGetRandomFlashcard())
     }
 
     override fun onResume() {

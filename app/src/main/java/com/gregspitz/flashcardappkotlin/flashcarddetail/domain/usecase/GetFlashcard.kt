@@ -8,9 +8,8 @@ import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
 /**
  * UseCase for getting a single Flashcard
  */
-class GetFlashcard(
-        private val flashcardRepository: FlashcardRepository
-) : UseCase<GetFlashcard.RequestValues, GetFlashcard.ResponseValue>() {
+class GetFlashcard(private val flashcardRepository: FlashcardRepository)
+    : UseCase<GetFlashcard.RequestValues, GetFlashcard.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues) {
         flashcardRepository.getFlashcard(requestValues.flashcardId,
