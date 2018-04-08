@@ -32,8 +32,10 @@ class RepoModule {
         val flashcardDao = flashcardDatabase.flashcardDao()
 
         // Add initial data to database
-        Executors.newSingleThreadExecutor().execute(Runnable {
-            flashcardDao.insertFlashcards(InitialData.flashcards)
+        Executors.newSingleThreadExecutor().execute({
+            if (!flashcardDao.getFlashcards().contains(InitialData.flashcards[0])) {
+                flashcardDao.insertFlashcards(InitialData.flashcards)
+            }
         })
 
         return flashcardDao
