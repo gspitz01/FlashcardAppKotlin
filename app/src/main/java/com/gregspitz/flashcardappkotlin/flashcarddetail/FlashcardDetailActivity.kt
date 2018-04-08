@@ -4,17 +4,30 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import com.gregspitz.flashcardappkotlin.Injection
+import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.R
+import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardActivity
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.flashcarddetail.domain.usecase.GetFlashcard
 import kotlinx.android.synthetic.main.activity_flashcard_detail.*
+import javax.inject.Inject
 
 class FlashcardDetailActivity : AppCompatActivity(), FlashcardDetailContract.View {
 
     private var active = false
 
     private lateinit var presenter: FlashcardDetailContract.Presenter
+
+    @Inject
+    lateinit var getFlashcard: GetFlashcard
+
+    @Inject
+    lateinit var useCaseHandler: UseCaseHandler
+
+    init {
+        FlashcardApplication.useCaseComponent.inject(this)
+    }
 
     companion object {
         const val flashcardIntentId = "flashcard_intent_id"
@@ -25,8 +38,7 @@ class FlashcardDetailActivity : AppCompatActivity(), FlashcardDetailContract.Vie
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_flashcard_detail)
 
-        FlashcardDetailPresenter(Injection.provideUseCaseHandler(), this,
-                Injection.provideGetFlashcard())
+        FlashcardDetailPresenter(useCaseHandler, this, getFlashcard)
     }
 
     override fun onResume() {

@@ -5,11 +5,12 @@ import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
 import java.util.*
+import javax.inject.Inject
 
 /**
  * Use case for retrieving a random flashcard while avoiding returning the previously seen card
  */
-class GetRandomFlashcard(private val flashcardRepository: FlashcardRepository)
+class GetRandomFlashcard @Inject constructor(private val flashcardRepository: FlashcardRepository)
     : UseCase<GetRandomFlashcard.RequestValues, GetRandomFlashcard.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues) {

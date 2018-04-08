@@ -1,5 +1,6 @@
 package com.gregspitz.flashcardappkotlin.data.source
 
+import android.util.Log
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 
 /**
@@ -55,6 +56,7 @@ class FakeFlashcardLocalDataSource : FlashcardDataSource {
     }
 
     fun addFlashcards(vararg flashcards: Flashcard) {
+        Log.d("FakeFlashcardRepo", "Adding cards: $this")
         flashcards.forEach { database[it.id] = it }
     }
 

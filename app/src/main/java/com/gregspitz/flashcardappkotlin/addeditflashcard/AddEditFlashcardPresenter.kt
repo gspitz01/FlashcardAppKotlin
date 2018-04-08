@@ -1,6 +1,5 @@
 package com.gregspitz.flashcardappkotlin.addeditflashcard
 
-import android.util.Log
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.SaveFlashcard
@@ -10,7 +9,7 @@ import com.gregspitz.flashcardappkotlin.flashcarddetail.domain.usecase.GetFlashc
 /**
  * Presenter for AddEditFlashcard view
  */
-class AddEditFlashcardPresenter(
+class AddEditFlashcardPresenter (
         private val useCaseHandler: UseCaseHandler,
         private val view: AddEditFlashcardContract.View,
         private val getFlashcard: GetFlashcard,

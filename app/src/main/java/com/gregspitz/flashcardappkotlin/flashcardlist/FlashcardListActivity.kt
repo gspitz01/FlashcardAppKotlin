@@ -5,20 +5,33 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
-import com.gregspitz.flashcardappkotlin.Injection
+import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.R
+import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardActivity
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.flashcarddetail.FlashcardDetailActivity
+import com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase.GetFlashcards
 import kotlinx.android.synthetic.main.activity_flashcard_list.*
+import javax.inject.Inject
 
 class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
 
     private lateinit var presenter : FlashcardListContract.Presenter
 
+    @Inject
+    lateinit var getFlashcards: GetFlashcards
+
+    @Inject
+    lateinit var useCaseHandler: UseCaseHandler
+
     private lateinit var recyclerAdapter : FlashcardRecyclerAdapter
 
     private var active = false
+
+    init {
+        FlashcardApplication.useCaseComponent.inject(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,8 +41,7 @@ class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
         recyclerAdapter = FlashcardRecyclerAdapter(emptyList())
         flashcardRecyclerView.adapter = recyclerAdapter
 
-        FlashcardListPresenter(Injection.provideUseCaseHandler(), this,
-                Injection.provideGetFlashcards())
+        FlashcardListPresenter(useCaseHandler, this, getFlashcards)
     }
 
     override fun onResume() {

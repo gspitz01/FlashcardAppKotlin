@@ -4,11 +4,12 @@ import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
+import javax.inject.Inject
 
 /**
  * A use case for retrieving all available flashcards
  */
-class GetFlashcards(private val flashcardRepository: FlashcardRepository)
+class GetFlashcards @Inject constructor(private val flashcardRepository: FlashcardRepository)
     : UseCase<GetFlashcards.RequestValues, GetFlashcards.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues) {

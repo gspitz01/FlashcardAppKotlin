@@ -1,7 +1,6 @@
 package com.gregspitz.flashcardappkotlin.data.source
 
 import android.support.annotation.VisibleForTesting
-import com.gregspitz.flashcardappkotlin.Injection
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.SaveFlashcard
 import com.gregspitz.flashcardappkotlin.di.AppModule
 import com.gregspitz.flashcardappkotlin.flashcarddetail.domain.usecase.GetFlashcard
@@ -17,7 +16,15 @@ import javax.inject.Singleton
 @Component(modules = [(AppModule::class), (RepoModule::class)])
 interface RepoComponent {
 
-    fun inject(injection: Injection)
+    fun inject(saveFlashcard: SaveFlashcard)
+
+    fun inject(getRandomFlashcard: GetRandomFlashcard)
+
+    fun inject(getFlashcards: GetFlashcards)
+
+    fun inject(getFlashcard: GetFlashcard)
+
+    fun exposeRepository() : FlashcardRepository
 
     @VisibleForTesting
     fun getFlashcardLocalDataSource() : FakeFlashcardLocalDataSource

@@ -3,22 +3,34 @@ package com.gregspitz.flashcardappkotlin.randomflashcard
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import com.gregspitz.flashcardappkotlin.Injection
+import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.R
+import com.gregspitz.flashcardappkotlin.UseCaseHandler
+import com.gregspitz.flashcardappkotlin.randomflashcard.domain.usecase.GetRandomFlashcard
 import kotlinx.android.synthetic.main.activity_random_flashcard.*
+import javax.inject.Inject
 
 class RandomFlashcardActivity : AppCompatActivity(), RandomFlashcardContract.View {
 
     private lateinit var presenter: RandomFlashcardContract.Presenter
 
+    @Inject
+    lateinit var getRandomFlashcard: GetRandomFlashcard
+
+    @Inject
+    lateinit var useCaseHandler: UseCaseHandler
+
     private var active = false
+
+    init {
+        FlashcardApplication.useCaseComponent.inject(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_random_flashcard)
 
-        RandomFlashcardPresenter(Injection.provideUseCaseHandler(),
-                this, Injection.provideGetRandomFlashcard())
+        RandomFlashcardPresenter(useCaseHandler, this, getRandomFlashcard)
     }
 
     override fun onResume() {

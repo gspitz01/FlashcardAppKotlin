@@ -4,15 +4,15 @@ import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
+import javax.inject.Inject
 
 /**
  * Use case for saving a flashcard
  */
-class SaveFlashcard(private val flashcardRepository: FlashcardRepository)
+class SaveFlashcard @Inject constructor(private val flashcardRepository: FlashcardRepository)
     : UseCase<SaveFlashcard.RequestValues, SaveFlashcard.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues) {
-        print("Saving flashcard")
         flashcardRepository.saveFlashcard(requestValues.flashcard,
                 object: FlashcardDataSource.SaveFlashcardCallback {
                     override fun onSaveSuccessful() {

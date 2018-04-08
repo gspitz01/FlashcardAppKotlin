@@ -5,18 +5,36 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import com.gregspitz.flashcardappkotlin.Injection
+import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.R
+import com.gregspitz.flashcardappkotlin.UseCaseHandler
+import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.SaveFlashcard
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.flashcarddetail.domain.usecase.GetFlashcard
 import com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListActivity
 import kotlinx.android.synthetic.main.activity_add_edit_flashcard.*
+import javax.inject.Inject
 
 class AddEditFlashcardActivity : AppCompatActivity(), AddEditFlashcardContract.View {
 
     private lateinit var presenter: AddEditFlashcardContract.Presenter
+
+    @Inject
+    lateinit var getFlashcard: GetFlashcard
+
+    @Inject
+    lateinit var  saveFlashcard: SaveFlashcard
+
+    @Inject
+    lateinit var useCaseHandler: UseCaseHandler
+
     private var flashcard: Flashcard? = null
 
     private var active = false
+
+    init {
+        FlashcardApplication.useCaseComponent.inject(this)
+    }
 
     companion object {
         const val flashcardIdExtra = "flashcard_id_extra"
@@ -27,9 +45,7 @@ class AddEditFlashcardActivity : AppCompatActivity(), AddEditFlashcardContract.V
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_edit_flashcard)
 
-        AddEditFlashcardPresenter(Injection.provideUseCaseHandler(), this,
-                Injection.provideGetFlashcard(),
-                Injection.provideSaveFlashcard())
+        AddEditFlashcardPresenter(useCaseHandler, this, getFlashcard, saveFlashcard)
     }
 
     override fun onResume() {
