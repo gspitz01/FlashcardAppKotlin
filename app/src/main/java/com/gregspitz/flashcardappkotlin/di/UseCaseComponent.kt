@@ -2,12 +2,10 @@ package com.gregspitz.flashcardappkotlin.di
 
 import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardActivity
 import com.gregspitz.flashcardappkotlin.data.source.RepoComponent
-import com.gregspitz.flashcardappkotlin.data.source.RepoModule
 import com.gregspitz.flashcardappkotlin.flashcarddetail.FlashcardDetailActivity
 import com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListActivity
 import com.gregspitz.flashcardappkotlin.randomflashcard.RandomFlashcardActivity
 import dagger.Component
-import javax.inject.Singleton
 
 /**
  * Dagger component for use case injection

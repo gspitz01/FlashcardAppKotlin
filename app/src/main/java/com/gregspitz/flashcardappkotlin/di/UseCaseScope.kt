@@ -3,8 +3,7 @@ package com.gregspitz.flashcardappkotlin.di
 import javax.inject.Scope
 
 /**
- * Dagger scope for UseCaseComponent
+ * Dagger scope for use cases
  */
 @Scope
-@Retention(AnnotationRetention.RUNTIME)
 annotation class UseCaseScope

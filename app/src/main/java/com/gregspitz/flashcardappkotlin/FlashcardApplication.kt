@@ -4,7 +4,9 @@ import android.app.Application
 import com.gregspitz.flashcardappkotlin.data.source.DaggerRepoComponent
 import com.gregspitz.flashcardappkotlin.data.source.RepoComponent
 import com.gregspitz.flashcardappkotlin.data.source.RepoModule
-import com.gregspitz.flashcardappkotlin.di.*
+import com.gregspitz.flashcardappkotlin.di.DaggerUseCaseComponent
+import com.gregspitz.flashcardappkotlin.di.UseCaseComponent
+import com.gregspitz.flashcardappkotlin.di.UseCaseModule
 
 /**
  * The main application class

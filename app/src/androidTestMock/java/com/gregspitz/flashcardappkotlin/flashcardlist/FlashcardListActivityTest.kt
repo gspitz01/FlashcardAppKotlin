@@ -40,7 +40,7 @@ class FlashcardListActivityTest {
 
     private val flashcard2 = Flashcard("1", "A different front", "A different back")
 
-    private val dataSource = FlashcardApplication.repoComponent.getFlashcardLocalDataSource()
+    private val dataSource = FlashcardApplication.repoComponent.exposeLocalDataSource()
 
     @Rule @JvmField
     val testRule = IntentsTestRule<FlashcardListActivity>(

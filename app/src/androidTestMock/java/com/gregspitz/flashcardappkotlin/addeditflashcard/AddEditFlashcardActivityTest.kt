@@ -34,7 +34,7 @@ class AddEditFlashcardActivityTest {
 
     private val flashcard = Flashcard("0", "Front", "Back")
 
-    private val dataSource = FlashcardApplication.repoComponent.getFlashcardLocalDataSource()
+    private val dataSource = FlashcardApplication.repoComponent.exposeLocalDataSource()
 
     @Rule
     @JvmField

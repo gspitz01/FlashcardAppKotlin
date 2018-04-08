@@ -36,7 +36,7 @@ class RandomFlashcardActivityTest {
 
     private var firstText = ""
 
-    private val dataSource = FlashcardApplication.repoComponent.getFlashcardLocalDataSource()
+    private val dataSource = FlashcardApplication.repoComponent.exposeLocalDataSource()
 
     @Rule @JvmField
     val testRule = IntentsTestRule<RandomFlashcardActivity>(
