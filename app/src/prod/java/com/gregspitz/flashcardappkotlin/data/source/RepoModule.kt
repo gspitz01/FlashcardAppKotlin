@@ -4,7 +4,8 @@ import android.app.Application
 import android.arch.persistence.db.SupportSQLiteDatabase
 import android.arch.persistence.room.Room
 import android.arch.persistence.room.RoomDatabase
-import android.content.Context
+import android.content.ContentValues
+import android.database.sqlite.SQLiteDatabase
 import com.gregspitz.flashcardappkotlin.InitialData
 import com.gregspitz.flashcardappkotlin.data.source.local.FlashcardDao
 import com.gregspitz.flashcardappkotlin.data.source.local.FlashcardDatabase
@@ -24,21 +25,32 @@ class RepoModule {
     fun provideFlashcardDatabase(application: Application) : FlashcardDatabase {
         return Room.databaseBuilder(application,
                 FlashcardDatabase::class.java, "flashcard.db")
+                .addCallback(object: RoomDatabase.Callback() {
+
+                    /*
+                     * Add initial data to the database
+                     */
+                    override fun onCreate(db: SupportSQLiteDatabase) {
+                        super.onCreate(db)
+                        Executors.newSingleThreadExecutor().execute({
+                            for (flashcard in InitialData.flashcards) {
+                                val contentValues = ContentValues()
+                                contentValues.put("id", flashcard.id)
+                                contentValues.put("front", flashcard.front)
+                                contentValues.put("back", flashcard.back)
+                                db.insert("flashcard", SQLiteDatabase.CONFLICT_REPLACE,
+                                        contentValues)
+                            }
+                        })
+
+                    }
+                })
                 .build()
     }
 
     @Provides @Singleton
     fun provideFlashcardDao(flashcardDatabase: FlashcardDatabase) : FlashcardDao {
-        val flashcardDao = flashcardDatabase.flashcardDao()
-
-        // Add initial data to database
-        Executors.newSingleThreadExecutor().execute({
-            if (!flashcardDao.getFlashcards().contains(InitialData.flashcards[0])) {
-                flashcardDao.insertFlashcards(InitialData.flashcards)
-            }
-        })
-
-        return flashcardDao
+        return flashcardDatabase.flashcardDao()
     }
 
     @Provides @Singleton

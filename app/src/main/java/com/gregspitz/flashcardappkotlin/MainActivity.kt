@@ -1,8 +1,8 @@
 package com.gregspitz.flashcardappkotlin
 
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.view.View
 import com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListActivity
 import com.gregspitz.flashcardappkotlin.randomflashcard.RandomFlashcardActivity
