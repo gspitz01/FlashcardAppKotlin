@@ -13,11 +13,11 @@ import java.util.concurrent.TimeUnit
  */
 class UseCaseThreadPoolScheduler : UseCaseScheduler {
 
-    val poolSize = 2
-    val maxPoolSize = 4
-    val timeout = 30L
+    private val poolSize = 2
+    private val maxPoolSize = 4
+    private val timeout = 30L
 
-    private var threadPoolExecutor = ThreadPoolExecutor(poolSize, maxPoolSize, timeout,
+    private val threadPoolExecutor = ThreadPoolExecutor(poolSize, maxPoolSize, timeout,
             TimeUnit.SECONDS, ArrayBlockingQueue<Runnable>(poolSize))
 
     private val handler = Handler()
