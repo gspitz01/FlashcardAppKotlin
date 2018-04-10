@@ -3,6 +3,7 @@ package com.gregspitz.flashcardappkotlin.randomflashcard
 import com.gregspitz.flashcardappkotlin.TestUseCaseScheduler
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.data.model.FlashcardSide
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
 import com.gregspitz.flashcardappkotlin.randomflashcard.domain.usecase.GetRandomFlashcard
@@ -25,9 +26,11 @@ class RandomFlashcardPresenterTest {
 
     private val randomFlashcardView: RandomFlashcardContract.View = mock()
 
+    private val randomFlashcardViewModel: RandomFlashcardContract.ViewModel = mock()
+
     private val callbackCaptor = argumentCaptor<FlashcardDataSource.GetFlashcardsCallback>()
 
-    private val flashcardFrontCaptor = argumentCaptor<String>()
+    private val flashcardCaptor = argumentCaptor<Flashcard>()
 
     private lateinit var presenter: RandomFlashcardPresenter
 
@@ -49,7 +52,8 @@ class RandomFlashcardPresenterTest {
         inOrder.verify(randomFlashcardView).setLoadingIndicator(true)
         callbackCaptor.firstValue.onFlashcardsLoaded(getSingleFlashcardList())
         inOrder.verify(randomFlashcardView).setLoadingIndicator(false)
-        verify(randomFlashcardView).showFlashcardSide(flashcard1.front)
+        verify(randomFlashcardViewModel).setFlashcard(flashcard1)
+        verify(randomFlashcardViewModel).setFlashcardSide(FlashcardSide.FRONT)
     }
 
     @Test
@@ -69,11 +73,11 @@ class RandomFlashcardPresenterTest {
         callbackCaptor.secondValue.onFlashcardsLoaded(getFlashcardList())
         inOrder.verify(randomFlashcardView).setLoadingIndicator(false)
 
-        verify(randomFlashcardView, times(2))
-                .showFlashcardSide(flashcardFrontCaptor.capture())
-        val firstFlashcardFrontShown = flashcardFrontCaptor.firstValue
-        val secondFlashcardFrontShown = flashcardFrontCaptor.secondValue
-        assertNotEquals(firstFlashcardFrontShown, secondFlashcardFrontShown)
+        verify(randomFlashcardViewModel, times(2))
+                .setFlashcard(flashcardCaptor.capture())
+        val firstFlashcardShown = flashcardCaptor.firstValue
+        val secondFlashcardShown = flashcardCaptor.secondValue
+        assertNotEquals(firstFlashcardShown, secondFlashcardShown)
     }
 
     @Test
@@ -95,10 +99,10 @@ class RandomFlashcardPresenterTest {
         callbackCaptor.secondValue.onFlashcardsLoaded(listOfSameFlashcard)
         inOrder.verify(randomFlashcardView).setLoadingIndicator(false)
 
-        verify(randomFlashcardView, times(2))
-                .showFlashcardSide(flashcardFrontCaptor.capture())
-        val firstFlashcardFrontShown = flashcardFrontCaptor.firstValue
-        val secondFlashcardFrontShown = flashcardFrontCaptor.secondValue
+        verify(randomFlashcardViewModel, times(2))
+                .setFlashcard(flashcardCaptor.capture())
+        val firstFlashcardFrontShown = flashcardCaptor.firstValue
+        val secondFlashcardFrontShown = flashcardCaptor.secondValue
         assertEquals(firstFlashcardFrontShown, secondFlashcardFrontShown)
     }
 
@@ -106,8 +110,11 @@ class RandomFlashcardPresenterTest {
     fun turnFlashcard_showsBackInView() {
         createAndStartPresenterAndSetCallbackCaptor()
         callbackCaptor.firstValue.onFlashcardsLoaded(getSingleFlashcardList())
+        whenever(randomFlashcardViewModel.getFlashcardSide()).thenReturn(FlashcardSide.FRONT)
+        val inOrder = inOrder(randomFlashcardViewModel)
+        inOrder.verify(randomFlashcardViewModel).setFlashcardSide(FlashcardSide.FRONT)
         presenter.turnFlashcard()
-        verify(randomFlashcardView).showFlashcardSide(flashcard1.back)
+        inOrder.verify(randomFlashcardViewModel).setFlashcardSide(FlashcardSide.BACK)
     }
 
     @Test
@@ -140,6 +147,7 @@ class RandomFlashcardPresenterTest {
 
     private fun createPresenter(): RandomFlashcardPresenter {
         return RandomFlashcardPresenter(UseCaseHandler(TestUseCaseScheduler()),
-                randomFlashcardView, GetRandomFlashcard(flashcardRepository))
+                randomFlashcardView, randomFlashcardViewModel,
+                GetRandomFlashcard(flashcardRepository))
     }
 }

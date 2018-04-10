@@ -1,8 +1,10 @@
 package com.gregspitz.flashcardappkotlin.randomflashcard
 
+import android.util.Log
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.data.model.FlashcardSide
 import com.gregspitz.flashcardappkotlin.randomflashcard.domain.usecase.GetRandomFlashcard
 
 /**
@@ -11,11 +13,11 @@ import com.gregspitz.flashcardappkotlin.randomflashcard.domain.usecase.GetRandom
 class RandomFlashcardPresenter(
         private val useCaseHandler: UseCaseHandler,
         private val view: RandomFlashcardContract.View,
+        private val viewModel: RandomFlashcardContract.ViewModel,
         private val getRandomFlashcard: GetRandomFlashcard
 ) : RandomFlashcardContract.Presenter {
 
     private var flashcard: Flashcard? = null
-    private var showingFront = false
 
     init {
         view.setPresenter(this)
@@ -27,13 +29,9 @@ class RandomFlashcardPresenter(
 
     override fun turnFlashcard() {
         if (view.isActive()) {
-            if (flashcard != null) {
-                if (showingFront) {
-                    view.showFlashcardSide(flashcard!!.back)
-                } else {
-                    view.showFlashcardSide(flashcard!!.front)
-                }
-                showingFront = !showingFront
+            when (viewModel.getFlashcardSide()) {
+                FlashcardSide.FRONT -> viewModel.setFlashcardSide(FlashcardSide.BACK)
+                FlashcardSide.BACK -> viewModel.setFlashcardSide(FlashcardSide.FRONT)
             }
         }
     }
@@ -50,8 +48,8 @@ class RandomFlashcardPresenter(
                         if (view.isActive()) {
                             view.setLoadingIndicator(false)
                             // Sure at this point flashcard isn't null so safe to use !!
-                            view.showFlashcardSide(flashcard!!.front)
-                            showingFront = true
+                            viewModel.setFlashcard(flashcard!!)
+                            viewModel.setFlashcardSide(FlashcardSide.FRONT)
                         }
                     }
 

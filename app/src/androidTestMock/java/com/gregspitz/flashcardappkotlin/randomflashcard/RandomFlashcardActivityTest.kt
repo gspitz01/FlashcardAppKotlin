@@ -1,6 +1,7 @@
 package com.gregspitz.flashcardappkotlin.randomflashcard
 
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.support.test.InstrumentationRegistry
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.click
@@ -76,6 +77,19 @@ class RandomFlashcardActivityTest {
         onView(withId(R.id.nextFlashcardButton)).perform(click())
         val secondText = getSecondText(flashcard1.front, flashcard2.front)
         onView(withId(R.id.flashcardSide)).check(matches(withText(secondText)))
+    }
+
+    @Test
+    fun onScreenRotation_maintainsSameFlashcard() {
+        // Make sure emulator or device currently allows screen rotation for this test to work
+        addFlashcardsToDataSource(flashcard1, flashcard2)
+        launchActivity()
+
+        testRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        onView(withId(R.id.flashcardSide))
+                .check(matches(withTextOfOneOf(flashcard1.front, flashcard2.front)))
+        testRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        onView(withId(R.id.flashcardSide)).check(matches(withText(firstText)))
     }
 
     @Test
