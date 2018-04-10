@@ -1,6 +1,7 @@
 package com.gregspitz.flashcardappkotlin.flashcarddetail
 
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.support.test.InstrumentationRegistry
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.click
@@ -73,6 +74,17 @@ class FlashcardDetailActivityTest {
         testRule.launchActivity(Intent())
         onView(withId(R.id.flashcard_front))
                 .check(matches(withText(R.string.failed_to_load_flashcard_text)))
+    }
+
+    @Test
+    fun onOrientationChange_maintainsSameFlashcardDetails() {
+        createIntentAndStartActivity()
+        testRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        onView(withId(R.id.flashcard_front)).check(matches(withText(flashcard.front)))
+        onView(withId(R.id.flashcard_back)).check(matches(withText(flashcard.back)))
+        testRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        onView(withId(R.id.flashcard_front)).check(matches(withText(flashcard.front)))
+        onView(withId(R.id.flashcard_back)).check(matches(withText(flashcard.back)))
     }
 
     private fun createIntentAndStartActivity() {

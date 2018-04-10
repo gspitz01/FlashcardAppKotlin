@@ -12,8 +12,6 @@ interface FlashcardDetailContract {
 
         fun setLoadingIndicator(active: Boolean)
 
-        fun showFlashcard(flashcard: Flashcard)
-
         fun showEditFlashcard(flashcardId: String)
 
         fun showFailedToLoadFlashcard()
@@ -28,5 +26,12 @@ interface FlashcardDetailContract {
         fun loadFlashcard(flashcardId: String)
 
         fun editFlashcard()
+    }
+
+    interface ViewModel {
+
+        fun setFlashcard(flashcard: Flashcard)
+
+        fun getFlashcard() : Flashcard?
     }
 }

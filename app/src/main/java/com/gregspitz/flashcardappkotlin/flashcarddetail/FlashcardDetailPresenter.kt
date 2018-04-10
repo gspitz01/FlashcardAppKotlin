@@ -11,6 +11,7 @@ import com.gregspitz.flashcardappkotlin.flashcarddetail.domain.usecase.GetFlashc
 class FlashcardDetailPresenter(
         private val useCaseHandler: UseCaseHandler,
         private val view: FlashcardDetailContract.View,
+        private val viewModel: FlashcardDetailContract.ViewModel,
         private val getFlashcard: GetFlashcard
 ) : FlashcardDetailContract.Presenter {
 
@@ -33,7 +34,7 @@ class FlashcardDetailPresenter(
                         flashcard = response.flashcard
                         if (view.isActive()) {
                             view.setLoadingIndicator(false)
-                            view.showFlashcard(response.flashcard)
+                            viewModel.setFlashcard(response.flashcard)
                         }
                     }
 

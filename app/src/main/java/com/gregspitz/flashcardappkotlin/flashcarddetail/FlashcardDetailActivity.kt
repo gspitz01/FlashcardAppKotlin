@@ -1,5 +1,7 @@
 package com.gregspitz.flashcardappkotlin.flashcarddetail
 
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -25,6 +27,8 @@ class FlashcardDetailActivity : AppCompatActivity(), FlashcardDetailContract.Vie
     @Inject
     lateinit var useCaseHandler: UseCaseHandler
 
+    private lateinit var viewModel: FlashcardDetailViewModel
+
     init {
         FlashcardApplication.useCaseComponent.inject(this)
     }
@@ -38,13 +42,24 @@ class FlashcardDetailActivity : AppCompatActivity(), FlashcardDetailContract.Vie
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_flashcard_detail)
 
-        FlashcardDetailPresenter(useCaseHandler, this, getFlashcard)
+        viewModel = ViewModelProviders.of(this).get(FlashcardDetailViewModel::class.java)
+
+        val flashcardObserver = Observer<Flashcard> {
+            flashcard_front.text = it?.front
+            flashcard_back.text = it?.back
+        }
+
+        viewModel.flashcard.observe(this, flashcardObserver)
+
+        FlashcardDetailPresenter(useCaseHandler, this, viewModel, getFlashcard)
     }
 
     override fun onResume() {
         super.onResume()
         active = true
-        presenter.start()
+        if (viewModel.flashcard.value == null) {
+            presenter.start()
+        }
     }
 
     override fun onPause() {
@@ -54,21 +69,13 @@ class FlashcardDetailActivity : AppCompatActivity(), FlashcardDetailContract.Vie
 
     override fun setPresenter(presenter: FlashcardDetailContract.Presenter) {
         this.presenter = presenter
-        editFlashcardButton.setOnClickListener(object: View.OnClickListener {
-            override fun onClick(v: View?) {
-                this@FlashcardDetailActivity.presenter.editFlashcard()
-            }
-
-        })
+        editFlashcardButton.setOnClickListener {
+            this@FlashcardDetailActivity.presenter.editFlashcard()
+        }
     }
 
     override fun setLoadingIndicator(active: Boolean) {
         // TODO: implement
-    }
-
-    override fun showFlashcard(flashcard: Flashcard) {
-        flashcard_front.text = flashcard.front
-        flashcard_back.text = flashcard.back
     }
 
     override fun showEditFlashcard(flashcardId: String) {

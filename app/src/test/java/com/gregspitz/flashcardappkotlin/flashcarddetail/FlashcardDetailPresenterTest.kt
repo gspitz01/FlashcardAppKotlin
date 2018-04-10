@@ -21,6 +21,8 @@ class FlashcardDetailPresenterTest {
 
     private val flashcardDetailView: FlashcardDetailContract.View = mock()
 
+    private val flashcardDetailViewModel: FlashcardDetailContract.ViewModel = mock()
+
     private val callbackCaptor = argumentCaptor<FlashcardDataSource.GetFlashcardCallback>()
 
     private lateinit var presenter: FlashcardDetailPresenter
@@ -47,7 +49,7 @@ class FlashcardDetailPresenterTest {
         callbackCaptor.firstValue.onFlashcardLoaded(flashcard)
 
         inOrder.verify(flashcardDetailView).setLoadingIndicator(false)
-        verify(flashcardDetailView).showFlashcard(flashcard)
+        verify(flashcardDetailViewModel).setFlashcard(flashcard)
     }
 
     @Test
@@ -79,6 +81,6 @@ class FlashcardDetailPresenterTest {
 
     private fun createPresenter(): FlashcardDetailPresenter {
         return FlashcardDetailPresenter(UseCaseHandler(TestUseCaseScheduler()),
-                flashcardDetailView, GetFlashcard(flashcardRepository))
+                flashcardDetailView, flashcardDetailViewModel, GetFlashcard(flashcardRepository))
     }
 }
