@@ -14,17 +14,17 @@ import kotlinx.android.synthetic.main.flashcard_list_holder.view.*
 class FlashcardRecyclerAdapter(private var flashcards: List<Flashcard>)
     : RecyclerView.Adapter<FlashcardRecyclerAdapter.Holder>() {
 
-    private lateinit var presenter: FlashcardListContract.Presenter
-
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): Holder {
-        val view = LayoutInflater.from(parent?.context).inflate(R.layout.flashcard_list_holder,
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.flashcard_list_holder,
                 parent, false)
         return Holder(view)
     }
 
-    override fun onBindViewHolder(holder: Holder?, position: Int) {
-        holder?.setFlashcard(flashcards.get(position))
+    override fun onBindViewHolder(holder: Holder, position: Int) {
+        holder.setFlashcard(flashcards[position])
     }
+
+    private lateinit var presenter: FlashcardListContract.Presenter
 
     override fun getItemCount(): Int = flashcards.size
 
@@ -40,12 +40,9 @@ class FlashcardRecyclerAdapter(private var flashcards: List<Flashcard>)
     inner class Holder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun setFlashcard(flashcard: Flashcard) {
             itemView.flashcard_front.text = flashcard.front
-            itemView.setOnClickListener(object: View.OnClickListener {
-                override fun onClick(v: View?) {
-                    presenter.onFlashcardClick(flashcards[adapterPosition].id)
-                }
-
-            })
+            itemView.setOnClickListener {
+                presenter.onFlashcardClick(flashcards[adapterPosition].id)
+            }
         }
     }
 
