@@ -25,3 +25,22 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+ext {
+    compileSdkVersion = 27
+    targetSdkVersion = 27
+    minSdkVersion = 21
+
+    supportLibraryVersion = '27.1.1'
+    constraintLayoutVersion = '1.0.2'
+    archLifecycleVersion = '1.1.1'
+    archRoomVersion = '1.0.0'
+    daggerVersion = '2.12'
+    kaptDaggerCompilerVersion = '2.13'
+    junitVersion = '4.12'
+    junitPlatformRunnerVersion = '1.0.0-M3'
+    mockitoKotlinVersion = '1.5.0'
+    spekVersion = '1.1.0-beta3'
+    supportTestRunnerVersion = '1.0.1'
+    espressoVersion = '3.0.1'
+}
