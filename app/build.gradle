@@ -1,9 +1,6 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
-
 apply plugin: 'kotlin-kapt'
 
 android {
@@ -59,10 +56,6 @@ android {
     }
 }
 
-repositories {
-    maven { url "http://dl.bintray.com/jetbrains/spek" }
-}
-
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
@@ -83,11 +76,6 @@ dependencies {
 
     testImplementation "junit:junit:$rootProject.ext.junitVersion"
     testImplementation "com.nhaarman:mockito-kotlin:$rootProject.ext.mockitoKotlinVersion"
-
-    // Spek
-    testImplementation "org.jetbrains.spek:spek-api:$rootProject.ext.spekVersion"
-    testImplementation "org.jetbrains.spek:spek-junit-platform-engine:$rootProject.ext.spekVersion"
-    testImplementation "org.junit.platform:junit-platform-runner:$rootProject.ext.junitPlatformRunnerVersion"
 
     androidTestImplementation "com.android.support.test:runner:$rootProject.ext.supportTestRunnerVersion"
     androidTestImplementation "com.android.support.test.espresso:espresso-core:$rootProject.ext.espressoVersion"
