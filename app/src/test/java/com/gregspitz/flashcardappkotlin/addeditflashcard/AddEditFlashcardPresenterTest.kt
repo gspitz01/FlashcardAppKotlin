@@ -1,16 +1,14 @@
 package com.gregspitz.flashcardappkotlin.addeditflashcard
 
-import com.gregspitz.flashcardappkotlin.TestUseCaseScheduler
+import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.SaveFlashcard
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
-import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
-import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
 import com.gregspitz.flashcardappkotlin.flashcarddetail.domain.usecase.GetFlashcard
 import com.nhaarman.mockito_kotlin.*
+import junit.framework.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Captor
 
 /**
  * Tests for the implementation of {@link AddEditFlashcardPresenter}
@@ -19,15 +17,25 @@ class AddEditFlashcardPresenterTest {
 
     private val flashcard = Flashcard("0", "Front", "Back")
 
-    private val flashcardRepository: FlashcardRepository = mock()
+    private val response = GetFlashcard.ResponseValue(flashcard)
 
     private val view: AddEditFlashcardContract.View = mock()
 
-    @Captor
-    private val getCallbackCaptor = argumentCaptor<FlashcardDataSource.GetFlashcardCallback>()
+    private val getFlashcard: GetFlashcard = mock()
 
-    @Captor
-    private val saveCallbackCaptor = argumentCaptor<FlashcardDataSource.SaveFlashcardCallback>()
+    private val saveFlashcard: SaveFlashcard = mock()
+
+    private val useCaseHandler: UseCaseHandler = mock()
+
+    private val getRequestCaptor = argumentCaptor<GetFlashcard.RequestValues>()
+
+    private val saveRequestCaptor = argumentCaptor<SaveFlashcard.RequestValues>()
+
+    private val getFlashcardCallbackCaptor =
+            argumentCaptor<UseCase.UseCaseCallback<GetFlashcard.ResponseValue>>()
+
+    private val saveFlashcardCallbackCaptor =
+            argumentCaptor<UseCase.UseCaseCallback<SaveFlashcard.ResponseValue>>()
 
     private lateinit var presenter: AddEditFlashcardPresenter
 
@@ -45,41 +53,53 @@ class AddEditFlashcardPresenterTest {
 
     @Test
     fun onStart_showsFlashcardInView() {
-        createAndStartPresenterAndSetCallbackCaptor()
+        createAndStartPresenter()
         val inOrder = inOrder(view)
         inOrder.verify(view).setLoadingIndicator(true)
-        getCallbackCaptor.firstValue.onFlashcardLoaded(flashcard)
+        verifyGetCallbackSuccess()
+        assertEquals(flashcard.id, getRequestCaptor.firstValue.flashcardId)
         inOrder.verify(view).setLoadingIndicator(false)
         verify(view).showFlashcard(flashcard)
     }
 
     @Test
-    fun flashcardNotAvailable_showsFailedToLoadInView() {
-        createAndStartPresenterAndSetCallbackCaptor()
+    fun onError_showsFailedToLoadInView() {
+        createAndStartPresenter()
         val inOrder = inOrder(view)
         inOrder.verify(view).setLoadingIndicator(true)
-        getCallbackCaptor.firstValue.onDataNotAvailable()
+        verifyGetCallbackFailure()
         inOrder.verify(view).setLoadingIndicator(false)
         verify(view).showFailedToLoadFlashcard()
     }
 
     @Test
     fun saveFlashcard_savesToRepositoryAndShowsSaveSuccessInView() {
-        createAndStartPresenterAndSetCallbackCaptor()
-        getCallbackCaptor.firstValue.onFlashcardLoaded(flashcard)
+        createAndStartPresenter()
+        val inOrder = inOrder(useCaseHandler)
+        inOrder.verify(useCaseHandler).execute(eq(getFlashcard), getRequestCaptor.capture(),
+                getFlashcardCallbackCaptor.capture())
+        getFlashcardCallbackCaptor.firstValue.onSuccess(response)
         presenter.saveFlashcard(flashcard)
-        verify(flashcardRepository).saveFlashcard(eq(flashcard), saveCallbackCaptor.capture())
-        saveCallbackCaptor.firstValue.onSaveSuccessful()
+        inOrder.verify(useCaseHandler).execute(eq(saveFlashcard), saveRequestCaptor.capture(),
+                saveFlashcardCallbackCaptor.capture())
+        assertEquals(flashcard, saveRequestCaptor.firstValue.flashcard)
+        val saveResponse = SaveFlashcard.ResponseValue()
+        saveFlashcardCallbackCaptor.firstValue.onSuccess(saveResponse)
         verify(view).showSaveSuccessful()
     }
 
     @Test
     fun saveFailed_showSaveFailedInView() {
-        createAndStartPresenterAndSetCallbackCaptor()
-        getCallbackCaptor.firstValue.onFlashcardLoaded(flashcard)
+        createAndStartPresenter()
+        val inOrder = inOrder(useCaseHandler)
+        inOrder.verify(useCaseHandler).execute(eq(getFlashcard), getRequestCaptor.capture(),
+                getFlashcardCallbackCaptor.capture())
+        getFlashcardCallbackCaptor.firstValue.onSuccess(response)
         presenter.saveFlashcard(flashcard)
-        verify(flashcardRepository).saveFlashcard(eq(flashcard), saveCallbackCaptor.capture())
-        saveCallbackCaptor.firstValue.onSaveFailed()
+        inOrder.verify(useCaseHandler).execute(eq(saveFlashcard), saveRequestCaptor.capture(),
+                saveFlashcardCallbackCaptor.capture())
+        assertEquals(flashcard, saveRequestCaptor.firstValue.flashcard)
+        saveFlashcardCallbackCaptor.firstValue.onError()
         verify(view).showSaveFailed()
     }
 
@@ -90,14 +110,27 @@ class AddEditFlashcardPresenterTest {
         verify(view).showFlashcardList()
     }
 
-    private fun createAndStartPresenterAndSetCallbackCaptor() {
+    private fun verifyGetCallbackSuccess() {
+        verifyGetCallback()
+        getFlashcardCallbackCaptor.firstValue.onSuccess(response)
+    }
+
+    private fun verifyGetCallbackFailure() {
+        verifyGetCallback()
+        getFlashcardCallbackCaptor.firstValue.onError()
+    }
+
+    private fun verifyGetCallback() {
+        verify(useCaseHandler).execute(eq(getFlashcard), getRequestCaptor.capture(),
+                getFlashcardCallbackCaptor.capture())
+    }
+
+    private fun createAndStartPresenter() {
         presenter = createPresenter()
         presenter.start()
-        verify(flashcardRepository).getFlashcard(eq(flashcard.id), getCallbackCaptor.capture())
     }
 
     private fun createPresenter(): AddEditFlashcardPresenter {
-        return AddEditFlashcardPresenter(UseCaseHandler(TestUseCaseScheduler()),
-                view, GetFlashcard(flashcardRepository), SaveFlashcard(flashcardRepository))
+        return AddEditFlashcardPresenter(useCaseHandler, view, getFlashcard, saveFlashcard)
     }
 }
