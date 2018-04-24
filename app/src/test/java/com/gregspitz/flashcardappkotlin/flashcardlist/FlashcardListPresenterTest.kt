@@ -1,10 +1,8 @@
 package com.gregspitz.flashcardappkotlin.flashcardlist
 
-import com.gregspitz.flashcardappkotlin.TestUseCaseScheduler
+import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
-import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
-import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
 import com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase.GetFlashcards
 import com.nhaarman.mockito_kotlin.*
 import org.junit.Before
@@ -20,78 +18,73 @@ class FlashcardListPresenterTest {
 
     private val flashcard2 = Flashcard("1", "A different front", "A different back")
 
-    private val mFlashcardRepository : FlashcardRepository = mock()
+    private val getFlashcards: GetFlashcards = mock()
 
-    private val mFlashcardListView : FlashcardListContract.View = mock()
+    private val useCaseHandler: UseCaseHandler = mock()
 
-    private val mCallbackArgumentCaptor = argumentCaptor<FlashcardDataSource.GetFlashcardsCallback>()
+    private val flashcardListView : FlashcardListContract.View = mock()
 
-    private lateinit var mFlashcardListPresenter: FlashcardListPresenter
+    private val useCaseCallbackCaptor =
+            argumentCaptor<UseCase.UseCaseCallback<GetFlashcards.ResponseValue>>()
+
+    private lateinit var flashcardListPresenter: FlashcardListPresenter
 
     @Before
     fun setup() {
-        whenever(mFlashcardListView.isActive()).thenReturn(true)
+        whenever(flashcardListView.isActive()).thenReturn(true)
     }
 
     @Test
     fun creation_setsPresenterOnView() {
-        mFlashcardListPresenter = createPresenter()
-        verify(mFlashcardListView).setPresenter(mFlashcardListPresenter)
+        flashcardListPresenter = createPresenter()
+        verify(flashcardListView).setPresenter(flashcardListPresenter)
     }
 
     @Test
     fun startup_showsFlashcardListInView() {
-        createAndStartPresenterAndSetGetFlashcardsCallbackCaptor()
-        val inOrder = inOrder(mFlashcardListView)
-        inOrder.verify(mFlashcardListView).setLoadingIndicator(true)
-        // Trigger callback with list of flashcards
+        createAndStartPresenter()
+        val inOrder = inOrder(flashcardListView)
+        inOrder.verify(flashcardListView).setLoadingIndicator(true)
+        verify(useCaseHandler).execute(eq(getFlashcards), any(), useCaseCallbackCaptor.capture())
         val flashcards = getTestFlashcardsList()
-        mCallbackArgumentCaptor.firstValue.onFlashcardsLoaded(flashcards)
-        inOrder.verify(mFlashcardListView).setLoadingIndicator(false)
-        verify(mFlashcardListView).showFlashcards(flashcards)
+        val response = GetFlashcards.ResponseValue(flashcards)
+        useCaseCallbackCaptor.firstValue.onSuccess(response)
+        inOrder.verify(flashcardListView).setLoadingIndicator(false)
+        verify(flashcardListView).showFlashcards(flashcards)
     }
 
     @Test
-    fun noFlashcardsToLoad_showsFailedToLoadInView() {
-        createAndStartPresenterAndSetGetFlashcardsCallbackCaptor()
-        mCallbackArgumentCaptor.firstValue.onDataNotAvailable()
-        verify(mFlashcardListView).showFailedToLoadFlashcards()
-    }
-
-    @Test
-    fun emptyListOfFlashcards_showsNoFlashcardsToLoadInView() {
-        createAndStartPresenterAndSetGetFlashcardsCallbackCaptor()
-        mCallbackArgumentCaptor.firstValue.onFlashcardsLoaded(emptyList())
-        verify(mFlashcardListView).showNoFlashcardsToLoad()
+    fun onError_showsFailedToLoadInView() {
+        createAndStartPresenter()
+        verify(useCaseHandler).execute(eq(getFlashcards), any(), useCaseCallbackCaptor.capture())
+        useCaseCallbackCaptor.firstValue.onError()
+        verify(flashcardListView).showFailedToLoadFlashcards()
     }
 
     @Test
     fun addFlashcard_showsAddFlashcard() {
-        createAndStartPresenterAndSetGetFlashcardsCallbackCaptor()
-        mFlashcardListPresenter.addFlashcard()
-        verify(mFlashcardListView).showAddFlashcard()
+        createAndStartPresenter()
+        flashcardListPresenter.addFlashcard()
+        verify(flashcardListView).showAddFlashcard()
     }
 
     @Test
     fun onFlashcardClick_showsFlashcardDetails() {
-        createAndStartPresenterAndSetGetFlashcardsCallbackCaptor()
-        mFlashcardListPresenter.onFlashcardClick(flashcard1.id)
-        verify(mFlashcardListView).showFlashcardDetailsUi(flashcard1.id)
+        createAndStartPresenter()
+        flashcardListPresenter.onFlashcardClick(flashcard1.id)
+        verify(flashcardListView).showFlashcardDetailsUi(flashcard1.id)
     }
 
     private fun getTestFlashcardsList(): List<Flashcard> {
         return Arrays.asList(flashcard1, flashcard2)
     }
 
-    private fun createAndStartPresenterAndSetGetFlashcardsCallbackCaptor() {
-        mFlashcardListPresenter = createPresenter()
-        mFlashcardListPresenter.start()
-        verify(mFlashcardRepository).getFlashcards(mCallbackArgumentCaptor.capture())
+    private fun createAndStartPresenter() {
+        flashcardListPresenter = createPresenter()
+        flashcardListPresenter.start()
     }
 
     private fun createPresenter(): FlashcardListPresenter {
-        return FlashcardListPresenter(
-                UseCaseHandler(TestUseCaseScheduler()),
-                mFlashcardListView, GetFlashcards(mFlashcardRepository))
+        return FlashcardListPresenter(useCaseHandler, flashcardListView, getFlashcards)
     }
 }
