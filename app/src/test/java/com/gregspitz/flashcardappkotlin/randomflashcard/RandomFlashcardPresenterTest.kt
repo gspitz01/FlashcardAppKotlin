@@ -1,17 +1,17 @@
 package com.gregspitz.flashcardappkotlin.randomflashcard
 
-import com.gregspitz.flashcardappkotlin.TestUseCaseScheduler
+import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardSide
-import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
-import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
 import com.gregspitz.flashcardappkotlin.randomflashcard.domain.usecase.GetRandomFlashcard
 import com.nhaarman.mockito_kotlin.*
-import org.junit.Assert.assertEquals
+import junit.framework.Assert.assertEquals
+import junit.framework.Assert.assertNull
 import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Test
+import org.mockito.InOrder
 
 /**
  * Tests for the implementation of {@link RandomFlashcardPresenter}
@@ -20,15 +20,24 @@ class RandomFlashcardPresenterTest {
 
     private val flashcard1 = Flashcard("0", "Front", "Back")
 
+    private val response1 = GetRandomFlashcard.ResponseValue(flashcard1)
+
     private val flashcard2 = Flashcard("1", "An affront", "Taken aback")
 
-    private val flashcardRepository: FlashcardRepository = mock()
+    private val response2 = GetRandomFlashcard.ResponseValue(flashcard2)
+
+    private val getRandomFlashcard: GetRandomFlashcard = mock()
+
+    private val useCaseHandler: UseCaseHandler = mock()
 
     private val randomFlashcardView: RandomFlashcardContract.View = mock()
 
     private val randomFlashcardViewModel: RandomFlashcardContract.ViewModel = mock()
 
-    private val callbackCaptor = argumentCaptor<FlashcardDataSource.GetFlashcardsCallback>()
+    private val useCaseCallbackCaptor =
+            argumentCaptor<UseCase.UseCaseCallback<GetRandomFlashcard.ResponseValue>>()
+
+    private val requestCaptor = argumentCaptor<GetRandomFlashcard.RequestValues>()
 
     private val flashcardCaptor = argumentCaptor<Flashcard>()
 
@@ -47,30 +56,37 @@ class RandomFlashcardPresenterTest {
 
     @Test
     fun onStart_showsFrontOfOnlyFlashcardIfThereIsOnlyOne() {
-        createAndStartPresenterAndSetCallbackCaptor()
-        val inOrder = inOrder(randomFlashcardView)
-        inOrder.verify(randomFlashcardView).setLoadingIndicator(true)
-        callbackCaptor.firstValue.onFlashcardsLoaded(getSingleFlashcardList())
+        createAndStartPresenter()
+        val inOrder = verifyLoadingIndicatorInOrderStart()
+        verify(useCaseHandler)
+                .execute(eq(getRandomFlashcard), any(), useCaseCallbackCaptor.capture())
+        useCaseCallbackCaptor.firstValue.onSuccess(response1)
         inOrder.verify(randomFlashcardView).setLoadingIndicator(false)
         verify(randomFlashcardViewModel).setFlashcard(flashcard1)
         verify(randomFlashcardViewModel).setFlashcardSide(FlashcardSide.FRONT)
     }
 
     @Test
-    fun onNewFlashcard_loadsDifferentFlashcardIfMultiple() {
-        presenter = createPresenter()
-        presenter.start()
-        val inOrder = inOrder(randomFlashcardView)
-        val repoInOrder = inOrder(flashcardRepository)
-        repoInOrder.verify(flashcardRepository).getFlashcards(callbackCaptor.capture())
-        inOrder.verify(randomFlashcardView).setLoadingIndicator(true)
-        callbackCaptor.firstValue.onFlashcardsLoaded(getFlashcardList())
+    fun onNewFlashcard_loadsDifferentFlashcard() {
+        createAndStartPresenter()
+        val inOrder = verifyLoadingIndicatorInOrderStart()
+        val useCaseHandlerInOrder = inOrder(useCaseHandler)
+        useCaseHandlerInOrder.verify(useCaseHandler).execute(eq(getRandomFlashcard),
+                requestCaptor.capture(), useCaseCallbackCaptor.capture())
+
+        assertNull(requestCaptor.firstValue.flashcardId)
+
+        useCaseCallbackCaptor.firstValue.onSuccess(response1)
         inOrder.verify(randomFlashcardView).setLoadingIndicator(false)
 
         presenter.loadNewFlashcard()
-        repoInOrder.verify(flashcardRepository).getFlashcards(callbackCaptor.capture())
         inOrder.verify(randomFlashcardView).setLoadingIndicator(true)
-        callbackCaptor.secondValue.onFlashcardsLoaded(getFlashcardList())
+        useCaseHandlerInOrder.verify(useCaseHandler).execute(eq(getRandomFlashcard),
+                requestCaptor.capture(), useCaseCallbackCaptor.capture())
+
+        assertEquals(flashcard1.id, requestCaptor.secondValue.flashcardId)
+
+        useCaseCallbackCaptor.secondValue.onSuccess(response2)
         inOrder.verify(randomFlashcardView).setLoadingIndicator(false)
 
         verify(randomFlashcardViewModel, times(2))
@@ -80,36 +96,13 @@ class RandomFlashcardPresenterTest {
         assertNotEquals(firstFlashcardShown, secondFlashcardShown)
     }
 
-    @Test
-    fun allFlashcardsHaveSameId_canRepeatFlashcardOnLoadNew() {
-        // This test is really just to make sure it doesn't end up in an infinite loop
-        val listOfSameFlashcard = listOf(flashcard1, flashcard1)
-        presenter = createPresenter()
-        presenter.start()
-        val inOrder = inOrder(randomFlashcardView)
-        val repoInOrder = inOrder(flashcardRepository)
-        repoInOrder.verify(flashcardRepository).getFlashcards(callbackCaptor.capture())
-        inOrder.verify(randomFlashcardView).setLoadingIndicator(true)
-        callbackCaptor.firstValue.onFlashcardsLoaded(listOfSameFlashcard)
-        inOrder.verify(randomFlashcardView).setLoadingIndicator(false)
-
-        presenter.loadNewFlashcard()
-        repoInOrder.verify(flashcardRepository).getFlashcards(callbackCaptor.capture())
-        inOrder.verify(randomFlashcardView).setLoadingIndicator(true)
-        callbackCaptor.secondValue.onFlashcardsLoaded(listOfSameFlashcard)
-        inOrder.verify(randomFlashcardView).setLoadingIndicator(false)
-
-        verify(randomFlashcardViewModel, times(2))
-                .setFlashcard(flashcardCaptor.capture())
-        val firstFlashcardFrontShown = flashcardCaptor.firstValue
-        val secondFlashcardFrontShown = flashcardCaptor.secondValue
-        assertEquals(firstFlashcardFrontShown, secondFlashcardFrontShown)
-    }
 
     @Test
     fun turnFlashcard_showsBackInView() {
-        createAndStartPresenterAndSetCallbackCaptor()
-        callbackCaptor.firstValue.onFlashcardsLoaded(getSingleFlashcardList())
+        createAndStartPresenter()
+        verify(useCaseHandler)
+                .execute(eq(getRandomFlashcard), any(), useCaseCallbackCaptor.capture())
+        useCaseCallbackCaptor.firstValue.onSuccess(response1)
         whenever(randomFlashcardViewModel.getFlashcardSide()).thenReturn(FlashcardSide.FRONT)
         val inOrder = inOrder(randomFlashcardViewModel)
         inOrder.verify(randomFlashcardViewModel).setFlashcardSide(FlashcardSide.FRONT)
@@ -118,36 +111,27 @@ class RandomFlashcardPresenterTest {
     }
 
     @Test
-    fun onNoDataNotAvailable_showsFailedToLoadFlashcardInView() {
-        createAndStartPresenterAndSetCallbackCaptor()
-        callbackCaptor.firstValue.onDataNotAvailable()
+    fun onDataNotAvailable_showsFailedToLoadFlashcardInView() {
+        createAndStartPresenter()
+        verify(useCaseHandler)
+                .execute(eq(getRandomFlashcard), any(), useCaseCallbackCaptor.capture())
+        useCaseCallbackCaptor.firstValue.onError()
         verify(randomFlashcardView).showFailedToLoadFlashcard()
     }
 
-    @Test
-    fun onEmptyFlashcardList_showsFailedToLoadFlashcardInView() {
-        createAndStartPresenterAndSetCallbackCaptor()
-        callbackCaptor.firstValue.onFlashcardsLoaded(emptyList())
-        verify(randomFlashcardView).showFailedToLoadFlashcard()
+    private fun verifyLoadingIndicatorInOrderStart() : InOrder {
+        val inOrder = inOrder(randomFlashcardView)
+        inOrder.verify(randomFlashcardView).setLoadingIndicator(true)
+        return inOrder
     }
 
-    private fun getSingleFlashcardList(): List<Flashcard> {
-        return listOf(flashcard1)
-    }
-
-    private fun getFlashcardList(): List<Flashcard> {
-        return listOf(flashcard1, flashcard2)
-    }
-
-    private fun createAndStartPresenterAndSetCallbackCaptor() {
+    private fun createAndStartPresenter() {
         presenter = createPresenter()
         presenter.start()
-        verify(flashcardRepository).getFlashcards(callbackCaptor.capture())
     }
 
     private fun createPresenter(): RandomFlashcardPresenter {
-        return RandomFlashcardPresenter(UseCaseHandler(TestUseCaseScheduler()),
-                randomFlashcardView, randomFlashcardViewModel,
-                GetRandomFlashcard(flashcardRepository))
+        return RandomFlashcardPresenter(useCaseHandler, randomFlashcardView,
+                randomFlashcardViewModel, getRandomFlashcard)
     }
 }
