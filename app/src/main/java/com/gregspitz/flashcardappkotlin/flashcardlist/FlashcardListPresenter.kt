@@ -9,6 +9,7 @@ import com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase.GetFlashcar
  */
 class FlashcardListPresenter(private val useCaseHandler: UseCaseHandler,
                              private val view: FlashcardListContract.View,
+                             private val viewModel: FlashcardListContract.ViewModel,
                              private val getFlashcards: GetFlashcards)
     : FlashcardListContract.Presenter {
 
@@ -32,7 +33,7 @@ class FlashcardListPresenter(private val useCaseHandler: UseCaseHandler,
                         if (view.isActive()) {
                             view.setLoadingIndicator(false)
                             if (response.flashcards.isNotEmpty()) {
-                                view.showFlashcards(response.flashcards)
+                                viewModel.setFlashcards(response.flashcards)
                             } else {
                                 view.showNoFlashcardsToLoad()
                             }

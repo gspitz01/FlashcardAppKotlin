@@ -24,6 +24,8 @@ class FlashcardListPresenterTest {
 
     private val flashcardListView : FlashcardListContract.View = mock()
 
+    private val flashcardListViewModel: FlashcardListContract.ViewModel = mock()
+
     private val useCaseCallbackCaptor =
             argumentCaptor<UseCase.UseCaseCallback<GetFlashcards.ResponseValue>>()
 
@@ -50,7 +52,7 @@ class FlashcardListPresenterTest {
         val response = GetFlashcards.ResponseValue(flashcards)
         useCaseCallbackCaptor.firstValue.onSuccess(response)
         inOrder.verify(flashcardListView).setLoadingIndicator(false)
-        verify(flashcardListView).showFlashcards(flashcards)
+        verify(flashcardListViewModel).setFlashcards(flashcards)
     }
 
     @Test
@@ -85,6 +87,7 @@ class FlashcardListPresenterTest {
     }
 
     private fun createPresenter(): FlashcardListPresenter {
-        return FlashcardListPresenter(useCaseHandler, flashcardListView, getFlashcards)
+        return FlashcardListPresenter(useCaseHandler, flashcardListView, flashcardListViewModel,
+                getFlashcards)
     }
 }

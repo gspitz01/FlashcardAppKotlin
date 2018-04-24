@@ -13,8 +13,6 @@ interface FlashcardListContract {
 
         fun setLoadingIndicator(active: Boolean)
 
-        fun showFlashcards(flashcards: List<Flashcard>)
-
         fun showFailedToLoadFlashcards()
 
         fun showNoFlashcardsToLoad()
@@ -33,5 +31,12 @@ interface FlashcardListContract {
         fun loadFlashcards()
 
         fun onFlashcardClick(flashcardId: String)
+    }
+
+    interface ViewModel {
+
+        fun setFlashcards(flashcards: List<Flashcard>)
+
+        fun getFlashcards() : List<Flashcard>?
     }
 }

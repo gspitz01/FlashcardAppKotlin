@@ -1,8 +1,10 @@
 package com.gregspitz.flashcardappkotlin.flashcardlist
 
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
@@ -27,6 +29,8 @@ class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
 
     private lateinit var recyclerAdapter : FlashcardRecyclerAdapter
 
+    private lateinit var viewModel: FlashcardListViewModel
+
     private var active = false
 
     init {
@@ -41,7 +45,18 @@ class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
         recyclerAdapter = FlashcardRecyclerAdapter(emptyList())
         flashcardRecyclerView.adapter = recyclerAdapter
 
-        FlashcardListPresenter(useCaseHandler, this, getFlashcards)
+        viewModel = ViewModelProviders.of(this).get(FlashcardListViewModel::class.java)
+
+        val flashcardsObserver = Observer<List<Flashcard>> {
+            if (it != null) {
+                flashcardListMessages.visibility = View.GONE
+                recyclerAdapter.updateFlashcards(it)
+            }
+        }
+
+        viewModel.flashcards.observe(this, flashcardsObserver)
+
+        FlashcardListPresenter(useCaseHandler, this, viewModel, getFlashcards)
     }
 
     override fun onResume() {
@@ -67,11 +82,6 @@ class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
 
     override fun setLoadingIndicator(active: Boolean) {
         // TODO: implement this
-    }
-
-    override fun showFlashcards(flashcards: List<Flashcard>) {
-        flashcardListMessages.visibility = View.GONE
-        recyclerAdapter.updateFlashcards(flashcards)
     }
 
     override fun showFailedToLoadFlashcards() {
