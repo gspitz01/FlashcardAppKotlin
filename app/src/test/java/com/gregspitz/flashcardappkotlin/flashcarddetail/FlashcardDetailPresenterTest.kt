@@ -1,12 +1,11 @@
 package com.gregspitz.flashcardappkotlin.flashcarddetail
 
-import com.gregspitz.flashcardappkotlin.TestUseCaseScheduler
+import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
-import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
-import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
 import com.gregspitz.flashcardappkotlin.flashcarddetail.domain.usecase.GetFlashcard
 import com.nhaarman.mockito_kotlin.*
+import junit.framework.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
@@ -17,13 +16,20 @@ class FlashcardDetailPresenterTest {
 
     private val flashcard = Flashcard("0", "Front", "Back")
 
-    private val flashcardRepository: FlashcardRepository = mock()
+    private val response = GetFlashcard.ResponseValue(flashcard)
+
+    private val getFlashcard: GetFlashcard = mock()
+
+    private val useCaseHandler: UseCaseHandler = mock()
 
     private val flashcardDetailView: FlashcardDetailContract.View = mock()
 
     private val flashcardDetailViewModel: FlashcardDetailContract.ViewModel = mock()
 
-    private val callbackCaptor = argumentCaptor<FlashcardDataSource.GetFlashcardCallback>()
+    private val requestCaptor = argumentCaptor<GetFlashcard.RequestValues>()
+
+    private val useCaseCallbackCaptor =
+            argumentCaptor<UseCase.UseCaseCallback<GetFlashcard.ResponseValue>>()
 
     private lateinit var presenter: FlashcardDetailPresenter
 
@@ -41,46 +47,55 @@ class FlashcardDetailPresenterTest {
 
     @Test
     fun loadFlashcard_showsFlashcardInView() {
-        createAndStartPresenterAndSetCallbackCaptor()
-
+        createAndStartPresenter()
         val inOrder = inOrder(flashcardDetailView)
         inOrder.verify(flashcardDetailView).setLoadingIndicator(true)
-        // Trigger callback
-        callbackCaptor.firstValue.onFlashcardLoaded(flashcard)
-
+        verifyUseCaseCallbackSuccess()
+        assertEquals(flashcard.id, requestCaptor.firstValue.flashcardId)
         inOrder.verify(flashcardDetailView).setLoadingIndicator(false)
         verify(flashcardDetailViewModel).setFlashcard(flashcard)
     }
 
     @Test
-    fun noAvailableFlashcard_showsFailedToLoadFlashcardInView() {
-        createAndStartPresenterAndSetCallbackCaptor()
-
+    fun onError_showsFailedToLoadFlashcardInView() {
+        createAndStartPresenter()
         val inOrder = inOrder(flashcardDetailView)
         inOrder.verify(flashcardDetailView).setLoadingIndicator(true)
-        // Trigger callback
-        callbackCaptor.firstValue.onDataNotAvailable()
-
+        verifyUseCaseCallbackFailure()
         inOrder.verify(flashcardDetailView).setLoadingIndicator(false)
         verify(flashcardDetailView).showFailedToLoadFlashcard()
     }
 
     @Test
     fun editFlashcard_tellsViewToShowEditFlashcardView() {
-        createAndStartPresenterAndSetCallbackCaptor()
-        callbackCaptor.firstValue.onFlashcardLoaded(flashcard)
+        createAndStartPresenter()
+        verifyUseCaseCallbackSuccess()
         presenter.editFlashcard()
         verify(flashcardDetailView).showEditFlashcard(flashcard.id)
     }
 
-    private fun createAndStartPresenterAndSetCallbackCaptor() {
+    private fun verifyUseCaseCallbackSuccess() {
+        verifyUseCaseCallback()
+        useCaseCallbackCaptor.firstValue.onSuccess(response)
+    }
+
+    private fun verifyUseCaseCallbackFailure() {
+        verifyUseCaseCallback()
+        useCaseCallbackCaptor.firstValue.onError()
+    }
+
+    private fun verifyUseCaseCallback() {
+        verify(useCaseHandler)
+                .execute(eq(getFlashcard), requestCaptor.capture(), useCaseCallbackCaptor.capture())
+    }
+
+    private fun createAndStartPresenter() {
         presenter = createPresenter()
         presenter.start()
-        verify(flashcardRepository).getFlashcard(eq(flashcard.id), callbackCaptor.capture())
     }
 
     private fun createPresenter(): FlashcardDetailPresenter {
-        return FlashcardDetailPresenter(UseCaseHandler(TestUseCaseScheduler()),
-                flashcardDetailView, flashcardDetailViewModel, GetFlashcard(flashcardRepository))
+        return FlashcardDetailPresenter(useCaseHandler, flashcardDetailView,
+                flashcardDetailViewModel, getFlashcard)
     }
 }
