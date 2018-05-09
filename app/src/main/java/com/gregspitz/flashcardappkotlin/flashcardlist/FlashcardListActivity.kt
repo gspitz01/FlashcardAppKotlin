@@ -12,7 +12,6 @@ import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardActivity
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
-import com.gregspitz.flashcardappkotlin.flashcarddetail.FlashcardDetailActivity
 import com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase.GetFlashcards
 import kotlinx.android.synthetic.main.activity_flashcard_list.*
 import javax.inject.Inject
@@ -31,6 +30,8 @@ class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
 
     private lateinit var viewModel: FlashcardListViewModel
 
+    private lateinit var pagerAdapter: FlashcardDetailPagerAdapter
+
     private var active = false
 
     init {
@@ -44,6 +45,8 @@ class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
         flashcardRecyclerView.layoutManager = LinearLayoutManager(this)
         recyclerAdapter = FlashcardRecyclerAdapter(emptyList())
         flashcardRecyclerView.adapter = recyclerAdapter
+        pagerAdapter = FlashcardDetailPagerAdapter(supportFragmentManager, listOf())
+        detailContent.adapter = pagerAdapter
 
         viewModel = ViewModelProviders.of(this).get(FlashcardListViewModel::class.java)
 
@@ -51,12 +54,24 @@ class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
             if (it != null) {
                 flashcardListMessages.visibility = View.GONE
                 recyclerAdapter.updateFlashcards(it)
+                initPagerAdapter(it)
             }
         }
 
         viewModel.flashcards.observe(this, flashcardsObserver)
 
         FlashcardListPresenter(useCaseHandler, this, viewModel, getFlashcards)
+    }
+
+    private fun initPagerAdapter(flashcards: List<Flashcard>) {
+        val fragments = flashcards.map {
+            val bundle = Bundle()
+            bundle.putParcelable(FlashcardDetailFragment.flashcardBundleId, it)
+            val fragment = FlashcardDetailFragment()
+            fragment.arguments = bundle
+            fragment
+        }
+        pagerAdapter.setFragments(fragments)
     }
 
     override fun onResume() {
@@ -73,11 +88,7 @@ class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
     override fun setPresenter(presenter: FlashcardListContract.Presenter) {
         this.presenter = presenter
         recyclerAdapter.setPresenter(this.presenter)
-        addFlashcardFab.setOnClickListener(object: View.OnClickListener {
-            override fun onClick(v: View?) {
-                this@FlashcardListActivity.presenter.addFlashcard()
-            }
-        })
+        addFlashcardFab.setOnClickListener { this@FlashcardListActivity.presenter.addFlashcard() }
     }
 
     override fun setLoadingIndicator(active: Boolean) {
@@ -99,10 +110,14 @@ class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
         startActivity(intent)
     }
 
-    override fun showFlashcardDetailsUi(flashcardId: String) {
-        val intent = Intent(this, FlashcardDetailActivity::class.java)
-        intent.putExtra(FlashcardDetailActivity.flashcardIntentId, flashcardId)
+    override fun showEditFlashcard(flashcardId: String) {
+        val intent = Intent(this, AddEditFlashcardActivity::class.java)
+        intent.putExtra(AddEditFlashcardActivity.flashcardIdExtra, flashcardId)
         startActivity(intent)
+    }
+
+    override fun showFlashcardDetailsUi(flashcardPosition: Int) {
+        detailContent.currentItem = flashcardPosition
     }
 
     override fun isActive(): Boolean = active

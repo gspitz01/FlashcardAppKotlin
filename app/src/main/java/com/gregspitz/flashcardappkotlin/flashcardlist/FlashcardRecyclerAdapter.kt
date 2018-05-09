@@ -39,9 +39,9 @@ class FlashcardRecyclerAdapter(private var flashcards: List<Flashcard>)
 
     inner class Holder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun setFlashcard(flashcard: Flashcard) {
-            itemView.flashcard_front.text = flashcard.front
+            itemView.flashcardFront.text = flashcard.front
             itemView.setOnClickListener {
-                presenter.onFlashcardClick(flashcards[adapterPosition].id)
+                presenter.onFlashcardClick(adapterPosition)
             }
         }
     }

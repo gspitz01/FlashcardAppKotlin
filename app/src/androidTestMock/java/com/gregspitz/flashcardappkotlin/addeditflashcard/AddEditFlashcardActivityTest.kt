@@ -32,6 +32,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class AddEditFlashcardActivityTest {
 
+    // TODO: change so that click show list shows that particular flashcard in detail view
+
     private val flashcard = Flashcard("0", "Front", "Back")
 
     private val dataSource = FlashcardApplication.repoComponent.exposeLocalDataSource()

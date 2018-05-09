@@ -73,8 +73,8 @@ class FlashcardListPresenterTest {
     @Test
     fun onFlashcardClick_showsFlashcardDetails() {
         createAndStartPresenter()
-        flashcardListPresenter.onFlashcardClick(flashcard1.id)
-        verify(flashcardListView).showFlashcardDetailsUi(flashcard1.id)
+        flashcardListPresenter.onFlashcardClick(0)
+        verify(flashcardListView).showFlashcardDetailsUi(0)
     }
 
     private fun getTestFlashcardsList(): List<Flashcard> {

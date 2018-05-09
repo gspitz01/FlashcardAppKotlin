@@ -1,4 +1,4 @@
-package com.gregspitz.flashcardappkotlin.flashcarddetail.domain.usecase
+package com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase
 
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard

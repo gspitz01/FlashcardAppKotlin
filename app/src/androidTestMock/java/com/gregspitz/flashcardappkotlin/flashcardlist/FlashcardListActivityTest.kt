@@ -1,9 +1,13 @@
 package com.gregspitz.flashcardappkotlin.flashcardlist
 
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.support.test.InstrumentationRegistry
+import android.support.test.espresso.Espresso
 import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.action.ViewActions.click
+import android.support.test.espresso.IdlingRegistry
+import android.support.test.espresso.IdlingResource
+import android.support.test.espresso.action.ViewActions.*
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.intent.Intents.intended
 import android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent
@@ -12,15 +16,14 @@ import android.support.test.espresso.intent.rule.IntentsTestRule
 import android.support.test.espresso.matcher.BoundedMatcher
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.runner.AndroidJUnit4
+import android.support.v4.view.ViewPager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.R
+import com.gregspitz.flashcardappkotlin.R.id.detailContent
 import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardActivity
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
-import com.gregspitz.flashcardappkotlin.data.source.FakeFlashcardLocalDataSource
-import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
-import com.gregspitz.flashcardappkotlin.flashcarddetail.FlashcardDetailActivity
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers.allOf
@@ -35,6 +38,8 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 class FlashcardListActivityTest {
+
+    // TODO: make it so RecyclerView scrolls with ViewPager
 
     private val flashcard1 = Flashcard("0", "A front", "A back")
 
@@ -63,6 +68,13 @@ class FlashcardListActivityTest {
     }
 
     @Test
+    fun detailsFragment_showsFirstFlashcardDetails() {
+        addFlashcardsToDataSource(flashcard1, flashcard2)
+        launchActivity()
+        checkDetailViewMatchesFlashcard(flashcard1)
+    }
+
+    @Test
     fun noFlashcardsToShow_showsNoFlashcardsMessage() {
         launchActivity()
         onView(withId(R.id.flashcardListMessages))
@@ -81,9 +93,60 @@ class FlashcardListActivityTest {
     fun clickFlashcard_showsFlashcardDetails() {
         addFlashcardsToDataSource(flashcard1, flashcard2)
         launchActivity()
-        onView(withText(flashcard1.front)).perform(click())
-        intended(allOf(hasComponent(FlashcardDetailActivity::class.java.name),
-                hasExtra(FlashcardDetailActivity.flashcardIntentId, flashcard1.id)))
+        onView(allOf(withText(flashcard2.front), isDescendantOfA(withId(R.id.flashcardRecyclerView))))
+                .perform(click())
+        checkDetailViewMatchesFlashcard(flashcard2)
+    }
+
+    @Test
+    fun swipeLeftDetailView_showsNextFlashcard() {
+        addFlashcardsToDataSource(flashcard1, flashcard2)
+        launchActivity()
+        val viewPagerIdlingResource = registerViewPagerIdlingResource()
+        onView(withId(R.id.detailContent)).perform(swipeLeft())
+        checkDetailViewMatchesFlashcard(flashcard2)
+        unregisterViewPagerIdlingResource(viewPagerIdlingResource)
+    }
+
+    @Test
+    fun swipeLeftThenRightDetailView_showsFirstFlashcardAgain() {
+        addFlashcardsToDataSource(flashcard1, flashcard2)
+        launchActivity()
+        val viewPagerIdlingResource = registerViewPagerIdlingResource()
+        onView(withId(R.id.detailContent))
+                .perform(swipeLeft())
+                .perform(swipeRight())
+        checkDetailViewMatchesFlashcard(flashcard1)
+        unregisterViewPagerIdlingResource(viewPagerIdlingResource)
+    }
+
+    @Test
+    fun clickEditFlashcardInDetailView_showsEditFlashcardView() {
+        addFlashcardsToDataSource(flashcard1, flashcard2)
+        launchActivity()
+        clickDetailViewEditButton()
+        checkIntendedForAddEditFlashcardActivity(flashcard1.id)
+    }
+
+    @Test
+    fun orientationChangeAndThenClickEditFlashcardInDetailView_showsEditFlashcardView() {
+        addFlashcardsToDataSource(flashcard1, flashcard2)
+        launchActivity()
+        testRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        testRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        clickDetailViewEditButton()
+        checkIntendedForAddEditFlashcardActivity(flashcard1.id)
+    }
+
+    @Test
+    fun detailViewSwipeThenClickEditFlashcard_showsEditFlashcardView() {
+        addFlashcardsToDataSource(flashcard1, flashcard2)
+        launchActivity()
+        val viewPagerIdlingResource = registerViewPagerIdlingResource()
+        onView(withId(R.id.detailContent)).perform(swipeLeft())
+        clickDetailViewEditButton()
+        checkIntendedForAddEditFlashcardActivity(flashcard2.id)
+        unregisterViewPagerIdlingResource(viewPagerIdlingResource)
     }
 
     @Test
@@ -91,9 +154,38 @@ class FlashcardListActivityTest {
         addFlashcardsToDataSource(flashcard1, flashcard2)
         launchActivity()
         onView(withId(R.id.addFlashcardFab)).perform(click())
+        checkIntendedForAddEditFlashcardActivity(AddEditFlashcardActivity.newFlashcardExtra)
+    }
+
+    private fun checkIntendedForAddEditFlashcardActivity(extraId: String) {
         intended(allOf(hasComponent(AddEditFlashcardActivity::class.java.name),
                 hasExtra(AddEditFlashcardActivity.flashcardIdExtra,
-                        AddEditFlashcardActivity.newFlashcardExtra)))
+                        extraId)))
+    }
+
+    private fun clickDetailViewEditButton() {
+        onView(allOf(withId(R.id.editFlashcardButton), isDescendantOfA(withId(R.id.detailContent)),
+                isCompletelyDisplayed())).perform(click())
+    }
+
+    private fun checkDetailViewMatchesFlashcard(flashcard: Flashcard) {
+        onView(allOf(withId(R.id.flashcardFront), isDescendantOfA(withId(R.id.detailContent)),
+                isCompletelyDisplayed()))
+                .check(matches(withText(flashcard.front)))
+        onView(allOf(withId(R.id.flashcardBack), isDescendantOfA(withId(R.id.detailContent)),
+                isCompletelyDisplayed()))
+                .check(matches(withText(flashcard.back)))
+    }
+
+    private fun registerViewPagerIdlingResource() : IdlingResource {
+        val detailPager = testRule.activity.findViewById<ViewPager>(detailContent)
+        val viewPagerIdlingResource = ViewPagerIdlingResource(detailPager, "PagerIdlingResource")
+        IdlingRegistry.getInstance().register(viewPagerIdlingResource)
+        return viewPagerIdlingResource
+    }
+
+    private fun unregisterViewPagerIdlingResource(idlingResource: IdlingResource) {
+        IdlingRegistry.getInstance().unregister(idlingResource)
     }
 
     private fun addFlashcardsToDataSource(vararg flashcards: Flashcard) {

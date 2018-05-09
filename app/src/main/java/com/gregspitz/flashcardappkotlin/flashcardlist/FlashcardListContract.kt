@@ -19,7 +19,9 @@ interface FlashcardListContract {
 
         fun showAddFlashcard()
 
-        fun showFlashcardDetailsUi(flashcardId: String)
+        fun showFlashcardDetailsUi(flashcardPosition: Int)
+
+        fun showEditFlashcard(flashcardId: String)
 
         fun isActive(): Boolean
     }
@@ -30,7 +32,7 @@ interface FlashcardListContract {
 
         fun loadFlashcards()
 
-        fun onFlashcardClick(flashcardId: String)
+        fun onFlashcardClick(flashcardPosition: Int)
     }
 
     interface ViewModel {
