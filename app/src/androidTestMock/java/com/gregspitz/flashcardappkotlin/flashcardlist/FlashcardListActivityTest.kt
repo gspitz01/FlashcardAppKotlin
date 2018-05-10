@@ -2,13 +2,12 @@ package com.gregspitz.flashcardappkotlin.flashcardlist
 
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.support.test.InstrumentationRegistry
-import android.support.test.espresso.Espresso
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.IdlingRegistry
 import android.support.test.espresso.IdlingResource
 import android.support.test.espresso.action.ViewActions.*
 import android.support.test.espresso.assertion.ViewAssertions.matches
+import android.support.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
 import android.support.test.espresso.intent.Intents.intended
 import android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import android.support.test.espresso.intent.matcher.IntentMatchers.hasExtra
@@ -93,8 +92,8 @@ class FlashcardListActivityTest {
     fun clickFlashcard_showsFlashcardDetails() {
         addFlashcardsToDataSource(flashcard1, flashcard2)
         launchActivity()
-        onView(allOf(withText(flashcard2.front), isDescendantOfA(withId(R.id.flashcardRecyclerView))))
-                .perform(click())
+        onView(withId(R.id.flashcardRecyclerView))
+                .perform(actionOnItemAtPosition<RecyclerView.ViewHolder>(1, click()))
         checkDetailViewMatchesFlashcard(flashcard2)
     }
 
