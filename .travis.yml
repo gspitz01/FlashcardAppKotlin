@@ -11,7 +11,7 @@ env:
     - ANDROID_ABI=armeabi-v7a
     - ANDROID_TAG=google_apis
     - ADB_INSTALL_TIMEOUT=20 # minutes (2 minutes by default)
-    
+
 android:
   components:
     - tools
@@ -53,7 +53,8 @@ install:
   - ./gradlew assembleDebug --stacktrace
 
 script:
-  - ./gradlew build connectedCheck --stacktrace
+  - ./gradlew build jacocoTestReport assembleAndroidTest
+  - ./gradlew connectedCheck --stacktrace
 
 branches:
   only:
@@ -61,3 +62,5 @@ branches:
 
 sudo: true
 
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
