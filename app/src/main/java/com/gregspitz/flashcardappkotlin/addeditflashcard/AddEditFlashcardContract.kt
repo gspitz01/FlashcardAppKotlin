@@ -35,7 +35,7 @@ interface AddEditFlashcardContract {
 
         fun showNewFlashcard()
 
-        fun showFlashcardList()
+        fun showFlashcardList(flashcardId: String)
 
         fun showFailedToLoadFlashcard()
 

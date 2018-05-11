@@ -23,6 +23,7 @@ import android.support.test.espresso.action.ViewActions.replaceText
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.intent.Intents.intended
 import android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent
+import android.support.test.espresso.intent.matcher.IntentMatchers.hasExtra
 import android.support.test.espresso.intent.rule.IntentsTestRule
 import android.support.test.espresso.matcher.RootMatchers.withDecorView
 import android.support.test.espresso.matcher.ViewMatchers.*
@@ -32,8 +33,10 @@ import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListActivity
-import junit.framework.Assert.assertEquals
+import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.not
+import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -44,8 +47,6 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 class AddEditFlashcardActivityTest {
-
-    // TODO: change so that click show list shows that particular flashcard in detail view
 
     private val flashcard = Flashcard("0", "Front", "Back")
 
@@ -60,6 +61,12 @@ class AddEditFlashcardActivityTest {
     fun setup() {
         dataSource.deleteAllFlashcards()
         dataSource.addFlashcards(flashcard)
+    }
+
+    @After
+    fun tearDown() {
+        val toast = testRule.activity.getToast()
+        toast?.cancel()
     }
 
     @Test
@@ -106,20 +113,29 @@ class AddEditFlashcardActivityTest {
         launchActivityWithStringIntent(flashcard.id)
         onView(withId(R.id.saveFlashcardButton)).perform(click())
         checkForToast(R.string.save_failed_toast_text)
+    }
 
+    @Test
+    fun showListButtonClickIntentWithId_showsFlashcardListViewWithThatFlashcardInDetailView() {
+        launchActivityWithStringIntent(flashcard.id)
+        onView(withId(R.id.showFlashcardListButton)).perform(click())
+        intended(allOf(hasComponent(FlashcardListActivity::class.java.name),
+                hasExtra(FlashcardListActivity.flashcardIdExtra, flashcard.id)))
+    }
+
+    @Test
+    fun showListButtonClickNewFlashcard_showsFlashcardListViewWithNoParticularFlashcard() {
+        launchActivityWithStringIntent(AddEditFlashcardActivity.newFlashcardExtra)
+        onView(withId(R.id.showFlashcardListButton)).perform(click())
+        intended(allOf(hasComponent(FlashcardListActivity::class.java.name),
+                hasExtra(FlashcardListActivity.flashcardIdExtra,
+                        FlashcardListActivity.noParticularFlashcardExtra)))
     }
 
     private fun checkForToast(stringId: Int) {
         onView(withText(stringId))
                 .inRoot(withDecorView(not(testRule.activity.window.decorView)))
                 .check(matches(isDisplayed()))
-    }
-
-    @Test
-    fun showListButtonClick_showsFlashcardListView() {
-        launchActivityWithStringIntent(flashcard.id)
-        onView(withId(R.id.showFlashcardListButton)).perform(click())
-        intended(hasComponent(FlashcardListActivity::class.java.name))
     }
 
     private fun getFlashcardFromRepoById(id: String): Flashcard {

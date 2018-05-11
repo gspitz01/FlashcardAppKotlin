@@ -32,16 +32,18 @@ class AddEditFlashcardPresenter (
         private val saveFlashcard: SaveFlashcard
 ) : AddEditFlashcardContract.Presenter {
 
+    private lateinit var flashcardId: String
+
     init {
         view.setPresenter(this)
     }
 
     override fun start() {
-        val id = view.getIdFromIntent()
-        if (id == AddEditFlashcardActivity.newFlashcardExtra) {
+        flashcardId = view.getIdFromIntent()
+        if (flashcardId == AddEditFlashcardActivity.newFlashcardExtra) {
             view.showNewFlashcard()
         } else {
-            loadFlashcard(view.getIdFromIntent())
+            loadFlashcard(flashcardId)
         }
     }
 
@@ -85,7 +87,7 @@ class AddEditFlashcardPresenter (
 
     override fun showList() {
         if (view.isActive()) {
-            view.showFlashcardList()
+            view.showFlashcardList(flashcardId)
         }
     }
 }

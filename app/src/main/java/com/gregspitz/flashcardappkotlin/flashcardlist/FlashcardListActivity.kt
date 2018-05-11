@@ -25,7 +25,6 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.R
-import com.gregspitz.flashcardappkotlin.R.id.*
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardActivity
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
@@ -34,6 +33,11 @@ import kotlinx.android.synthetic.main.activity_flashcard_list.*
 import javax.inject.Inject
 
 class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
+
+    companion object {
+        const val flashcardIdExtra = "flashcard_id_extra"
+        const val noParticularFlashcardExtra = "-1"
+    }
 
     private lateinit var presenter : FlashcardListContract.Presenter
 
@@ -72,12 +76,24 @@ class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
                 flashcardListMessages.visibility = View.GONE
                 recyclerAdapter.updateFlashcards(it)
                 initPagerAdapter(it)
+                moveToDetailsFromIntent(it)
             }
         }
 
         viewModel.flashcards.observe(this, flashcardsObserver)
 
         FlashcardListPresenter(useCaseHandler, this, viewModel, getFlashcards)
+    }
+
+    private fun moveToDetailsFromIntent(flashcards: List<Flashcard>) {
+        val flashcardId = intent.getStringExtra(flashcardIdExtra)
+        if (flashcardId != null && flashcardId != noParticularFlashcardExtra) {
+            for ((index, flashcard) in flashcards.withIndex()) {
+                if (flashcard.id == flashcardId) {
+                    detailContent.currentItem = index
+                }
+            }
+        }
     }
 
     private fun initPagerAdapter(flashcards: List<Flashcard>) {

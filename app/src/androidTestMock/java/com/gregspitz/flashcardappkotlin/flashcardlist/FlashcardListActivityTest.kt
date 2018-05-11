@@ -90,6 +90,15 @@ class FlashcardListActivityTest {
     }
 
     @Test
+    fun launchWithIntent_showsThatFlashcardInDetails() {
+        addFlashcardsToDataSource(flashcard1, flashcard2)
+        val intent = Intent()
+        intent.putExtra(FlashcardListActivity.flashcardIdExtra, flashcard2.id)
+        testRule.launchActivity(intent)
+        checkDetailViewMatchesFlashcard(flashcard2)
+    }
+
+    @Test
     fun noFlashcardsToShow_showsNoFlashcardsMessage() {
         launchActivity()
         onView(withId(R.id.flashcardListMessages))

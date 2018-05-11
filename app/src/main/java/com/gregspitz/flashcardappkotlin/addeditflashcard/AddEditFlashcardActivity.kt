@@ -18,12 +18,12 @@ package com.gregspitz.flashcardappkotlin.addeditflashcard
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.annotation.VisibleForTesting
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Toast
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.R
-import com.gregspitz.flashcardappkotlin.R.id.*
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.GetFlashcard
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.SaveFlashcard
@@ -48,6 +48,8 @@ class AddEditFlashcardActivity : AppCompatActivity(), AddEditFlashcardContract.V
     private var flashcard: Flashcard? = null
 
     private var active = false
+
+    private var toast: Toast? = null
 
     init {
         FlashcardApplication.useCaseComponent.inject(this)
@@ -112,8 +114,14 @@ class AddEditFlashcardActivity : AppCompatActivity(), AddEditFlashcardContract.V
         flashcardEditBack.setText(flashcard.back)
     }
 
-    override fun showFlashcardList() {
-        startActivity(Intent(this, FlashcardListActivity::class.java))
+    override fun showFlashcardList(flashcardId: String) {
+        val intent = Intent(this, FlashcardListActivity::class.java)
+        var extraId = flashcardId
+        if (extraId == newFlashcardExtra) {
+            extraId = FlashcardListActivity.noParticularFlashcardExtra
+        }
+        intent.putExtra(FlashcardListActivity.flashcardIdExtra, extraId)
+        startActivity(intent)
     }
 
     override fun showFailedToLoadFlashcard() {
@@ -126,14 +134,21 @@ class AddEditFlashcardActivity : AppCompatActivity(), AddEditFlashcardContract.V
     }
 
     override fun showSaveSuccessful() {
-        Toast.makeText(this, R.string.save_successful_toast_text, Toast.LENGTH_LONG).show()
+        toast = Toast.makeText(this, R.string.save_successful_toast_text, Toast.LENGTH_LONG)
+        toast?.show()
     }
 
     override fun showSaveFailed() {
-        Toast.makeText(this, R.string.save_failed_toast_text, Toast.LENGTH_LONG).show()
+        toast = Toast.makeText(this, R.string.save_failed_toast_text, Toast.LENGTH_LONG)
+        toast?.show()
     }
 
     override fun isActive(): Boolean {
         return active
+    }
+
+    @VisibleForTesting
+    fun getToast(): Toast? {
+        return toast
     }
 }
