@@ -52,7 +52,9 @@ class RandomFlashcardPresenter(
     }
 
     override fun loadNewFlashcard() {
-        view.setLoadingIndicator(true)
+        if (view.isActive()) {
+            view.setLoadingIndicator(true)
+        }
 
         val flashcardId = flashcard?.id
         useCaseHandler.execute(

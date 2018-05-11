@@ -114,16 +114,26 @@ class RandomFlashcardPresenterTest {
 
 
     @Test
-    fun turnFlashcard_showsBackInView() {
-        createAndStartPresenter()
-        verify(useCaseHandler)
-                .execute(eq(getRandomFlashcard), any(), useCaseCallbackCaptor.capture())
-        useCaseCallbackCaptor.firstValue.onSuccess(response1)
+    fun turnFlashcardFromFront_showsBackInView() {
+        createStartAndGetFlashcard()
         whenever(randomFlashcardViewModel.getFlashcardSide()).thenReturn(FlashcardSide.FRONT)
         val inOrder = inOrder(randomFlashcardViewModel)
         inOrder.verify(randomFlashcardViewModel).setFlashcardSide(FlashcardSide.FRONT)
         presenter.turnFlashcard()
         inOrder.verify(randomFlashcardViewModel).setFlashcardSide(FlashcardSide.BACK)
+    }
+
+    @Test
+    fun turnFlashcardFromBack_showsFrontInView() {
+        createStartAndGetFlashcard()
+        whenever(randomFlashcardViewModel.getFlashcardSide()).thenReturn(FlashcardSide.FRONT)
+        val inOrder = inOrder(randomFlashcardViewModel)
+        inOrder.verify(randomFlashcardViewModel).setFlashcardSide(FlashcardSide.FRONT)
+        presenter.turnFlashcard()
+        inOrder.verify(randomFlashcardViewModel).setFlashcardSide(FlashcardSide.BACK)
+        whenever(randomFlashcardViewModel.getFlashcardSide()).thenReturn(FlashcardSide.BACK)
+        presenter.turnFlashcard()
+        inOrder.verify(randomFlashcardViewModel).setFlashcardSide(FlashcardSide.FRONT)
     }
 
     @Test
@@ -133,6 +143,44 @@ class RandomFlashcardPresenterTest {
                 .execute(eq(getRandomFlashcard), any(), useCaseCallbackCaptor.capture())
         useCaseCallbackCaptor.firstValue.onError()
         verify(randomFlashcardView).showFailedToLoadFlashcard()
+    }
+
+    @Test
+    fun viewNotActive_turnFlashcard_doesNotCallViewModel() {
+        // TODO: maybe even when the view is inactive, the presenter should change the viewmodel
+        // in that case change this text and the next couple
+        whenever(randomFlashcardView.isActive()).thenReturn(false)
+        createStartAndGetFlashcard()
+        presenter.turnFlashcard()
+        verify(randomFlashcardView, never()).setLoadingIndicator(any())
+        verify(randomFlashcardViewModel, never()).setFlashcardSide(any())
+    }
+
+    @Test
+    fun viewNotActive_loadNewFlashcardOnSuccess_doesNotCallViewOrViewModel() {
+        whenever(randomFlashcardView.isActive()).thenReturn(false)
+        createStartAndGetFlashcard()
+        verify(randomFlashcardView, never()).setLoadingIndicator(any())
+        verify(randomFlashcardViewModel, never()).setFlashcard(any())
+        verify(randomFlashcardViewModel, never()).setFlashcardSide(any())
+    }
+
+    @Test
+    fun viewNotActive_loadNewFlashcardOnError_doesNotCallView() {
+        whenever(randomFlashcardView.isActive()).thenReturn(false)
+        createAndStartPresenter()
+        verify(useCaseHandler)
+                .execute(eq(getRandomFlashcard), any(), useCaseCallbackCaptor.capture())
+        useCaseCallbackCaptor.firstValue.onError()
+        verify(randomFlashcardView, never()).setLoadingIndicator(any())
+        verify(randomFlashcardView, never()).showFailedToLoadFlashcard()
+    }
+
+    private fun createStartAndGetFlashcard() {
+        createAndStartPresenter()
+        verify(useCaseHandler)
+                .execute(eq(getRandomFlashcard), any(), useCaseCallbackCaptor.capture())
+        useCaseCallbackCaptor.firstValue.onSuccess(response1)
     }
 
     private fun verifyLoadingIndicatorInOrderStart() : InOrder {
