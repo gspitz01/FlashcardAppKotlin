@@ -22,7 +22,7 @@ import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.GetFlash
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.SaveFlashcard
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.nhaarman.mockito_kotlin.*
-import junit.framework.Assert.assertEquals
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
