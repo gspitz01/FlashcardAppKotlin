@@ -16,12 +16,14 @@
         android:visibility="gone"/>
 
     <EditText
+        android:inputType="text"
         android:id="@+id/flashcardEditFront"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/flashcard_front_hint_text"/>
 
     <EditText
+        android:inputType="text"
         android:id="@+id/flashcardEditBack"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
