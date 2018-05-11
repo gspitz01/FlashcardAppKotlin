@@ -5,8 +5,6 @@ package com.gregspitz.flashcardappkotlin
  */
 class UseCaseHandler(private val mUseCaseScheduler: UseCaseScheduler) {
 
-    companion object : SingletonHolder<UseCaseHandler, UseCaseScheduler>(::UseCaseHandler)
-
     private fun runnable(f: () -> Unit): Runnable = Runnable { f() }
 
     fun <T : UseCase.RequestValues, R : UseCase.ResponseValue> execute(

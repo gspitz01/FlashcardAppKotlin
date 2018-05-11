@@ -16,8 +16,6 @@
 
 package com.gregspitz.flashcardappkotlin.data.source
 
-import android.util.Log
-import com.gregspitz.flashcardappkotlin.SingletonHolder
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 
 /**
@@ -25,15 +23,11 @@ import com.gregspitz.flashcardappkotlin.data.model.Flashcard
  */
 open class FlashcardRepository(private val localDataSource: FlashcardDataSource) : FlashcardDataSource {
 
-    companion object : SingletonHolder<FlashcardRepository, FlashcardDataSource>(
-            ::FlashcardRepository)
-
     override fun getFlashcards(callback: FlashcardDataSource.GetFlashcardsCallback) {
         localDataSource.getFlashcards(callback)
     }
 
     override fun getFlashcard(flashcardId: String, callback: FlashcardDataSource.GetFlashcardCallback) {
-        Log.d("FlashcardRepository", "Getting from local: $localDataSource")
         localDataSource.getFlashcard(flashcardId, callback)
     }
 
