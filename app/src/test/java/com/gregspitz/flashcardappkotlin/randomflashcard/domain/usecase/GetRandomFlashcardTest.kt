@@ -36,8 +36,10 @@ class GetRandomFlashcardTest {
 
     private val flashcard1 = Flashcard("0", "Front", "Back")
     private val flashcard2 = Flashcard("1", "Front", "Back")
+    private val flashcard3 = Flashcard("0", "Front", "Back")
     private val singleFlashcardList = listOf(flashcard1)
     private val flashcards = listOf(flashcard1, flashcard2)
+    private val flashcardsSameId = listOf(flashcard1, flashcard3)
 
     private val flashcardRepository: FlashcardRepository = mock()
 
@@ -73,6 +75,16 @@ class GetRandomFlashcardTest {
         useCaseHandler.execute(getRandomFlashcards, values, callback)
         verify(flashcardRepository).getFlashcards(repositoryCallbackCaptor.capture())
         repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(singleFlashcardList)
+        verify(callback).onSuccess(responseCaptor.capture())
+        assertEquals(flashcard1, responseCaptor.firstValue.flashcard)
+    }
+
+    @Test
+    fun allFlashcardsHaveSameId_getsFirstFlashcardInListAndCallsSuccessOnCallback() {
+        val values = GetRandomFlashcard.RequestValues(flashcard1.id)
+        useCaseHandler.execute(getRandomFlashcards, values, callback)
+        verify(flashcardRepository).getFlashcards(repositoryCallbackCaptor.capture())
+        repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(flashcardsSameId)
         verify(callback).onSuccess(responseCaptor.capture())
         assertEquals(flashcard1, responseCaptor.firstValue.flashcard)
     }
