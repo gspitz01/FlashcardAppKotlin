@@ -121,9 +121,9 @@ class AddEditFlashcardPresenterTest {
 
     @Test
     fun showList_callsShowListViewOnView() {
-        presenter = createPresenter()
+        createAndStartPresenter()
         presenter.showList()
-        verify(view).showFlashcardList()
+        verify(view).showFlashcardList(eq(flashcard.id))
     }
 
     private fun verifyGetCallbackSuccess() {
