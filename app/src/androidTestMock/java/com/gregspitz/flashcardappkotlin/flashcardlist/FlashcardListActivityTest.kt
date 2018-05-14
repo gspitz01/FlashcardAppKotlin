@@ -21,6 +21,7 @@ import android.content.pm.ActivityInfo
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.IdlingRegistry
 import android.support.test.espresso.IdlingResource
+import android.support.test.espresso.ViewInteraction
 import android.support.test.espresso.action.ViewActions.*
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
@@ -53,8 +54,6 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 class FlashcardListActivityTest {
-
-    // TODO: make it so RecyclerView scrolls with ViewPager
 
     private val flashcard1 = Flashcard("0", "A front", "A back")
 
@@ -139,8 +138,28 @@ class FlashcardListActivityTest {
         val viewPagerIdlingResource = registerViewPagerIdlingResource()
         onView(withId(R.id.detailContent))
                 .perform(swipeLeft())
+        onView(withId(R.id.detailContent))
                 .perform(swipeRight())
         checkDetailViewMatchesFlashcard(flashcard1)
+        unregisterViewPagerIdlingResource(viewPagerIdlingResource)
+    }
+
+    @Test
+    fun swipingDetailView_recyclerViewFollows() {
+        val flashcard3 = Flashcard("2", "Front2", "Back2")
+        val flashcard4 = Flashcard("3", "Front3", "Back3")
+        val flashcard5 = Flashcard("4", "Front4", "Back4")
+        val flashcard6 = Flashcard("5", "Front5", "Back5")
+        val flashcard7 = Flashcard("6", "Front6", "Back6")
+        val flashcard8 = Flashcard("7", "Front7", "Back7")
+        addFlashcardsToDataSource(flashcard1, flashcard2, flashcard3, flashcard4, flashcard5,
+                flashcard6, flashcard7, flashcard8)
+        launchActivity()
+        val viewPagerIdlingResource = registerViewPagerIdlingResource()
+        performMultipleSwipes(onView(withId(R.id.detailContent)), 6)
+        checkDetailViewMatchesFlashcard(flashcard7)
+        onView(allOf(isDescendantOfA(withId(R.id.flashcardRecyclerView)),
+                withText(flashcard7.front))).check(matches(isDisplayed()))
         unregisterViewPagerIdlingResource(viewPagerIdlingResource)
     }
 
@@ -179,6 +198,12 @@ class FlashcardListActivityTest {
         launchActivity()
         onView(withId(R.id.addFlashcardFab)).perform(click())
         checkIntendedForAddEditFlashcardActivity(AddEditFlashcardActivity.newFlashcardExtra)
+    }
+
+    private fun performMultipleSwipes(view: ViewInteraction?, number: Int) {
+        for (i in 1..number) {
+            view?.perform(swipeLeft())
+        }
     }
 
     private fun checkIntendedForAddEditFlashcardActivity(extraId: String) {
