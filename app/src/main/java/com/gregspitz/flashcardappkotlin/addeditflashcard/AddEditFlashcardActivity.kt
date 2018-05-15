@@ -80,24 +80,18 @@ class AddEditFlashcardActivity : AppCompatActivity(), AddEditFlashcardContract.V
 
     override fun setPresenter(presenter: AddEditFlashcardContract.Presenter) {
         this.presenter = presenter
-        saveFlashcardButton.setOnClickListener(object: View.OnClickListener {
-            override fun onClick(v: View?) {
-                val front = flashcardEditFront.text.toString()
-                val back = flashcardEditBack.text.toString()
-                if (flashcard != null) {
-                    flashcard = Flashcard(flashcard!!.id, front, back)
-                } else {
-                    flashcard = Flashcard(front = front, back = back)
-                }
-                this@AddEditFlashcardActivity.presenter.saveFlashcard(flashcard!!)
+        saveFlashcardButton.setOnClickListener {
+            val front = flashcardEditFront.text.toString()
+            val back = flashcardEditBack.text.toString()
+            flashcard = if (flashcard != null) {
+                Flashcard(flashcard!!.id, front, back)
+            } else {
+                Flashcard(front = front, back = back)
             }
-        })
+            this@AddEditFlashcardActivity.presenter.saveFlashcard(flashcard!!)
+        }
 
-        showFlashcardListButton.setOnClickListener(object: View.OnClickListener {
-            override fun onClick(v: View?) {
-                this@AddEditFlashcardActivity.presenter.showList()
-            }
-        })
+        showFlashcardListButton.setOnClickListener { this@AddEditFlashcardActivity.presenter.showList() }
     }
 
     override fun setLoadingIndicator(active: Boolean) {
