@@ -10,18 +10,16 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:name=".FlashcardApplication" tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
         <activity android:name=".flashcardlist.FlashcardListActivity">
         </activity>
         <activity android:name=".addeditflashcard.AddEditFlashcardActivity">
         </activity>
         <activity android:name=".randomflashcard.RandomFlashcardActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
         </activity>
     </application>
 
