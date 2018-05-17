@@ -1,37 +1,23 @@
-/*
- * Copyright (C) 2018 Greg Spitz
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.gregspitz.flashcardappkotlin.randomflashcard
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import android.support.v4.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.R
-import com.gregspitz.flashcardappkotlin.R.id.flashcardSide
-import com.gregspitz.flashcardappkotlin.R.id.nextFlashcardButton
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardSide
 import com.gregspitz.flashcardappkotlin.randomflashcard.domain.usecase.GetRandomFlashcard
-import kotlinx.android.synthetic.main.activity_random_flashcard.*
+import kotlinx.android.synthetic.main.fragment_random_flashcard.*
 import javax.inject.Inject
 
-class RandomFlashcardActivity : AppCompatActivity(), RandomFlashcardContract.View {
+
+class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
 
     private lateinit var presenter: RandomFlashcardContract.Presenter
 
@@ -45,25 +31,35 @@ class RandomFlashcardActivity : AppCompatActivity(), RandomFlashcardContract.Vie
 
     private var active = false
 
-    init {
-        FlashcardApplication.useCaseComponent.inject(this)
+    companion object {
+        @JvmStatic
+        fun newInstance() = RandomFlashcardFragment()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_random_flashcard)
-
+        FlashcardApplication.useCaseComponent.inject(this)
         viewModel = ViewModelProviders.of(this).get(RandomFlashcardViewModel::class.java)
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_random_flashcard, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         val randomFlashcardObserver = Observer<Flashcard> {
-            when(viewModel.flashcardSide.value) {
+            when (viewModel.flashcardSide.value) {
                 FlashcardSide.FRONT -> flashcardSide.text = it?.front
                 FlashcardSide.BACK -> flashcardSide.text = it?.back
             }
         }
 
         val flashcardSideObserver = Observer<FlashcardSide> {
-            when(it) {
+            when (it) {
                 FlashcardSide.FRONT -> flashcardSide.text = viewModel.randomFlashcard.value?.front
                 FlashcardSide.BACK -> flashcardSide.text = viewModel.randomFlashcard.value?.back
             }
@@ -88,21 +84,26 @@ class RandomFlashcardActivity : AppCompatActivity(), RandomFlashcardContract.Vie
         active = false
     }
 
-    override fun setPresenter(presenter: RandomFlashcardContract.Presenter) {
-        this.presenter = presenter
-        flashcardSide.setOnClickListener {
-            this@RandomFlashcardActivity.presenter.turnFlashcard() }
-
-        nextFlashcardButton.setOnClickListener { this@RandomFlashcardActivity.presenter.loadNewFlashcard() }
-    }
-
     override fun setLoadingIndicator(active: Boolean) {
-        // TODO: implement
+        // TODO: fill this in
     }
 
     override fun showFailedToLoadFlashcard() {
         flashcardSide.setText(R.string.failed_to_load_flashcard_text)
     }
 
-    override fun isActive(): Boolean = active
+    override fun isActive(): Boolean {
+        return active
+    }
+
+    override fun setPresenter(presenter: RandomFlashcardContract.Presenter) {
+        this.presenter = presenter
+        flashcardSide.setOnClickListener {
+            this@RandomFlashcardFragment.presenter.turnFlashcard()
+        }
+
+        nextFlashcardButton.setOnClickListener {
+            this@RandomFlashcardFragment.presenter.loadNewFlashcard()
+        }
+    }
 }

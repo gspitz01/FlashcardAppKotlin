@@ -12,4 +12,7 @@
     <string name="show_flashcard_list_button_text">Show List</string>
     <string name="save_successful_toast_text">Save Successful</string>
     <string name="save_failed_toast_text">Save Failed!</string>
+    <string name="nav_game_title">Play Game</string>
+    <string name="nav_list_title">Flashcard List</string>
+    <string name="nav_header_title">Where to Go?</string>
 </resources>

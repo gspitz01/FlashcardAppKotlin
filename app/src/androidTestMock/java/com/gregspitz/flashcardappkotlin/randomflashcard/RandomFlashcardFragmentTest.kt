@@ -30,6 +30,7 @@ import android.view.View
 import android.widget.TextView
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.R
+import com.gregspitz.flashcardappkotlin.SingleFragmentActivity
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import org.hamcrest.Description
 import org.hamcrest.Matcher
@@ -39,10 +40,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Tests for the implementation of {@link RandomFlashcardActivity}
+ * Tests for the implementation of {@link RandomFlashcardFragment}
  */
 @RunWith(AndroidJUnit4::class)
-class RandomFlashcardActivityTest {
+class RandomFlashcardFragmentTest {
 
     private val flashcard1 = Flashcard("0", "Front", "Back")
 
@@ -53,12 +54,13 @@ class RandomFlashcardActivityTest {
     private val dataSource = FlashcardApplication.repoComponent.exposeLocalDataSource()
 
     @Rule @JvmField
-    val testRule = IntentsTestRule<RandomFlashcardActivity>(
-            RandomFlashcardActivity::class.java, true, false)
+    val testRule = IntentsTestRule<SingleFragmentActivity>(
+            SingleFragmentActivity::class.java, true, false)
 
     @Before
     fun setup() {
         dataSource.deleteAllFlashcards()
+
     }
 
     @Test
@@ -144,5 +146,6 @@ class RandomFlashcardActivityTest {
 
     private fun launchActivity() {
         testRule.launchActivity(Intent())
+        testRule.activity.setFragment(RandomFlashcardFragment.newInstance())
     }
 }
