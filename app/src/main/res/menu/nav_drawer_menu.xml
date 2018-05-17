@@ -6,4 +6,7 @@
     <item
         android:id="@+id/navList"
         android:title="@string/nav_list_title"/>
+    <item
+        android:id="@+id/newFlashcard"
+        android:title="@string/nav_new_flashcard_title"/>
 </menu>

@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment
 import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardFragment
 import com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListFragment
 import com.gregspitz.flashcardappkotlin.randomflashcard.RandomFlashcardFragment
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), MainFragmentRouter {
 
@@ -19,6 +20,24 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
 
         // Start with the game
         setFragment(randomFlashcardFragment)
+
+        navDrawer.setNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.navGame -> {
+                    showRandomFlashcard()
+                    return@setNavigationItemSelectedListener true
+                }
+                R.id.navList -> {
+                    showFlashcardList(FlashcardListFragment.noParticularFlashcardExtra)
+                    return@setNavigationItemSelectedListener true
+                }
+                R.id.newFlashcard -> {
+                    showAddEditFlashcard(AddEditFlashcardFragment.newFlashcardExtra)
+                    return@setNavigationItemSelectedListener true
+                }
+                else -> false
+            }
+        }
     }
 
     private fun setFragment(fragment: Fragment) {

@@ -45,5 +45,8 @@ class MainScreenTest {
         onView(withId(R.id.drawerLayout)).perform(DrawerActions.open())
         onView(withId(R.id.navDrawer)).perform(navigateTo(R.id.navList))
         onView(withId(R.id.flashcardRecyclerView)).check(matches(isDisplayed()))
+        onView(withId(R.id.drawerLayout)).perform(DrawerActions.open())
+        onView(withId(R.id.navDrawer)).perform(navigateTo(R.id.newFlashcard))
+        onView(withId(R.id.saveFlashcardButton)).check(matches(isDisplayed()))
     }
 }
