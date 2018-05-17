@@ -98,7 +98,6 @@ dependencies {
 
     androidTestImplementation "com.android.support.test:runner:$rootProject.ext.supportTestRunnerVersion"
     androidTestImplementation "com.android.support.test.espresso:espresso-core:$rootProject.ext.espressoVersion"
-    androidTestImplementation "com.android.support.test.espresso:espresso-intents:$rootProject.ext.espressoVersion"
     androidTestImplementation "com.android.support.test.espresso:espresso-contrib:$rootProject.ext.espressoVersion"
     androidTestImplementation "android.arch.persistence.room:testing:$rootProject.ext.archRoomVersion"
 

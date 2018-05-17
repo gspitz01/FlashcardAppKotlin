@@ -35,6 +35,8 @@ interface FlashcardListContract {
 
         fun showAddFlashcard()
 
+        fun setDetailView(flashcardId: String)
+
         fun showFlashcardDetailsUi(flashcardPosition: Int)
 
         fun showEditFlashcard(flashcardId: String)

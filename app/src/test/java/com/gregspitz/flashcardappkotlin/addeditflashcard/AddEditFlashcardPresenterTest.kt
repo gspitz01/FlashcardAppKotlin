@@ -58,7 +58,7 @@ class AddEditFlashcardPresenterTest {
     @Before
     fun setup() {
         whenever(view.isActive()).thenReturn(true)
-        whenever(view.getIdFromIntent()).thenReturn(flashcard.id)
+        whenever(view.getIdFromArguments()).thenReturn(flashcard.id)
     }
 
     @Test

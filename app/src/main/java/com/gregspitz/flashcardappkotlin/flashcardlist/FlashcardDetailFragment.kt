@@ -50,7 +50,7 @@ class FlashcardDetailFragment : Fragment() {
         flashcardBack.text = flashcard?.back
         editFlashcardButton.setOnClickListener {
             if (flashcard != null) {
-                (activity as FlashcardListActivity).showEditFlashcard(flashcard!!.id)
+                (parentFragment as FlashcardListFragment).showEditFlashcard(flashcard!!.id)
             }
         }
     }

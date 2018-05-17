@@ -25,12 +25,9 @@ import android.support.test.espresso.ViewInteraction
 import android.support.test.espresso.action.ViewActions.*
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
-import android.support.test.espresso.intent.Intents.intended
-import android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent
-import android.support.test.espresso.intent.matcher.IntentMatchers.hasExtra
-import android.support.test.espresso.intent.rule.IntentsTestRule
 import android.support.test.espresso.matcher.BoundedMatcher
 import android.support.test.espresso.matcher.ViewMatchers.*
+import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.RecyclerView
@@ -38,6 +35,7 @@ import android.view.View
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.R.id.detailContent
+import com.gregspitz.flashcardappkotlin.SingleFragmentActivity
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import org.hamcrest.Description
 import org.hamcrest.Matcher
@@ -49,10 +47,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Tests for the implementation of {@link FlashcardListActivity}
+ * Tests for the implementation of {@link FlashcardListFragment}
  */
 @RunWith(AndroidJUnit4::class)
-class FlashcardListActivityTest {
+class FlashcardListFragmentTest {
 
     private val flashcard1 = Flashcard("0", "A front", "A back")
 
@@ -61,8 +59,8 @@ class FlashcardListActivityTest {
     private val dataSource = FlashcardApplication.repoComponent.exposeLocalDataSource()
 
     @Rule @JvmField
-    val testRule = IntentsTestRule<FlashcardListActivity>(
-            FlashcardListActivity::class.java, true, false)
+    val testRule = ActivityTestRule<SingleFragmentActivity>(
+            SingleFragmentActivity::class.java, true, false)
 
     @Before
     fun setup() {
@@ -88,12 +86,15 @@ class FlashcardListActivityTest {
     }
 
     @Test
-    fun launchWithIntent_showsThatFlashcardInDetails() {
+    fun launchWithId_showsThatFlashcardInDetails() {
         addFlashcardsToDataSource(flashcard1, flashcard2)
-        val intent = Intent()
-        intent.putExtra(FlashcardListActivity.flashcardIdExtra, flashcard2.id)
-        testRule.launchActivity(intent)
+        launchActivity(flashcard2.id)
+        val viewPagerIdlingResource = registerViewPagerIdlingResource()
+        // The idling resource seems to not work here, not sure why
+        // so I am forced, against my better judgment, to do this:
+        Thread.sleep(500)
         checkDetailViewMatchesFlashcard(flashcard2)
+        unregisterViewPagerIdlingResource(viewPagerIdlingResource)
     }
 
     @Test
@@ -167,7 +168,7 @@ class FlashcardListActivityTest {
         addFlashcardsToDataSource(flashcard1, flashcard2)
         launchActivity()
         clickDetailViewEditButton()
-        checkIntendedForAddEditFlashcardActivity(flashcard1.id)
+        checkForAddEditFlashcardFragment(flashcard1.front, flashcard1.back)
     }
 
     @Test
@@ -177,7 +178,7 @@ class FlashcardListActivityTest {
         testRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         testRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         clickDetailViewEditButton()
-        checkIntendedForAddEditFlashcardActivity(flashcard1.id)
+        checkForAddEditFlashcardFragment(flashcard1.front, flashcard1.back)
     }
 
     @Test
@@ -187,30 +188,29 @@ class FlashcardListActivityTest {
         val viewPagerIdlingResource = registerViewPagerIdlingResource()
         onView(withId(R.id.detailContent)).perform(swipeLeft())
         clickDetailViewEditButton()
-        checkIntendedForAddEditFlashcardActivity(flashcard2.id)
+        checkForAddEditFlashcardFragment(flashcard2.front, flashcard2.back)
         unregisterViewPagerIdlingResource(viewPagerIdlingResource)
     }
+
 
     @Test
     fun clickAddFlashcardFab_showsAddEditFlashcardView() {
         addFlashcardsToDataSource(flashcard1, flashcard2)
         launchActivity()
         onView(withId(R.id.addFlashcardFab)).perform(click())
-        // TODO: fix this
-//        checkIntendedForAddEditFlashcardActivity(AddEditFlashcardActivity.newFlashcardExtra)
+        checkForAddEditFlashcardFragment("", "")
+    }
+
+    private fun checkForAddEditFlashcardFragment(front: String, back: String) {
+        onView(withId(R.id.saveFlashcardButton)).check(matches(isDisplayed()))
+        onView(withId(R.id.flashcardEditFront)).check(matches(withText(front)))
+        onView(withId(R.id.flashcardEditBack)).check(matches(withText(back)))
     }
 
     private fun performMultipleSwipes(view: ViewInteraction?, number: Int) {
         for (i in 1..number) {
             view?.perform(swipeLeft())
         }
-    }
-
-    private fun checkIntendedForAddEditFlashcardActivity(extraId: String) {
-        // TODO: fix this
-//        intended(allOf(hasComponent(AddEditFlashcardActivity::class.java.name),
-//                hasExtra(AddEditFlashcardActivity.flashcardIdExtra,
-//                        extraId)))
     }
 
     private fun clickDetailViewEditButton() {
@@ -228,7 +228,10 @@ class FlashcardListActivityTest {
     }
 
     private fun registerViewPagerIdlingResource() : IdlingResource {
-        val detailPager = testRule.activity.findViewById<ViewPager>(detailContent)
+        // Force Espresso to wait until fragment is loaded.
+        onView(withId(R.id.flashcardRecyclerView)).check(matches(isDisplayed()))
+        val detailPager = testRule.activity.supportFragmentManager
+                .fragments[0].view!!.findViewById<ViewPager>(detailContent)
         val viewPagerIdlingResource = ViewPagerIdlingResource(detailPager, "PagerIdlingResource")
         IdlingRegistry.getInstance().register(viewPagerIdlingResource)
         return viewPagerIdlingResource
@@ -243,8 +246,10 @@ class FlashcardListActivityTest {
     }
 
 
-    private fun launchActivity() {
+    private fun launchActivity(flashcardId: String =
+                                       FlashcardListFragment.noParticularFlashcardExtra) {
         testRule.launchActivity(Intent())
+        testRule.activity.setFragment(FlashcardListFragment.newInstance(flashcardId))
     }
 
     private fun hasFlashcardFrontForPosition(

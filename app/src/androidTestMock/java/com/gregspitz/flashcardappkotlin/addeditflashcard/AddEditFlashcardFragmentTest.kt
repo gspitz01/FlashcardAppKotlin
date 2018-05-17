@@ -21,20 +21,16 @@ import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.action.ViewActions.replaceText
 import android.support.test.espresso.assertion.ViewAssertions.matches
-import android.support.test.espresso.intent.Intents.intended
-import android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent
-import android.support.test.espresso.intent.matcher.IntentMatchers.hasExtra
-import android.support.test.espresso.intent.rule.IntentsTestRule
 import android.support.test.espresso.matcher.RootMatchers.withDecorView
 import android.support.test.espresso.matcher.ViewMatchers.*
+import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.SingleFragmentActivity
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
-import com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListActivity
-import org.hamcrest.Matchers.allOf
+import org.hamcrest.Matchers
 import org.hamcrest.Matchers.not
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -55,7 +51,7 @@ class AddEditFlashcardFragmentTest {
 
     @Rule
     @JvmField
-    val testRule = IntentsTestRule<SingleFragmentActivity>(SingleFragmentActivity::class.java,
+    val testRule = ActivityTestRule<SingleFragmentActivity>(SingleFragmentActivity::class.java,
             true, false)
 
     @Before
@@ -66,34 +62,37 @@ class AddEditFlashcardFragmentTest {
 
     @After
     fun tearDown() {
-        val fragment = testRule.activity.supportFragmentManager.fragments[0] as AddEditFlashcardFragment
-        val toast = fragment.getToast()
-        toast?.cancel()
+        try {
+            (testRule.activity.supportFragmentManager.fragments[0] as AddEditFlashcardFragment)
+                    .getToast()?.cancel()
+        } catch (ex: ClassCastException) {
+            // Ignore. This just means the fragment was switched to a different one. That's fine.
+        }
     }
 
     @Test
     fun startWithFlashcardId_showsFlashcardInfo() {
-        launchActivityWithStringIntent(flashcard.id)
+        launchActivityWithFlashcardId(flashcard.id)
         onView(withId(R.id.flashcardEditFront)).check(matches(withText(flashcard.front)))
         onView(withId(R.id.flashcardEditBack)).check(matches(withText(flashcard.back)))
     }
 
     @Test
     fun startWithNewFlashcardIntent_showsBlankFields() {
-        launchActivityWithStringIntent(AddEditFlashcardFragment.newFlashcardExtra)
+        launchActivityWithFlashcardId(AddEditFlashcardFragment.newFlashcardExtra)
         onView(withId(R.id.flashcardEditFront)).check(matches(withText("")))
         onView(withId(R.id.flashcardEditBack)).check(matches(withText("")))
     }
 
     @Test
     fun startWithBadFlashcardId_showsFailedToLoad() {
-        launchActivityWithStringIntent("Bad ID")
+        launchActivityWithFlashcardId("Bad ID")
         onView(withId(R.id.failedToLoadFlashcard)).check(matches(isDisplayed()))
     }
 
     @Test
     fun saveFlashcardButtonClick_savesChangesToExistingFlashcard() {
-        launchActivityWithStringIntent(flashcard.id)
+        launchActivityWithFlashcardId(flashcard.id)
 
         val newFront = "New Front"
         val newBack = "New Back"
@@ -112,26 +111,23 @@ class AddEditFlashcardFragmentTest {
     @Test
     fun saveFailed_showsSaveFailedToast() {
         dataSource.setFailure(true)
-        launchActivityWithStringIntent(flashcard.id)
+        launchActivityWithFlashcardId(flashcard.id)
         onView(withId(R.id.saveFlashcardButton)).perform(click())
         checkForToast(R.string.save_failed_toast_text)
     }
 
     @Test
     fun showListButtonClickIntentWithId_showsFlashcardListViewWithThatFlashcardInDetailView() {
-        launchActivityWithStringIntent(flashcard.id)
+        launchActivityWithFlashcardId(flashcard.id)
         onView(withId(R.id.showFlashcardListButton)).perform(click())
-        intended(allOf(hasComponent(FlashcardListActivity::class.java.name),
-                hasExtra(FlashcardListActivity.flashcardIdExtra, flashcard.id)))
+        checkDetailViewMatchesFlashcard(flashcard)
     }
 
     @Test
     fun showListButtonClickNewFlashcard_showsFlashcardListViewWithNoParticularFlashcard() {
-        launchActivityWithStringIntent(AddEditFlashcardFragment.newFlashcardExtra)
+        launchActivityWithFlashcardId(AddEditFlashcardFragment.newFlashcardExtra)
         onView(withId(R.id.showFlashcardListButton)).perform(click())
-        intended(allOf(hasComponent(FlashcardListActivity::class.java.name),
-                hasExtra(FlashcardListActivity.flashcardIdExtra,
-                        FlashcardListActivity.noParticularFlashcardExtra)))
+        onView(withId(R.id.detailContent)).check(matches(isDisplayed()))
     }
 
     private fun checkForToast(stringId: Int) {
@@ -155,11 +151,18 @@ class AddEditFlashcardFragmentTest {
         return savedFlashcards[0]
     }
 
+    private fun checkDetailViewMatchesFlashcard(flashcard: Flashcard) {
+        onView(Matchers.allOf(withId(R.id.flashcardFront), isDescendantOfA(withId(R.id.detailContent)),
+                isCompletelyDisplayed()))
+                .check(matches(withText(flashcard.front)))
+        onView(Matchers.allOf(withId(R.id.flashcardBack), isDescendantOfA(withId(R.id.detailContent)),
+                isCompletelyDisplayed()))
+                .check(matches(withText(flashcard.back)))
+    }
 
-    private fun launchActivityWithStringIntent(extra: String) {
-        val intent = Intent()
-        intent.putExtra(AddEditFlashcardFragment.flashcardIdExtra, extra)
-        testRule.launchActivity(intent)
-        testRule.activity.setFragment(AddEditFlashcardFragment.newInstance())
+
+    private fun launchActivityWithFlashcardId(flashcardId: String) {
+        testRule.launchActivity(Intent())
+        testRule.activity.setFragment(AddEditFlashcardFragment.newInstance(flashcardId))
     }
 }

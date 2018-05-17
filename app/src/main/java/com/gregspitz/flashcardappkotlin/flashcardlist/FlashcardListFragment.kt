@@ -1,43 +1,29 @@
-/*
- * Copyright (C) 2018 Greg Spitz
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.gregspitz.flashcardappkotlin.flashcardlist
+
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.content.Intent
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v4.view.ViewPager
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
+import com.gregspitz.flashcardappkotlin.MainFragmentRouter
 import com.gregspitz.flashcardappkotlin.R
+import com.gregspitz.flashcardappkotlin.R.id.detailContent
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
+import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardFragment
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase.GetFlashcards
-import kotlinx.android.synthetic.main.activity_flashcard_list.*
+import kotlinx.android.synthetic.main.fragment_flashcard_list.*
 import javax.inject.Inject
 
-class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
+private const val FLASHCARD_ID = "flashcard_id"
 
-    companion object {
-        const val flashcardIdExtra = "flashcard_id_extra"
-        const val noParticularFlashcardExtra = "-1"
-    }
+class FlashcardListFragment : Fragment(), FlashcardListContract.View {
 
     private lateinit var presenter : FlashcardListContract.Presenter
 
@@ -55,18 +41,39 @@ class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
 
     private var active = false
 
-    init {
-        FlashcardApplication.useCaseComponent.inject(this)
+    private var flashcardId: String? = null
+
+    companion object {
+        const val noParticularFlashcardExtra = "-1"
+
+        fun newInstance(flashcardId: String) = FlashcardListFragment().apply {
+            arguments = Bundle().apply {
+                putString(FLASHCARD_ID, flashcardId)
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_flashcard_list)
+        arguments?.let {
+            flashcardId = it.getString(FLASHCARD_ID)
+        }
+        FlashcardApplication.useCaseComponent.inject(this)
+        viewModel = ViewModelProviders.of(this).get(FlashcardListViewModel::class.java)
+    }
 
-        flashcardRecyclerView.layoutManager = LinearLayoutManager(this)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_flashcard_list, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        flashcardRecyclerView.layoutManager = LinearLayoutManager(activity)
         recyclerAdapter = FlashcardRecyclerAdapter(emptyList())
         flashcardRecyclerView.adapter = recyclerAdapter
-        pagerAdapter = FlashcardDetailPagerAdapter(supportFragmentManager, listOf())
+        pagerAdapter = FlashcardDetailPagerAdapter(childFragmentManager, listOf())
         detailContent.adapter = pagerAdapter
         detailContent.addOnPageChangeListener(object: ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {}
@@ -80,14 +87,12 @@ class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
 
         })
 
-        viewModel = ViewModelProviders.of(this).get(FlashcardListViewModel::class.java)
-
         val flashcardsObserver = Observer<List<Flashcard>> {
             if (it != null) {
                 flashcardListMessages.visibility = View.GONE
                 recyclerAdapter.updateFlashcards(it)
                 initPagerAdapter(it)
-                moveToDetailsFromIntent(it)
+                moveToDetailsFromArgument(it)
             }
         }
 
@@ -96,8 +101,7 @@ class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
         FlashcardListPresenter(useCaseHandler, this, viewModel, getFlashcards)
     }
 
-    private fun moveToDetailsFromIntent(flashcards: List<Flashcard>) {
-        val flashcardId = intent.getStringExtra(flashcardIdExtra)
+    private fun moveToDetailsFromArgument(flashcards: List<Flashcard>) {
         if (flashcardId != null && flashcardId != noParticularFlashcardExtra) {
             for ((index, flashcard) in flashcards.withIndex()) {
                 if (flashcard.id == flashcardId) {
@@ -129,10 +133,11 @@ class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
         active = false
     }
 
-    override fun setPresenter(presenter: FlashcardListContract.Presenter) {
-        this.presenter = presenter
-        recyclerAdapter.setPresenter(this.presenter)
-        addFlashcardFab.setOnClickListener { this@FlashcardListActivity.presenter.addFlashcard() }
+    override fun setDetailView(flashcardId: String) {
+        this.flashcardId = flashcardId
+        if (viewModel.flashcards.value != null) {
+            moveToDetailsFromArgument(viewModel.flashcards.value!!)
+        }
     }
 
     override fun setLoadingIndicator(active: Boolean) {
@@ -148,23 +153,25 @@ class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
     }
 
     override fun showAddFlashcard() {
-        // TODO: fix this
-//        val intent = Intent(this, AddEditFlashcardActivity::class.java)
-//        intent.putExtra(AddEditFlashcardActivity.flashcardIdExtra,
-//                AddEditFlashcardActivity.newFlashcardExtra)
-//        startActivity(intent)
-    }
-
-    override fun showEditFlashcard(flashcardId: String) {
-        // TODO: fix this
-//        val intent = Intent(this, AddEditFlashcardActivity::class.java)
-//        intent.putExtra(AddEditFlashcardActivity.flashcardIdExtra, flashcardId)
-//        startActivity(intent)
+        (activity as MainFragmentRouter)
+                .showAddEditFlashcard(AddEditFlashcardFragment.newFlashcardExtra)
     }
 
     override fun showFlashcardDetailsUi(flashcardPosition: Int) {
         detailContent.currentItem = flashcardPosition
     }
 
-    override fun isActive(): Boolean = active
+    override fun showEditFlashcard(flashcardId: String) {
+        (activity as MainFragmentRouter).showAddEditFlashcard(flashcardId)
+    }
+
+    override fun isActive(): Boolean {
+        return active
+    }
+
+    override fun setPresenter(presenter: FlashcardListContract.Presenter) {
+        this.presenter = presenter
+        recyclerAdapter.setPresenter(this.presenter)
+        addFlashcardFab.setOnClickListener { this@FlashcardListFragment.presenter.addFlashcard() }
+    }
 }

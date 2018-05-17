@@ -29,7 +29,9 @@ interface AddEditFlashcardContract {
 
         fun setLoadingIndicator(active: Boolean)
 
-        fun getIdFromIntent() : String
+        fun getIdFromArguments() : String
+
+        fun setFlashcard(flashcardId: String)
 
         fun showFlashcard(flashcard: Flashcard)
 

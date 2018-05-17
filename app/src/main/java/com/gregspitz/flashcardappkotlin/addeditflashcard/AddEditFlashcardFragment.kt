@@ -1,7 +1,6 @@
 package com.gregspitz.flashcardappkotlin.addeditflashcard
 
 
-import android.content.Intent
 import android.os.Bundle
 import android.support.annotation.VisibleForTesting
 import android.support.v4.app.Fragment
@@ -10,16 +9,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
+import com.gregspitz.flashcardappkotlin.MainFragmentRouter
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.GetFlashcard
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.SaveFlashcard
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
-import com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListActivity
 import kotlinx.android.synthetic.main.fragment_add_edit_flashcard.*
-
 import javax.inject.Inject
 
+
+private const val FLASHCARD_ID = "flashcard_id"
 
 class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
 
@@ -34,6 +34,8 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
     @Inject
     lateinit var useCaseHandler: UseCaseHandler
 
+    private var flashcardId: String? = null
+
     private var flashcard: Flashcard? = null
 
     private var active = false
@@ -41,14 +43,20 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
     private var toast: Toast? = null
 
     companion object {
-        const val flashcardIdExtra = "flashcard_id_extra"
         const val newFlashcardExtra = "-1"
 
-        fun newInstance() = AddEditFlashcardFragment()
+        fun newInstance(flashcardId: String) = AddEditFlashcardFragment().apply {
+            arguments = Bundle().apply {
+                putString(FLASHCARD_ID, flashcardId)
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        arguments?.let {
+            flashcardId = it.getString(FLASHCARD_ID)
+        }
         FlashcardApplication.useCaseComponent.inject(this)
     }
 
@@ -74,12 +82,17 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
         active = false
     }
 
+    override fun setFlashcard(flashcardId: String) {
+        this.flashcardId = flashcardId
+        presenter.loadFlashcard(flashcardId)
+    }
+
     override fun setLoadingIndicator(active: Boolean) {
         // TODO: fill this in
     }
 
-    override fun getIdFromIntent(): String {
-        return activity?.intent?.getStringExtra(flashcardIdExtra) ?: newFlashcardExtra
+    override fun getIdFromArguments(): String {
+        return flashcardId ?: newFlashcardExtra
     }
 
     override fun showFlashcard(flashcard: Flashcard) {
@@ -94,13 +107,7 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
     }
 
     override fun showFlashcardList(flashcardId: String) {
-        val intent = Intent(activity, FlashcardListActivity::class.java)
-        var extraId = flashcardId
-        if (extraId == newFlashcardExtra) {
-            extraId = FlashcardListActivity.noParticularFlashcardExtra
-        }
-        intent.putExtra(FlashcardListActivity.flashcardIdExtra, extraId)
-        startActivity(intent)
+        (activity as MainFragmentRouter).showFlashcardList(flashcardId)
     }
 
     override fun showFailedToLoadFlashcard() {
