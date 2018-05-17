@@ -16,7 +16,7 @@
 
 package com.gregspitz.flashcardappkotlin.di
 
-import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardActivity
+import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardFragment
 import com.gregspitz.flashcardappkotlin.data.source.RepoComponent
 import com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListActivity
 import com.gregspitz.flashcardappkotlin.randomflashcard.RandomFlashcardFragment
@@ -29,7 +29,7 @@ import dagger.Component
 @Component(modules = [(UseCaseModule::class)], dependencies = [(RepoComponent::class)])
 interface UseCaseComponent {
 
-    fun inject(addEditFlashcardActivity: AddEditFlashcardActivity)
+    fun inject(addEditFlashcardFragment: AddEditFlashcardFragment)
 
     fun inject(flashcardListActivity: FlashcardListActivity)
 

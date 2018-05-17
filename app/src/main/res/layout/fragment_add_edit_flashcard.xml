@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="@dimen/edit_flashcard_view_padding"
-    tools:context="com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardActivity">
+    tools:context="com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardFragment">
 
     <TextView
         android:id="@+id/failedToLoadFlashcard"

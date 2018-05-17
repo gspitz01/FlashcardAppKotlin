@@ -27,7 +27,6 @@ import android.view.View
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
-import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardActivity
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase.GetFlashcards
 import kotlinx.android.synthetic.main.activity_flashcard_list.*
@@ -149,16 +148,18 @@ class FlashcardListActivity : AppCompatActivity(), FlashcardListContract.View {
     }
 
     override fun showAddFlashcard() {
-        val intent = Intent(this, AddEditFlashcardActivity::class.java)
-        intent.putExtra(AddEditFlashcardActivity.flashcardIdExtra,
-                AddEditFlashcardActivity.newFlashcardExtra)
-        startActivity(intent)
+        // TODO: fix this
+//        val intent = Intent(this, AddEditFlashcardActivity::class.java)
+//        intent.putExtra(AddEditFlashcardActivity.flashcardIdExtra,
+//                AddEditFlashcardActivity.newFlashcardExtra)
+//        startActivity(intent)
     }
 
     override fun showEditFlashcard(flashcardId: String) {
-        val intent = Intent(this, AddEditFlashcardActivity::class.java)
-        intent.putExtra(AddEditFlashcardActivity.flashcardIdExtra, flashcardId)
-        startActivity(intent)
+        // TODO: fix this
+//        val intent = Intent(this, AddEditFlashcardActivity::class.java)
+//        intent.putExtra(AddEditFlashcardActivity.flashcardIdExtra, flashcardId)
+//        startActivity(intent)
     }
 
     override fun showFlashcardDetailsUi(flashcardPosition: Int) {

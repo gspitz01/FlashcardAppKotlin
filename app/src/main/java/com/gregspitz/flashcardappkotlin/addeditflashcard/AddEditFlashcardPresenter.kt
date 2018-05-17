@@ -40,7 +40,7 @@ class AddEditFlashcardPresenter (
 
     override fun start() {
         flashcardId = view.getIdFromIntent()
-        if (flashcardId == AddEditFlashcardActivity.newFlashcardExtra) {
+        if (flashcardId == AddEditFlashcardFragment.newFlashcardExtra) {
             view.showNewFlashcard()
         } else {
             loadFlashcard(flashcardId)

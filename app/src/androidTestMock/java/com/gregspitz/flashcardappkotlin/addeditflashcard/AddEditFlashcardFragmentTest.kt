@@ -30,6 +30,7 @@ import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.runner.AndroidJUnit4
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.R
+import com.gregspitz.flashcardappkotlin.SingleFragmentActivity
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListActivity
@@ -43,10 +44,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Tests for the implementation of {@link AddEditFlashcardActivity}
+ * Tests for the implementation of {@link AddEditFlashcardFragment}
  */
 @RunWith(AndroidJUnit4::class)
-class AddEditFlashcardActivityTest {
+class AddEditFlashcardFragmentTest {
 
     private val flashcard = Flashcard("0", "Front", "Back")
 
@@ -54,7 +55,7 @@ class AddEditFlashcardActivityTest {
 
     @Rule
     @JvmField
-    val testRule = IntentsTestRule<AddEditFlashcardActivity>(AddEditFlashcardActivity::class.java,
+    val testRule = IntentsTestRule<SingleFragmentActivity>(SingleFragmentActivity::class.java,
             true, false)
 
     @Before
@@ -65,7 +66,8 @@ class AddEditFlashcardActivityTest {
 
     @After
     fun tearDown() {
-        val toast = testRule.activity.getToast()
+        val fragment = testRule.activity.supportFragmentManager.fragments[0] as AddEditFlashcardFragment
+        val toast = fragment.getToast()
         toast?.cancel()
     }
 
@@ -78,7 +80,7 @@ class AddEditFlashcardActivityTest {
 
     @Test
     fun startWithNewFlashcardIntent_showsBlankFields() {
-        launchActivityWithStringIntent(AddEditFlashcardActivity.newFlashcardExtra)
+        launchActivityWithStringIntent(AddEditFlashcardFragment.newFlashcardExtra)
         onView(withId(R.id.flashcardEditFront)).check(matches(withText("")))
         onView(withId(R.id.flashcardEditBack)).check(matches(withText("")))
     }
@@ -125,7 +127,7 @@ class AddEditFlashcardActivityTest {
 
     @Test
     fun showListButtonClickNewFlashcard_showsFlashcardListViewWithNoParticularFlashcard() {
-        launchActivityWithStringIntent(AddEditFlashcardActivity.newFlashcardExtra)
+        launchActivityWithStringIntent(AddEditFlashcardFragment.newFlashcardExtra)
         onView(withId(R.id.showFlashcardListButton)).perform(click())
         intended(allOf(hasComponent(FlashcardListActivity::class.java.name),
                 hasExtra(FlashcardListActivity.flashcardIdExtra,
@@ -156,7 +158,8 @@ class AddEditFlashcardActivityTest {
 
     private fun launchActivityWithStringIntent(extra: String) {
         val intent = Intent()
-        intent.putExtra(AddEditFlashcardActivity.flashcardIdExtra, extra)
+        intent.putExtra(AddEditFlashcardFragment.flashcardIdExtra, extra)
         testRule.launchActivity(intent)
+        testRule.activity.setFragment(AddEditFlashcardFragment.newInstance())
     }
 }

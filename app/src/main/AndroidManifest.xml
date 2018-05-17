@@ -14,8 +14,6 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".flashcardlist.FlashcardListActivity">
         </activity>
-        <activity android:name=".addeditflashcard.AddEditFlashcardActivity">
-        </activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
