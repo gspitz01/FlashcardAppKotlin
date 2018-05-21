@@ -23,6 +23,8 @@ import com.gregspitz.flashcardappkotlin.data.model.Flashcard
  */
 open class FlashcardRepository(private val localDataSource: FlashcardDataSource) : FlashcardDataSource {
 
+    // TODO: add remote data service here
+
     override fun getFlashcards(callback: FlashcardDataSource.GetFlashcardsCallback) {
         localDataSource.getFlashcards(callback)
     }

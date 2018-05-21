@@ -38,6 +38,7 @@ ext {
     constraintLayoutVersion = '1.1.0'
     archLifecycleVersion = '1.1.1'
     archRoomVersion = '1.1.0'
+    retrofitVersion = '2.4.0'
     daggerVersion = '2.12'
     kaptDaggerCompilerVersion = '2.13'
     junitVersion = '4.12'
