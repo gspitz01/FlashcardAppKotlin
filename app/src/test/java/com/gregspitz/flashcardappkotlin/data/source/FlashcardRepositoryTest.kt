@@ -17,9 +17,9 @@
 package com.gregspitz.flashcardappkotlin.data.source
 
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
-import com.nhaarman.mockito_kotlin.eq
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.verify
+import com.gregspitz.flashcardappkotlin.data.source.local.FlashcardDao
+import com.gregspitz.flashcardappkotlin.data.source.local.FlashcardLocalDataSource
+import com.nhaarman.mockito_kotlin.*
 import org.junit.Test
 
 /**
@@ -27,15 +27,42 @@ import org.junit.Test
  */
 class FlashcardRepositoryTest {
 
-    private val mockLocalDataSource: FlashcardDataSource = mock()
+    private val flashcard1 = Flashcard("0", "Front", "Back")
+    private val flashcard2 = Flashcard("1", "Different Front", "Other Back")
+    private val flashcards = listOf(flashcard1, flashcard2)
 
-    private val flashcardRepository = FlashcardRepository(mockLocalDataSource)
+    private val mockFlashcardDao: FlashcardDao = mock()
+
+    private val localDataSource = FlashcardLocalDataSource(mockFlashcardDao)
+
+    private val spyLocalDataSource: FlashcardLocalDataSource = spy(localDataSource)
+
+    private val mockRemoteDataSource: FlashcardDataSource = mock()
+
+    private val getFlashcardsArgumentCaptor =
+            argumentCaptor<FlashcardDataSource.GetFlashcardsCallback>()
+
+    private val getFlashcardsCallback: FlashcardDataSource.GetFlashcardsCallback = mock()
+
+    private val flashcardRepository = FlashcardRepository(spyLocalDataSource, mockRemoteDataSource)
 
     @Test
-    fun getFlashcards_callsGetFlashcardsOnLocalDataSource() {
-        val getFlashcardsCallback: FlashcardDataSource.GetFlashcardsCallback = mock()
+    fun getFlashcards_callsGetFlashcardsOnRemoteDataSourceFirstTime() {
         flashcardRepository.getFlashcards(getFlashcardsCallback)
-        verify(mockLocalDataSource).getFlashcards(eq(getFlashcardsCallback))
+        verify(mockRemoteDataSource).getFlashcards(any())
+    }
+
+    @Test
+    fun getFlashcardsSecondTime_getsFlashcardsFromCache() {
+        // First call will go to remote data source
+        flashcardRepository.getFlashcards(getFlashcardsCallback)
+        verify(mockRemoteDataSource).getFlashcards(getFlashcardsArgumentCaptor.capture())
+        getFlashcardsArgumentCaptor.firstValue.onFlashcardsLoaded(flashcards)
+
+        // Second call will get from cache
+        flashcardRepository.getFlashcards(getFlashcardsCallback)
+        verify(getFlashcardsCallback, times(2)).onFlashcardsLoaded(flashcards)
+        verifyNoMoreInteractions(mockRemoteDataSource)
     }
 
     @Test
@@ -43,25 +70,63 @@ class FlashcardRepositoryTest {
         val getFlashcardCallback: FlashcardDataSource.GetFlashcardCallback = mock()
         val flashcardId = "id"
         flashcardRepository.getFlashcard(flashcardId, getFlashcardCallback)
-        verify(mockLocalDataSource).getFlashcard(eq(flashcardId), eq(getFlashcardCallback))
+        verify(spyLocalDataSource).getFlashcard(eq(flashcardId), any())
     }
 
     @Test
-    fun saveFlashcard_callsSaveFlashcardOnLocalDataSource() {
+    fun getFlashcard_failedLocalDataSource_callsGetFlashcardOnRemoteDataSource() {
+        val getFlashcardCallback: FlashcardDataSource.GetFlashcardCallback = mock()
+        val flashcardId = "id"
+        whenever(mockFlashcardDao.getFlashcard(eq(flashcardId))).thenReturn(null)
+        flashcardRepository.getFlashcard(flashcardId, getFlashcardCallback)
+        verify(spyLocalDataSource).getFlashcard(eq(flashcardId), any())
+        verify(mockRemoteDataSource).getFlashcard(eq(flashcardId), any())
+    }
+
+    @Test
+    fun saveFlashcard_callsSaveFlashcardToRemoteDataSourceAndSetsCacheDirty() {
+        // Call getFlashcards once to make sure cache is not dirty
+        getRemoteFlashcardsWithArgumentCaptor()
+
         val saveFlashcardCallback: FlashcardDataSource.SaveFlashcardCallback = mock()
         val flashcard = Flashcard("0", "Front", "Back")
         flashcardRepository.saveFlashcard(flashcard, saveFlashcardCallback)
-        verify(mockLocalDataSource).saveFlashcard(eq(flashcard), eq(saveFlashcardCallback))
+        verify(mockRemoteDataSource).saveFlashcard(eq(flashcard), eq(saveFlashcardCallback))
+
+        // Prove cache is dirty again
+        flashcardRepository.getFlashcards(getFlashcardsCallback)
+        verify(mockRemoteDataSource, times(2))
+                .getFlashcards(any())
     }
 
     @Test
-    fun deleteAllFlashcards_callsDeleteAllFlashcardsOnLocalDataSource() {
+    fun deleteAllFlashcards_callsDeleteAllFlashcardsOnLocalDataSourceAndSetsCacheDirty() {
+        // Call getFlashcards once to make sure cache is not dirty
+        getRemoteFlashcardsWithArgumentCaptor()
+
         flashcardRepository.deleteAllFlashcards()
-        verify(mockLocalDataSource).deleteAllFlashcards()
+        verify(spyLocalDataSource).deleteAllFlashcards()
+
+        // Prove cache is dirty again
+        flashcardRepository.getFlashcards(getFlashcardsCallback)
+        verify(mockRemoteDataSource, times(2)).getFlashcards(any())
     }
 
-    @Test(expected = NotImplementedError::class)
-    fun refreshFlashcards_throwsNotImplementedError() {
+    @Test
+    fun refreshFlashcards_setsCacheDirty() {
+        // Call getFlashcards once to make sure cache is not dirty
+        getRemoteFlashcardsWithArgumentCaptor()
+
         flashcardRepository.refreshFlashcards()
+
+        // Prove cache is dirty again
+        flashcardRepository.getFlashcards(getFlashcardsCallback)
+        verify(mockRemoteDataSource, times(2)).getFlashcards(any())
+    }
+
+    private fun getRemoteFlashcardsWithArgumentCaptor() {
+        flashcardRepository.getFlashcards(getFlashcardsCallback)
+        verify(mockRemoteDataSource).getFlashcards(getFlashcardsArgumentCaptor.capture())
+        getFlashcardsArgumentCaptor.firstValue.onFlashcardsLoaded(flashcards)
     }
 }

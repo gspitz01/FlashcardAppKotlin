@@ -37,7 +37,7 @@ interface FlashcardDao {
     @Insert(onConflict = REPLACE)
     fun insertFlashcard(flashcard: Flashcard)
 
-    @Insert
+    @Insert(onConflict = REPLACE)
     fun insertFlashcards(flashcards: List<Flashcard>)
 
     @Query("DELETE from flashcard")

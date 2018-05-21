@@ -26,6 +26,7 @@ import com.gregspitz.flashcardappkotlin.InitialData
 import com.gregspitz.flashcardappkotlin.data.source.local.FlashcardDao
 import com.gregspitz.flashcardappkotlin.data.source.local.FlashcardDatabase
 import com.gregspitz.flashcardappkotlin.data.source.local.FlashcardLocalDataSource
+import com.gregspitz.flashcardappkotlin.data.source.remote.FlashcardRemoteDataSource
 import dagger.Module
 import dagger.Provides
 import java.util.concurrent.Executors
@@ -70,12 +71,19 @@ class RepoModule {
     }
 
     @Provides @Singleton
-    fun provideFlashcardLocalDataSource(flashcardDao: FlashcardDao) : FlashcardDataSource {
+    fun provideFlashcardLocalDataSource(flashcardDao: FlashcardDao) : FlashcardLocalDataSource {
         return FlashcardLocalDataSource(flashcardDao)
     }
 
     @Provides @Singleton
-    fun provideFlashcardRepository(flashcardDataSource: FlashcardDataSource) : FlashcardRepository {
-        return FlashcardRepository(flashcardDataSource)
+    fun provideFlashcardRemoteDataSource() : FlashcardRemoteDataSource {
+        return FlashcardRemoteDataSource()
+    }
+
+    @Provides @Singleton
+    fun provideFlashcardRepository(flashcardLocalDataSource: FlashcardLocalDataSource,
+                                   flashcardRemoteDataSource: FlashcardRemoteDataSource)
+            : FlashcardRepository {
+        return FlashcardRepository(flashcardLocalDataSource, flashcardRemoteDataSource)
     }
 }
