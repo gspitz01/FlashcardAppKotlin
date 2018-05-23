@@ -49,7 +49,13 @@ class FlashcardRepositoryTest {
     @Test
     fun getFlashcards_callsGetFlashcardsOnRemoteDataSourceFirstTime() {
         flashcardRepository.getFlashcards(getFlashcardsCallback)
-        verify(mockRemoteDataSource).getFlashcards(any())
+        verify(mockRemoteDataSource).getFlashcards(getFlashcardsArgumentCaptor.capture())
+        getFlashcardsArgumentCaptor.firstValue.onFlashcardsLoaded(flashcards)
+
+        // Also saves flashcards to local data source
+        for (flashcard in flashcards) {
+            verify(spyLocalDataSource).saveFlashcard(eq(flashcard), any())
+        }
     }
 
     @Test
@@ -63,6 +69,14 @@ class FlashcardRepositoryTest {
         flashcardRepository.getFlashcards(getFlashcardsCallback)
         verify(getFlashcardsCallback, times(2)).onFlashcardsLoaded(flashcards)
         verifyNoMoreInteractions(mockRemoteDataSource)
+    }
+
+    @Test
+    fun getFlashcards_remoteSourceFails_triesFromLocalSource() {
+        flashcardRepository.getFlashcards(getFlashcardsCallback)
+        verify(mockRemoteDataSource).getFlashcards(getFlashcardsArgumentCaptor.capture())
+        getFlashcardsArgumentCaptor.firstValue.onDataNotAvailable()
+        verify(spyLocalDataSource).getFlashcards(any())
     }
 
     @Test

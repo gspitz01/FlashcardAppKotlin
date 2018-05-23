@@ -30,15 +30,14 @@ open class FlashcardRepository(private val localDataSource: FlashcardDataSource,
     private var cacheDirty = true
 
     override fun getFlashcards(callback: FlashcardDataSource.GetFlashcardsCallback) {
-        if (cacheDirty) {
+        // If cache is dirty or empty first try to get from remote source
+        // if that is not available, then try from the local source
+        // This is the reverse flow of getFlashcard
+        if (cacheDirty || cache.isEmpty()) {
             getFlashcardsFromRemoteSource(callback)
         } else {
-            if (cache.isNotEmpty()) {
-                callback.onFlashcardsLoaded(cache.values.toList())
-            } else {
-                // Never end up here
-                getFlashcardsFromLocalSource(callback)
-            }
+            // If cache is neither dirty nor empty, simply get from cache
+            callback.onFlashcardsLoaded(cache.values.toList())
         }
     }
 
@@ -95,11 +94,12 @@ open class FlashcardRepository(private val localDataSource: FlashcardDataSource,
     private fun getFlashcardsFromLocalSource(callback: FlashcardDataSource.GetFlashcardsCallback) {
         localDataSource.getFlashcards(object: FlashcardDataSource.GetFlashcardsCallback {
             override fun onFlashcardsLoaded(flashcards: List<Flashcard>) {
+                updateCache(flashcards)
                 callback.onFlashcardsLoaded(flashcards)
             }
 
             override fun onDataNotAvailable() {
-                getFlashcardsFromRemoteSource(callback)
+                callback.onDataNotAvailable()
             }
 
         })
@@ -121,7 +121,8 @@ open class FlashcardRepository(private val localDataSource: FlashcardDataSource,
             }
 
             override fun onDataNotAvailable() {
-                callback.onDataNotAvailable()
+                // If can't get from remote, try from local
+                getFlashcardsFromLocalSource(callback)
             }
         })
     }
