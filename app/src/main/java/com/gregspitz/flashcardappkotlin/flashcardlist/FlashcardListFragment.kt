@@ -17,6 +17,7 @@ import com.gregspitz.flashcardappkotlin.R.id.detailContent
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardFragment
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.data.model.FlashcardListItem
 import com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase.GetFlashcards
 import kotlinx.android.synthetic.main.fragment_flashcard_list.*
 import javax.inject.Inject
@@ -87,7 +88,7 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
 
         })
 
-        val flashcardsObserver = Observer<List<Flashcard>> {
+        val flashcardsObserver = Observer<List<FlashcardListItem>> {
             if (it != null) {
                 flashcardListMessages.visibility = View.GONE
                 recyclerAdapter.updateFlashcards(it)
@@ -101,20 +102,25 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
         FlashcardListPresenter(useCaseHandler, this, viewModel, getFlashcards)
     }
 
-    private fun moveToDetailsFromArgument(flashcards: List<Flashcard>) {
+    private fun moveToDetailsFromArgument(flashcards: List<FlashcardListItem>) {
         if (flashcardId != null && flashcardId != noParticularFlashcardExtra) {
             for ((index, flashcard) in flashcards.withIndex()) {
-                if (flashcard.id == flashcardId) {
-                    detailContent?.currentItem = index
+                when (flashcard) {
+                    is Flashcard -> {
+                        if (flashcard.id == flashcardId) {
+                            detailContent?.currentItem = index
+                        }
+                    }
                 }
+
             }
         }
     }
 
-    private fun initPagerAdapter(flashcards: List<Flashcard>) {
-        val fragments = flashcards.map {
+    private fun initPagerAdapter(flashcards: List<FlashcardListItem>) {
+        val fragments = flashcards.filter { it is Flashcard }.map {
             val bundle = Bundle()
-            bundle.putParcelable(FlashcardDetailFragment.flashcardBundleId, it)
+            bundle.putParcelable(FlashcardDetailFragment.flashcardBundleId, it as Flashcard)
             val fragment = FlashcardDetailFragment()
             fragment.arguments = bundle
             fragment

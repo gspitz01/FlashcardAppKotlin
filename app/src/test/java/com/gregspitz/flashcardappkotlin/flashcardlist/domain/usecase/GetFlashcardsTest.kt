@@ -60,7 +60,7 @@ class GetFlashcardsTest {
     fun executeUseCase_getsFlashcardsFromRepositoryAndOnSuccessCallsSuccessOnCallback() {
         repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(TestData.FLASHCARD_LIST)
         verify(callback).onSuccess(responseCaptor.capture())
-        assertEquals(TestData.FLASHCARD_LIST, responseCaptor.firstValue.flashcards)
+        assertEquals(TestData.FLASHCARD_LIST_WITH_CATEGORIES, responseCaptor.firstValue.flashcards)
     }
 
     @Test

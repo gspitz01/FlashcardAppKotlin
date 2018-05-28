@@ -21,30 +21,57 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.gregspitz.flashcardappkotlin.R
+import com.gregspitz.flashcardappkotlin.data.model.Category
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.data.model.FlashcardListItem
+import kotlinx.android.synthetic.main.category_list_holder.view.*
 import kotlinx.android.synthetic.main.flashcard_list_holder.view.*
 
 /**
  * Recycler adapter to hold a list of Flashcards
  */
-class FlashcardRecyclerAdapter(private var flashcards: List<Flashcard>)
+class FlashcardRecyclerAdapter(private var flashcards: List<FlashcardListItem>)
     : RecyclerView.Adapter<FlashcardRecyclerAdapter.Holder>() {
 
+    private val VIEW_TYPE_CATEGORY = 0
+    private val VIEW_TYPE_FLASHCARD = 1
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.flashcard_list_holder,
-                parent, false)
-        return Holder(view)
+        return when (viewType) {
+            VIEW_TYPE_FLASHCARD -> {
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.flashcard_list_holder,
+                        parent, false)
+                FlashcardHolder(view)
+            }
+            else -> {
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.category_list_holder,
+                        parent, false)
+                CategoryHolder(view)
+            }
+        }
     }
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
-        holder.setFlashcard(flashcards[position])
+        when (holder.itemViewType) {
+            VIEW_TYPE_FLASHCARD -> (holder as FlashcardHolder)
+                    .setFlashcard(flashcards[position] as Flashcard)
+            else -> (holder as CategoryHolder).setCategory(flashcards[position] as Category)
+        }
+
     }
 
     private lateinit var presenter: FlashcardListContract.Presenter
 
     override fun getItemCount(): Int = flashcards.size
 
-    fun updateFlashcards(flashcards: List<Flashcard>) {
+    override fun getItemViewType(position: Int): Int {
+        return when (flashcards[position]) {
+            is Flashcard -> VIEW_TYPE_FLASHCARD
+            else -> VIEW_TYPE_CATEGORY
+        }
+    }
+
+    fun updateFlashcards(flashcards: List<FlashcardListItem>) {
         this.flashcards = flashcards
         notifyDataSetChanged()
     }
@@ -53,12 +80,20 @@ class FlashcardRecyclerAdapter(private var flashcards: List<Flashcard>)
         this.presenter = presenter
     }
 
-    inner class Holder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    open inner class Holder(itemView: View) : RecyclerView.ViewHolder(itemView)
+
+    inner class FlashcardHolder(itemView: View) : Holder(itemView) {
         fun setFlashcard(flashcard: Flashcard) {
             itemView.flashcardFront.text = flashcard.front
             itemView.setOnClickListener {
                 presenter.onFlashcardClick(adapterPosition)
             }
+        }
+    }
+
+    inner class CategoryHolder(itemView: View) : Holder(itemView) {
+        fun setCategory(category: Category) {
+            itemView.categoryName.text = category.name
         }
     }
 

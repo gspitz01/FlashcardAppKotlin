@@ -17,7 +17,9 @@
 package com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase
 
 import com.gregspitz.flashcardappkotlin.UseCase
+import com.gregspitz.flashcardappkotlin.data.model.Category
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.data.model.FlashcardListItem
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
 import javax.inject.Inject
@@ -31,7 +33,14 @@ class GetFlashcards @Inject constructor(private val flashcardRepository: Flashca
     override fun executeUseCase(requestValues: RequestValues) {
         flashcardRepository.getFlashcards(object: FlashcardDataSource.GetFlashcardsCallback {
             override fun onFlashcardsLoaded(flashcards: List<Flashcard>) {
-                getUseCaseCallback().onSuccess(ResponseValue(flashcards))
+                val listWithCategories = mutableListOf<FlashcardListItem>()
+                for (flashcard in flashcards) {
+                    if (!listWithCategories.contains(Category(flashcard.category))) {
+                        listWithCategories.add(Category(flashcard.category))
+                    }
+                    listWithCategories.add(flashcard)
+                }
+                getUseCaseCallback().onSuccess(ResponseValue(listWithCategories))
             }
 
             override fun onDataNotAvailable() {
@@ -43,5 +52,5 @@ class GetFlashcards @Inject constructor(private val flashcardRepository: Flashca
 
     class RequestValues : UseCase.RequestValues
 
-    class ResponseValue(val flashcards: List<Flashcard>) : UseCase.ResponseValue
+    class ResponseValue(val flashcards: List<FlashcardListItem>) : UseCase.ResponseValue
 }

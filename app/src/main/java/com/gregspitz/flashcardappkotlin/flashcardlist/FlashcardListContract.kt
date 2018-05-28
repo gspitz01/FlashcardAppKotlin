@@ -19,6 +19,7 @@ package com.gregspitz.flashcardappkotlin.flashcardlist
 import com.gregspitz.flashcardappkotlin.BasePresenter
 import com.gregspitz.flashcardappkotlin.BaseView
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.data.model.FlashcardListItem
 
 /**
  * A contract between the flashcard list view and its presenter
@@ -55,8 +56,8 @@ interface FlashcardListContract {
 
     interface ViewModel {
 
-        fun setFlashcards(flashcards: List<Flashcard>)
+        fun setFlashcards(flashcards: List<FlashcardListItem>)
 
-        fun getFlashcards() : List<Flashcard>?
+        fun getFlashcards() : List<FlashcardListItem>?
     }
 }

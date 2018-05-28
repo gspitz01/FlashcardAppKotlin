@@ -18,20 +18,20 @@ package com.gregspitz.flashcardappkotlin.flashcardlist
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
-import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.data.model.FlashcardListItem
 
 /**
  * ViewModel for FlashcardListActivity
  */
 class FlashcardListViewModel : ViewModel(), FlashcardListContract.ViewModel {
 
-    val flashcards: MutableLiveData<List<Flashcard>> = MutableLiveData()
+    val flashcards: MutableLiveData<List<FlashcardListItem>> = MutableLiveData()
 
-    override fun setFlashcards(flashcards: List<Flashcard>) {
+    override fun setFlashcards(flashcards: List<FlashcardListItem>) {
         this.flashcards.value = flashcards
     }
 
-    override fun getFlashcards() : List<Flashcard>? {
+    override fun getFlashcards() : List<FlashcardListItem>? {
         return flashcards.value
     }
 
