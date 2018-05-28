@@ -16,6 +16,7 @@
 
 package com.gregspitz.flashcardappkotlin.data.source
 
+import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_LIST
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.source.local.FlashcardDao
 import com.gregspitz.flashcardappkotlin.data.source.local.FlashcardLocalDataSource
@@ -26,10 +27,6 @@ import org.junit.Test
  * Tests for {@link FlashcardRepository}
  */
 class FlashcardRepositoryTest {
-
-    private val flashcard1 = Flashcard("0", "Front", "Back")
-    private val flashcard2 = Flashcard("1", "Different Front", "Other Back")
-    private val flashcards = listOf(flashcard1, flashcard2)
 
     private val mockFlashcardDao: FlashcardDao = mock()
 
@@ -50,10 +47,10 @@ class FlashcardRepositoryTest {
     fun getFlashcards_callsGetFlashcardsOnRemoteDataSourceFirstTime() {
         flashcardRepository.getFlashcards(getFlashcardsCallback)
         verify(mockRemoteDataSource).getFlashcards(getFlashcardsArgumentCaptor.capture())
-        getFlashcardsArgumentCaptor.firstValue.onFlashcardsLoaded(flashcards)
+        getFlashcardsArgumentCaptor.firstValue.onFlashcardsLoaded(FLASHCARD_LIST)
 
         // Also saves flashcards to local data source
-        for (flashcard in flashcards) {
+        for (flashcard in FLASHCARD_LIST) {
             verify(spyLocalDataSource).saveFlashcard(eq(flashcard), any())
         }
     }
@@ -63,11 +60,11 @@ class FlashcardRepositoryTest {
         // First call will go to remote data source
         flashcardRepository.getFlashcards(getFlashcardsCallback)
         verify(mockRemoteDataSource).getFlashcards(getFlashcardsArgumentCaptor.capture())
-        getFlashcardsArgumentCaptor.firstValue.onFlashcardsLoaded(flashcards)
+        getFlashcardsArgumentCaptor.firstValue.onFlashcardsLoaded(FLASHCARD_LIST)
 
         // Second call will get from cache
         flashcardRepository.getFlashcards(getFlashcardsCallback)
-        verify(getFlashcardsCallback, times(2)).onFlashcardsLoaded(flashcards)
+        verify(getFlashcardsCallback, times(2)).onFlashcardsLoaded(FLASHCARD_LIST)
         verifyNoMoreInteractions(mockRemoteDataSource)
     }
 
@@ -103,7 +100,7 @@ class FlashcardRepositoryTest {
         getRemoteFlashcardsWithArgumentCaptor()
 
         val saveFlashcardCallback: FlashcardDataSource.SaveFlashcardCallback = mock()
-        val flashcard = Flashcard("0", "Front", "Back")
+        val flashcard = Flashcard("0", "Some Category", "Front", "Back")
         flashcardRepository.saveFlashcard(flashcard, saveFlashcardCallback)
         verify(mockRemoteDataSource).saveFlashcard(eq(flashcard), eq(saveFlashcardCallback))
 
@@ -141,6 +138,6 @@ class FlashcardRepositoryTest {
     private fun getRemoteFlashcardsWithArgumentCaptor() {
         flashcardRepository.getFlashcards(getFlashcardsCallback)
         verify(mockRemoteDataSource).getFlashcards(getFlashcardsArgumentCaptor.capture())
-        getFlashcardsArgumentCaptor.firstValue.onFlashcardsLoaded(flashcards)
+        getFlashcardsArgumentCaptor.firstValue.onFlashcardsLoaded(FLASHCARD_LIST)
     }
 }

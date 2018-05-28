@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginTop="?attr/actionBarSize"
     android:padding="@dimen/flashcard_list_view_padding"
     tools:context="com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListFragment">
 

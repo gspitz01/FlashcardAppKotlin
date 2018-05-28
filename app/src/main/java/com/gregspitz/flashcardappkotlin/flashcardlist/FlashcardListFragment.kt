@@ -105,7 +105,7 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
         if (flashcardId != null && flashcardId != noParticularFlashcardExtra) {
             for ((index, flashcard) in flashcards.withIndex()) {
                 if (flashcard.id == flashcardId) {
-                    detailContent.currentItem = index
+                    detailContent?.currentItem = index
                 }
             }
         }
@@ -126,6 +126,7 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
         super.onResume()
         active = true
         presenter.start()
+        viewModel.flashcards.value?.let { moveToDetailsFromArgument(it) }
     }
 
     override fun onPause() {
@@ -135,9 +136,6 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
 
     override fun setDetailView(flashcardId: String) {
         this.flashcardId = flashcardId
-        if (viewModel.flashcards.value != null) {
-            moveToDetailsFromArgument(viewModel.flashcards.value!!)
-        }
     }
 
     override fun setLoadingIndicator(active: Boolean) {

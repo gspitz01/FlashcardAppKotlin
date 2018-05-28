@@ -16,23 +16,18 @@
 
 package com.gregspitz.flashcardappkotlin.flashcardlist
 
+import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_LIST
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
-import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase.GetFlashcards
 import com.nhaarman.mockito_kotlin.*
 import org.junit.Before
 import org.junit.Test
-import java.util.*
 
 /**
  * Tests for the implementation of {@link FlashcardListPresenter}
  */
 class FlashcardListPresenterTest {
-
-    private val flashcard1 = Flashcard("0", "A front", "A back")
-
-    private val flashcard2 = Flashcard("1", "A different front", "A different back")
 
     private val getFlashcards: GetFlashcards = mock()
 
@@ -64,11 +59,10 @@ class FlashcardListPresenterTest {
         val inOrder = inOrder(flashcardListView)
         inOrder.verify(flashcardListView).setLoadingIndicator(true)
         verify(useCaseHandler).execute(eq(getFlashcards), any(), useCaseCallbackCaptor.capture())
-        val flashcards = getTestFlashcardsList()
-        val response = GetFlashcards.ResponseValue(flashcards)
+        val response = GetFlashcards.ResponseValue(FLASHCARD_LIST)
         useCaseCallbackCaptor.firstValue.onSuccess(response)
         inOrder.verify(flashcardListView).setLoadingIndicator(false)
-        verify(flashcardListViewModel).setFlashcards(flashcards)
+        verify(flashcardListViewModel).setFlashcards(FLASHCARD_LIST)
     }
 
     @Test
@@ -91,10 +85,6 @@ class FlashcardListPresenterTest {
         createAndStartPresenter()
         flashcardListPresenter.onFlashcardClick(0)
         verify(flashcardListView).showFlashcardDetailsUi(0)
-    }
-
-    private fun getTestFlashcardsList(): List<Flashcard> {
-        return Arrays.asList(flashcard1, flashcard2)
     }
 
     private fun createAndStartPresenter() {

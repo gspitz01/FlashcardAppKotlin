@@ -16,10 +16,14 @@
 
 package com.gregspitz.flashcardappkotlin.randomflashcard.domain.usecase
 
+import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_1
+import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_2
+import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_LIST
+import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_LIST_SAME_IDS
+import com.gregspitz.flashcardappkotlin.TestData.SINGLE_FLASHCARD_LIST
 import com.gregspitz.flashcardappkotlin.TestUseCaseScheduler
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
-import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
 import com.nhaarman.mockito_kotlin.argumentCaptor
@@ -33,13 +37,6 @@ import org.junit.Test
  * Tests for {@link GetRandomFlashcard}
  */
 class GetRandomFlashcardTest {
-
-    private val flashcard1 = Flashcard("0", "Front", "Back")
-    private val flashcard2 = Flashcard("1", "Front", "Back")
-    private val flashcard3 = Flashcard("0", "Front", "Back")
-    private val singleFlashcardList = listOf(flashcard1)
-    private val flashcards = listOf(flashcard1, flashcard2)
-    private val flashcardsSameId = listOf(flashcard1, flashcard3)
 
     private val flashcardRepository: FlashcardRepository = mock()
 
@@ -64,39 +61,39 @@ class GetRandomFlashcardTest {
         val values = GetRandomFlashcard.RequestValues(null)
         useCaseHandler.execute(getRandomFlashcards, values, callback)
         verify(flashcardRepository).getFlashcards(repositoryCallbackCaptor.capture())
-        repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(singleFlashcardList)
+        repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(SINGLE_FLASHCARD_LIST)
         verify(callback).onSuccess(responseCaptor.capture())
-        assertEquals(flashcard1, responseCaptor.firstValue.flashcard)
+        assertEquals(FLASHCARD_1, responseCaptor.firstValue.flashcard)
     }
 
     @Test
     fun onlyOneFlashcard_samePreviousFlashcard_getsFlashcardAndCallsSuccessOnCallback() {
-        val values = GetRandomFlashcard.RequestValues(flashcard1.id)
+        val values = GetRandomFlashcard.RequestValues(FLASHCARD_1.id)
         useCaseHandler.execute(getRandomFlashcards, values, callback)
         verify(flashcardRepository).getFlashcards(repositoryCallbackCaptor.capture())
-        repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(singleFlashcardList)
+        repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(SINGLE_FLASHCARD_LIST)
         verify(callback).onSuccess(responseCaptor.capture())
-        assertEquals(flashcard1, responseCaptor.firstValue.flashcard)
+        assertEquals(FLASHCARD_1, responseCaptor.firstValue.flashcard)
     }
 
     @Test
     fun allFlashcardsHaveSameId_getsFirstFlashcardInListAndCallsSuccessOnCallback() {
-        val values = GetRandomFlashcard.RequestValues(flashcard1.id)
+        val values = GetRandomFlashcard.RequestValues(FLASHCARD_1.id)
         useCaseHandler.execute(getRandomFlashcards, values, callback)
         verify(flashcardRepository).getFlashcards(repositoryCallbackCaptor.capture())
-        repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(flashcardsSameId)
+        repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(FLASHCARD_LIST_SAME_IDS)
         verify(callback).onSuccess(responseCaptor.capture())
-        assertEquals(flashcard1, responseCaptor.firstValue.flashcard)
+        assertEquals(FLASHCARD_1, responseCaptor.firstValue.flashcard)
     }
 
     @Test
     fun bothFlashcards_getsFlashcardDifferentFromPreviousAndCallsSuccessOnCallback() {
-        val values = GetRandomFlashcard.RequestValues(flashcard1.id)
+        val values = GetRandomFlashcard.RequestValues(FLASHCARD_1.id)
         useCaseHandler.execute(getRandomFlashcards, values, callback)
         verify(flashcardRepository).getFlashcards(repositoryCallbackCaptor.capture())
-        repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(flashcards)
+        repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(FLASHCARD_LIST)
         verify(callback).onSuccess(responseCaptor.capture())
-        assertEquals(flashcard2, responseCaptor.firstValue.flashcard)
+        assertEquals(FLASHCARD_2, responseCaptor.firstValue.flashcard)
     }
 
     @Test

@@ -16,7 +16,8 @@
 
 package com.gregspitz.flashcardappkotlin.data.source.local
 
-import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_1
+import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_LIST
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import com.nhaarman.mockito_kotlin.*
 import org.junit.Test
@@ -26,43 +27,39 @@ import org.junit.Test
  */
 class FlashcardLocalDataSourceTest {
 
-    private val flashcard1 = Flashcard("0", "Front", "Back")
-    private val flashcard2 = Flashcard("1", "Front", "Back")
-    private val flashcards = listOf(flashcard1, flashcard2)
-
     private val mockFlashcardDao: FlashcardDao = mock()
 
     private val flashcardLocalDataSource = FlashcardLocalDataSource(mockFlashcardDao)
 
     @Test
     fun getFlashcards_getsFlashcardsFromFlashcardDaoAndPassesThemToCallback() {
-        whenever(mockFlashcardDao.getFlashcards()).thenReturn(flashcards)
+        whenever(mockFlashcardDao.getFlashcards()).thenReturn(FLASHCARD_LIST)
         val getFlashcardsCallback: FlashcardDataSource.GetFlashcardsCallback = mock()
         flashcardLocalDataSource.getFlashcards(getFlashcardsCallback)
-        verify(getFlashcardsCallback).onFlashcardsLoaded(eq(flashcards))
+        verify(getFlashcardsCallback).onFlashcardsLoaded(eq(FLASHCARD_LIST))
     }
 
     @Test
     fun getFlashcardWithAvailableFlashcard_getsFromDaoAndPassesToCallback() {
-        whenever(mockFlashcardDao.getFlashcard(eq(flashcard1.id))).thenReturn(flashcard1)
+        whenever(mockFlashcardDao.getFlashcard(eq(FLASHCARD_1.id))).thenReturn(FLASHCARD_1)
         val getFlashcardCallback: FlashcardDataSource.GetFlashcardCallback = mock()
-        flashcardLocalDataSource.getFlashcard(flashcard1.id, getFlashcardCallback)
-        verify(getFlashcardCallback).onFlashcardLoaded(eq(flashcard1))
+        flashcardLocalDataSource.getFlashcard(FLASHCARD_1.id, getFlashcardCallback)
+        verify(getFlashcardCallback).onFlashcardLoaded(eq(FLASHCARD_1))
     }
 
     @Test
     fun getFlashcardWithUnavailableFlashcard_callsOnDataNotAvailableOnCallback() {
-        whenever(mockFlashcardDao.getFlashcard(flashcard1.id)).thenReturn(null)
+        whenever(mockFlashcardDao.getFlashcard(FLASHCARD_1.id)).thenReturn(null)
         val getFlashcardCallback: FlashcardDataSource.GetFlashcardCallback = mock()
-        flashcardLocalDataSource.getFlashcard(flashcard1.id, getFlashcardCallback)
+        flashcardLocalDataSource.getFlashcard(FLASHCARD_1.id, getFlashcardCallback)
         verify(getFlashcardCallback).onDataNotAvailable()
     }
 
     @Test
     fun saveFlashcard_insertsFlashcardIntoDaoAndCallSaveSuccessfulOnCallback() {
         val saveFlashcardCallback: FlashcardDataSource.SaveFlashcardCallback = mock()
-        flashcardLocalDataSource.saveFlashcard(flashcard1, saveFlashcardCallback)
-        verify(mockFlashcardDao).insertFlashcard(eq(flashcard1))
+        flashcardLocalDataSource.saveFlashcard(FLASHCARD_1, saveFlashcardCallback)
+        verify(mockFlashcardDao).insertFlashcard(eq(FLASHCARD_1))
         verify(saveFlashcardCallback).onSaveSuccessful()
     }
 

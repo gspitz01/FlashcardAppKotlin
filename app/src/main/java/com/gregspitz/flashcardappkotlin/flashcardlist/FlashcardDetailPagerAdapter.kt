@@ -16,6 +16,7 @@
 
 package com.gregspitz.flashcardappkotlin.flashcardlist
 
+import android.os.Parcelable
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
@@ -31,9 +32,14 @@ class FlashcardDetailPagerAdapter(fragmentManager: FragmentManager,
         return fragments.size
     }
 
+    override fun restoreState(state: Parcelable?, loader: ClassLoader?) {
+        // Do nothing to avoid NPE
+        // this solution comes from this stackoverflow response
+        // https://stackoverflow.com/questions/18642890/fragmentstatepageradapter-with-childfragmentmanager-fragmentmanagerimpl-getfra
+    }
+
     fun setFragments(fragments: List<Fragment>) {
         this.fragments = fragments
         notifyDataSetChanged()
     }
-
 }

@@ -32,8 +32,14 @@ class RepoModule {
     }
 
     @Provides @Singleton
-    fun provideRepository(flashcardLocalDataSource: FakeFlashcardLocalDataSource)
+    fun provideRemoteDataSource() : FakeFlashcardRemoteDataSource {
+        return FakeFlashcardRemoteDataSource()
+    }
+
+    @Provides @Singleton
+    fun provideRepository(flashcardLocalDataSource: FakeFlashcardLocalDataSource,
+                          flashcardRemoteDataSource: FakeFlashcardRemoteDataSource)
             : FlashcardRepository {
-        return FlashcardRepository(flashcardLocalDataSource)
+        return FlashcardRepository(flashcardLocalDataSource, flashcardRemoteDataSource)
     }
 }

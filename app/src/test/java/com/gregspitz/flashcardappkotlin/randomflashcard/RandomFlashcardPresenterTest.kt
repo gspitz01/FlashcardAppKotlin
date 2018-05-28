@@ -16,15 +16,15 @@
 
 package com.gregspitz.flashcardappkotlin.randomflashcard
 
+import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_1
+import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_2
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardSide
 import com.gregspitz.flashcardappkotlin.randomflashcard.domain.usecase.GetRandomFlashcard
 import com.nhaarman.mockito_kotlin.*
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertNotEquals
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.InOrder
@@ -34,13 +34,9 @@ import org.mockito.InOrder
  */
 class RandomFlashcardPresenterTest {
 
-    private val flashcard1 = Flashcard("0", "Front", "Back")
+    private val response1 = GetRandomFlashcard.ResponseValue(FLASHCARD_1)
 
-    private val response1 = GetRandomFlashcard.ResponseValue(flashcard1)
-
-    private val flashcard2 = Flashcard("1", "An affront", "Taken aback")
-
-    private val response2 = GetRandomFlashcard.ResponseValue(flashcard2)
+    private val response2 = GetRandomFlashcard.ResponseValue(FLASHCARD_2)
 
     private val getRandomFlashcard: GetRandomFlashcard = mock()
 
@@ -78,7 +74,7 @@ class RandomFlashcardPresenterTest {
                 .execute(eq(getRandomFlashcard), any(), useCaseCallbackCaptor.capture())
         useCaseCallbackCaptor.firstValue.onSuccess(response1)
         inOrder.verify(randomFlashcardView).setLoadingIndicator(false)
-        verify(randomFlashcardViewModel).setFlashcard(flashcard1)
+        verify(randomFlashcardViewModel).setFlashcard(FLASHCARD_1)
         verify(randomFlashcardViewModel).setFlashcardSide(FlashcardSide.FRONT)
     }
 
@@ -100,7 +96,7 @@ class RandomFlashcardPresenterTest {
         useCaseHandlerInOrder.verify(useCaseHandler).execute(eq(getRandomFlashcard),
                 requestCaptor.capture(), useCaseCallbackCaptor.capture())
 
-        assertEquals(flashcard1.id, requestCaptor.secondValue.flashcardId)
+        assertEquals(FLASHCARD_1.id, requestCaptor.secondValue.flashcardId)
 
         useCaseCallbackCaptor.secondValue.onSuccess(response2)
         inOrder.verify(randomFlashcardView).setLoadingIndicator(false)

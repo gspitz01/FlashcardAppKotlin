@@ -131,12 +131,13 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
     override fun setPresenter(presenter: AddEditFlashcardContract.Presenter) {
         this.presenter = presenter
         saveFlashcardButton.setOnClickListener {
+            val category = flashcardEditCategory.text.toString()
             val front = flashcardEditFront.text.toString()
             val back = flashcardEditBack.text.toString()
             flashcard = if (flashcard != null) {
-                Flashcard(flashcard!!.id, front, back)
+                Flashcard(flashcard!!.id, category, front, back)
             } else {
-                Flashcard(front = front, back = back)
+                Flashcard(category = category, front = front, back = back)
             }
             this@AddEditFlashcardFragment.presenter.saveFlashcard(flashcard!!)
         }

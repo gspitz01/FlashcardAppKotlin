@@ -24,10 +24,11 @@ import kotlinx.android.parcel.Parcelize
 import java.util.*
 
 /**
- * An immutable text flashcard with a front and a back
+ * An immutable text flashcard with a category (as a String), front and a back
  */
 @SuppressLint("ParcelCreator")
 @Parcelize
 @Entity(tableName = "flashcard")
 data class Flashcard(@PrimaryKey val id: String = UUID.randomUUID().toString(),
-                     val front: String, val back: String) : Parcelable
+                     val category: String, val front: String, val back: String)
+    : Parcelable, FlashcardListItem

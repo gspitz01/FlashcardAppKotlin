@@ -16,10 +16,10 @@
 
 package com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase
 
+import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.TestUseCaseScheduler
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
-import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
 import com.nhaarman.mockito_kotlin.*
@@ -31,9 +31,7 @@ import org.junit.Test
  */
 class SaveFlashcardTest {
 
-    private val flashcard = Flashcard("0", "Front", "Back")
-
-    private val values = SaveFlashcard.RequestValues(flashcard)
+    private val values = SaveFlashcard.RequestValues(FLASHCARD_1)
 
     private val flashcardRepository: FlashcardRepository = mock()
 
@@ -50,7 +48,7 @@ class SaveFlashcardTest {
     fun setup() {
         saveFlashcard = SaveFlashcard(flashcardRepository)
         useCaseHandler.execute(saveFlashcard, values, callback)
-        verify(flashcardRepository).saveFlashcard(eq(flashcard), repositoryCallbackCaptor.capture())
+        verify(flashcardRepository).saveFlashcard(eq(FLASHCARD_1), repositoryCallbackCaptor.capture())
     }
 
     @Test

@@ -16,11 +16,11 @@
 
 package com.gregspitz.flashcardappkotlin.addeditflashcard
 
+import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.GetFlashcard
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.SaveFlashcard
-import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.nhaarman.mockito_kotlin.*
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -31,9 +31,7 @@ import org.junit.Test
  */
 class AddEditFlashcardPresenterTest {
 
-    private val flashcard = Flashcard("0", "Front", "Back")
-
-    private val response = GetFlashcard.ResponseValue(flashcard)
+    private val response = GetFlashcard.ResponseValue(FLASHCARD_1)
 
     private val view: AddEditFlashcardContract.View = mock()
 
@@ -58,7 +56,7 @@ class AddEditFlashcardPresenterTest {
     @Before
     fun setup() {
         whenever(view.isActive()).thenReturn(true)
-        whenever(view.getIdFromArguments()).thenReturn(flashcard.id)
+        whenever(view.getIdFromArguments()).thenReturn(FLASHCARD_1.id)
     }
 
     @Test
@@ -73,9 +71,9 @@ class AddEditFlashcardPresenterTest {
         val inOrder = inOrder(view)
         inOrder.verify(view).setLoadingIndicator(true)
         verifyGetCallbackSuccess()
-        assertEquals(flashcard.id, getRequestCaptor.firstValue.flashcardId)
+        assertEquals(FLASHCARD_1.id, getRequestCaptor.firstValue.flashcardId)
         inOrder.verify(view).setLoadingIndicator(false)
-        verify(view).showFlashcard(flashcard)
+        verify(view).showFlashcard(FLASHCARD_1)
     }
 
     @Test
@@ -95,10 +93,10 @@ class AddEditFlashcardPresenterTest {
         inOrder.verify(useCaseHandler).execute(eq(getFlashcard), getRequestCaptor.capture(),
                 getFlashcardCallbackCaptor.capture())
         getFlashcardCallbackCaptor.firstValue.onSuccess(response)
-        presenter.saveFlashcard(flashcard)
+        presenter.saveFlashcard(FLASHCARD_1)
         inOrder.verify(useCaseHandler).execute(eq(saveFlashcard), saveRequestCaptor.capture(),
                 saveFlashcardCallbackCaptor.capture())
-        assertEquals(flashcard, saveRequestCaptor.firstValue.flashcard)
+        assertEquals(FLASHCARD_1, saveRequestCaptor.firstValue.flashcard)
         val saveResponse = SaveFlashcard.ResponseValue()
         saveFlashcardCallbackCaptor.firstValue.onSuccess(saveResponse)
         verify(view).showSaveSuccessful()
@@ -111,10 +109,10 @@ class AddEditFlashcardPresenterTest {
         inOrder.verify(useCaseHandler).execute(eq(getFlashcard), getRequestCaptor.capture(),
                 getFlashcardCallbackCaptor.capture())
         getFlashcardCallbackCaptor.firstValue.onSuccess(response)
-        presenter.saveFlashcard(flashcard)
+        presenter.saveFlashcard(FLASHCARD_1)
         inOrder.verify(useCaseHandler).execute(eq(saveFlashcard), saveRequestCaptor.capture(),
                 saveFlashcardCallbackCaptor.capture())
-        assertEquals(flashcard, saveRequestCaptor.firstValue.flashcard)
+        assertEquals(FLASHCARD_1, saveRequestCaptor.firstValue.flashcard)
         saveFlashcardCallbackCaptor.firstValue.onError()
         verify(view).showSaveFailed()
     }
@@ -123,7 +121,7 @@ class AddEditFlashcardPresenterTest {
     fun showList_callsShowListViewOnView() {
         createAndStartPresenter()
         presenter.showList()
-        verify(view).showFlashcardList(eq(flashcard.id))
+        verify(view).showFlashcardList(eq(FLASHCARD_1.id))
     }
 
     private fun verifyGetCallbackSuccess() {
