@@ -34,6 +34,7 @@ import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_2
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.SingleFragmentActivity
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.junit.Before
@@ -48,8 +49,9 @@ import org.junit.runner.RunWith
 class RandomFlashcardFragmentTest {
 
     private var firstText = ""
+    private var firstCategory = ""
 
-    private val dataSource = FlashcardApplication.repoComponent.exposeLocalDataSource()
+    private val dataSource = FlashcardApplication.repoComponent.exposeRepository()
 
     @Rule @JvmField
     val testRule = ActivityTestRule<SingleFragmentActivity>(
@@ -58,7 +60,6 @@ class RandomFlashcardFragmentTest {
     @Before
     fun setup() {
         dataSource.deleteAllFlashcards()
-
     }
 
     @Test
@@ -67,7 +68,9 @@ class RandomFlashcardFragmentTest {
 
         launchActivity()
 
-        onView(withId(R.id.flashcardSide)).check(matches(withText(FLASHCARD_1.front)))
+        onView(withId(R.id.flashcardCategory)).check(matches(withText(FLASHCARD_1.category)))
+        onView(withId(R.id.flashcardSide))
+                .check(matches(withText(FLASHCARD_1.front)))
                 .perform(click())
                 .check(matches(withText(FLASHCARD_1.back)))
     }
@@ -85,11 +88,12 @@ class RandomFlashcardFragmentTest {
         addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity()
 
-        onView(withId(R.id.flashcardSide))
-                .check(matches(withTextOfOneOf(FLASHCARD_1.front, FLASHCARD_2.front)))
+        verifyFirstCategoryAndText(FLASHCARD_1, FLASHCARD_2)
         onView(withId(R.id.nextFlashcardButton)).perform(click())
         val secondText = getSecondText(FLASHCARD_1.front, FLASHCARD_2.front)
         onView(withId(R.id.flashcardSide)).check(matches(withText(secondText)))
+        val secondCategory = getSecondCategory(FLASHCARD_1.category, FLASHCARD_2.category)
+        onView(withId(R.id.flashcardCategory)).check(matches(withText(secondCategory)))
     }
 
     @Test
@@ -99,9 +103,9 @@ class RandomFlashcardFragmentTest {
         launchActivity()
 
         testRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        onView(withId(R.id.flashcardSide))
-                .check(matches(withTextOfOneOf(FLASHCARD_1.front, FLASHCARD_2.front)))
+        verifyFirstCategoryAndText(FLASHCARD_1, FLASHCARD_2)
         testRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        onView(withId(R.id.flashcardCategory)).check(matches(withText(firstCategory)))
         onView(withId(R.id.flashcardSide)).check(matches(withText(firstText)))
     }
 
@@ -110,9 +114,18 @@ class RandomFlashcardFragmentTest {
         addFlashcardsToDataSource(FLASHCARD_1)
         launchActivity()
 
+        onView(withId(R.id.flashcardCategory)).check(matches(withText(FLASHCARD_1.category)))
         onView(withId(R.id.flashcardSide)).check(matches(withText(FLASHCARD_1.front)))
         onView(withId(R.id.nextFlashcardButton)).perform(click())
+        onView(withId(R.id.flashcardCategory)).check(matches(withText(FLASHCARD_1.category)))
         onView(withId(R.id.flashcardSide)).check(matches(withText(FLASHCARD_1.front)))
+    }
+
+    private fun verifyFirstCategoryAndText(flashcard1: Flashcard, flashcard2: Flashcard) {
+        onView(withId(R.id.flashcardCategory))
+                .check(matches(withCategoryOfOneOf(flashcard1.category, flashcard2.category)))
+        onView(withId(R.id.flashcardSide))
+                .check(matches(withTextOfOneOf(flashcard1.front, flashcard2.front)))
     }
 
     private fun getSecondText(text1: String, text2: String): String {
@@ -121,7 +134,31 @@ class RandomFlashcardFragmentTest {
         } else if (firstText == text2) {
             return text1
         }
-        throw IllegalStateException("First text did not equal one of these texts:\n$text1\n$text2")
+        throw IllegalStateException("First text did not equal one of these:\n$text1\n$text2")
+    }
+
+    private fun getSecondCategory(category1: String, category2: String): String {
+        if (firstCategory == category1) {
+            return category2
+        } else if (firstCategory == category2) {
+            return category1
+        }
+        throw IllegalStateException(
+                "First category did not equal one of these:\n$category1\n$category2")
+    }
+
+    private fun withCategoryOfOneOf(category1: String, category2: String): Matcher<in View>? {
+        return object: BoundedMatcher<View, TextView>(TextView::class.java) {
+            override fun describeTo(description: Description?) {
+                description?.appendText("with possible text: $category1 -- or -- $category2")
+            }
+
+            override fun matchesSafely(item: TextView?): Boolean {
+                firstCategory = item?.text.toString()
+                return item?.text == category1 || item?.text == category2
+            }
+
+        }
     }
 
     private fun withTextOfOneOf(text1: String, text2: String): Matcher<in View>? {
@@ -139,7 +176,13 @@ class RandomFlashcardFragmentTest {
     }
 
     private fun addFlashcardsToDataSource(vararg flashcards: Flashcard) {
-        dataSource.addFlashcards(*flashcards)
+        for (flashcard in flashcards) {
+            dataSource.saveFlashcard(flashcard, object : FlashcardDataSource.SaveFlashcardCallback {
+                override fun onSaveSuccessful() { /* ignore */}
+
+                override fun onSaveFailed() { /* ignore */ }
+            })
+        }
     }
 
     private fun launchActivity() {

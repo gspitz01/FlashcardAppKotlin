@@ -52,6 +52,7 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
         super.onViewCreated(view, savedInstanceState)
 
         val randomFlashcardObserver = Observer<Flashcard> {
+            flashcardCategory.text = it?.category
             when (viewModel.flashcardSide.value) {
                 FlashcardSide.FRONT -> flashcardSide.text = it?.front
                 FlashcardSide.BACK -> flashcardSide.text = it?.back

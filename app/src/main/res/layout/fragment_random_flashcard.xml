@@ -16,6 +16,13 @@
         android:text="@string/next_flashcard_button_text"/>
 
     <TextView
+        android:id="@+id/flashcardCategory"
+        style="@style/TextAppearance.AppCompat.Headline"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <TextView
         android:id="@+id/flashcardSide"
         style="@style/Base.TextAppearance.AppCompat.Headline"
         android:layout_width="match_parent"
