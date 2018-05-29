@@ -25,6 +25,7 @@ import android.support.test.espresso.ViewInteraction
 import android.support.test.espresso.action.ViewActions.*
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
+import android.support.test.espresso.contrib.RecyclerViewActions.scrollToPosition
 import android.support.test.espresso.matcher.BoundedMatcher
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.ActivityTestRule
@@ -39,6 +40,7 @@ import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.R.id.detailContent
 import com.gregspitz.flashcardappkotlin.SingleFragmentActivity
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers.allOf
@@ -54,7 +56,9 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class FlashcardListFragmentTest {
 
-    private val dataSource = FlashcardApplication.repoComponent.exposeLocalDataSource()
+    private val dataSource = FlashcardApplication.repoComponent.exposeRepository()
+    private val localDataSource = FlashcardApplication.repoComponent.exposeLocalDataSource()
+    private val remoteDataSource = FlashcardApplication.repoComponent.exposeRemoteDataSource()
 
     @Rule @JvmField
     val testRule = ActivityTestRule<SingleFragmentActivity>(
@@ -69,10 +73,10 @@ class FlashcardListFragmentTest {
     fun flashcardRecyclerView_showsFlashcardFronts() {
         addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity()
-        onView(withId(R.id.flashcardRecyclerView))
-                .check(matches(hasFlashcardFrontForPosition(0, FLASHCARD_1)))
-        onView(withId(R.id.flashcardRecyclerView))
-                .check(matches(hasFlashcardFrontForPosition(1, FLASHCARD_2)))
+        scrollToAndVerifyPosition(0, FLASHCARD_1.category)
+        scrollToAndVerifyPosition(1, FLASHCARD_1.front)
+        scrollToAndVerifyPosition(2, FLASHCARD_2.category)
+        scrollToAndVerifyPosition(3, FLASHCARD_2.front)
         onView(withId(R.id.flashcardListMessages)).check(matches(not(isDisplayed())))
     }
 
@@ -104,7 +108,8 @@ class FlashcardListFragmentTest {
 
     @Test
     fun failedToLoadFlashcards_showsFailedToLoadMessage() {
-        dataSource.setFailure(true)
+        localDataSource.setFailure(true)
+        remoteDataSource.setFailure(true)
         launchActivity()
         onView(withId(R.id.flashcardListMessages))
                 .check(matches(withText(R.string.failed_to_load_flashcard_text)))
@@ -115,7 +120,7 @@ class FlashcardListFragmentTest {
         addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity()
         onView(withId(R.id.flashcardRecyclerView))
-                .perform(actionOnItemAtPosition<RecyclerView.ViewHolder>(1, click()))
+                .perform(actionOnItemAtPosition<RecyclerView.ViewHolder>(3, click()))
         checkDetailViewMatchesFlashcard(FLASHCARD_2)
     }
 
@@ -217,6 +222,9 @@ class FlashcardListFragmentTest {
     }
 
     private fun checkDetailViewMatchesFlashcard(flashcard: Flashcard) {
+        onView(allOf(withId(R.id.flashcardCategory), isDescendantOfA(withId(R.id.detailContent)),
+                isCompletelyDisplayed()))
+                .check(matches(withText(flashcard.category)))
         onView(allOf(withId(R.id.flashcardFront), isDescendantOfA(withId(R.id.detailContent)),
                 isCompletelyDisplayed()))
                 .check(matches(withText(flashcard.front)))
@@ -240,7 +248,13 @@ class FlashcardListFragmentTest {
     }
 
     private fun addFlashcardsToDataSource(vararg flashcards: Flashcard) {
-        dataSource.addFlashcards(*flashcards)
+        for (flashcard in flashcards) {
+            dataSource.saveFlashcard(flashcard, object: FlashcardDataSource.SaveFlashcardCallback {
+                override fun onSaveSuccessful() { /* ignore */ }
+
+                override fun onSaveFailed() { /* ignore */ }
+            })
+        }
     }
 
 
@@ -250,23 +264,29 @@ class FlashcardListFragmentTest {
         testRule.activity.setFragment(FlashcardListFragment.newInstance(flashcardId))
     }
 
-    private fun hasFlashcardFrontForPosition(
-            position: Int, flashcard: Flashcard): Matcher<in View>? =
-        object : BoundedMatcher<View, RecyclerView>(RecyclerView::class.java) {
-            override fun matchesSafely(item: RecyclerView?): Boolean {
-                if (item == null) {
-                    return false
+    private fun scrollToAndVerifyPosition(position: Int, text: String) {
+        onView(withId(R.id.flashcardRecyclerView))
+                .perform(scrollToPosition<RecyclerView.ViewHolder>(position))
+                .check(matches(hasFlashcardTextForPosition(position, text)))
+    }
+
+    private fun hasFlashcardTextForPosition(position: Int, text: String)
+            : Matcher<in View>? =
+            object : BoundedMatcher<View, RecyclerView>(RecyclerView::class.java) {
+                override fun describeTo(description: Description?) {
+                    description?.appendText("Item has flashcard category at position $position")
                 }
 
-                val holder = item.findViewHolderForAdapterPosition(position)
+                override fun matchesSafely(item: RecyclerView?): Boolean {
+                    if (item == null) {
+                        return false
+                    }
 
-                return holder != null &&
-                        withChild(withText(flashcard.front)).matches(holder.itemView)
-            }
+                    val holder = item.findViewHolderForAdapterPosition(position)
+                    return holder != null &&
+                            withChild(withText(text)).matches(holder.itemView)
+                }
 
-            override fun describeTo(description: Description?) {
-                description?.appendText("Item has flashcard data at position $position")
             }
-        }
 
 }

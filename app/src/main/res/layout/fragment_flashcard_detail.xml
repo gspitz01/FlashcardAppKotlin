@@ -6,6 +6,12 @@
               tools:context="com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardDetailFragment">
 
     <TextView
+        android:id="@+id/flashcardCategory"
+        style="@style/TextAppearance.AppCompat.Headline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <TextView
         android:id="@+id/flashcardFront"
         style="@style/TextAppearance.AppCompat.Headline"
         android:layout_width="match_parent"

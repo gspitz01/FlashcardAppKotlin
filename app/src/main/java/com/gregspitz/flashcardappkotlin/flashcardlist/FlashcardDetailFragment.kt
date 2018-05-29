@@ -46,6 +46,7 @@ class FlashcardDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        flashcardCategory.text = flashcard?.category
         flashcardFront.text = flashcard?.front
         flashcardBack.text = flashcard?.back
         editFlashcardButton.setOnClickListener {

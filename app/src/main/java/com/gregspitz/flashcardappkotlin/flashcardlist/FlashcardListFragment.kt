@@ -40,6 +40,9 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
 
     private lateinit var pagerAdapter: FlashcardDetailPagerAdapter
 
+    // A map to figure out the recycler position from the pager position for auto-scrolling
+    private val pagerPositionToRecyclerPositionMap: MutableMap<Int, Int> = mutableMapOf()
+
     private var active = false
 
     private var flashcardId: String? = null
@@ -83,9 +86,10 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
                                         positionOffsetPixels: Int) {}
 
             override fun onPageSelected(position: Int) {
-                flashcardRecyclerView.scrollToPosition(position)
+                pagerPositionToRecyclerPositionMap[position]?.let {
+                    flashcardRecyclerView.scrollToPosition(it)
+                }
             }
-
         })
 
         val flashcardsObserver = Observer<List<FlashcardListItem>> {
@@ -118,12 +122,18 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
     }
 
     private fun initPagerAdapter(flashcards: List<FlashcardListItem>) {
-        val fragments = flashcards.filter { it is Flashcard }.map {
-            val bundle = Bundle()
-            bundle.putParcelable(FlashcardDetailFragment.flashcardBundleId, it as Flashcard)
-            val fragment = FlashcardDetailFragment()
-            fragment.arguments = bundle
-            fragment
+        val fragments = mutableListOf<FlashcardDetailFragment>()
+        var pagerPosition = 0
+        for ((index, flashcard) in flashcards.withIndex()) {
+            if (flashcard is Flashcard) {
+                val bundle = Bundle()
+                bundle.putParcelable(FlashcardDetailFragment.flashcardBundleId, flashcard)
+                val fragment = FlashcardDetailFragment()
+                fragment.arguments = bundle
+                fragments.add(fragment)
+                pagerPositionToRecyclerPositionMap[pagerPosition] = index
+                pagerPosition++
+            }
         }
         pagerAdapter.setFragments(fragments)
     }
