@@ -17,11 +17,11 @@
 package com.gregspitz.flashcardappkotlin
 
 import android.support.test.espresso.Espresso.onView
+import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.DrawerActions
 import android.support.test.espresso.contrib.NavigationViewActions.navigateTo
-import android.support.test.espresso.matcher.ViewMatchers.isDisplayed
-import android.support.test.espresso.matcher.ViewMatchers.withId
+import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
@@ -42,7 +42,7 @@ class MainScreenTest {
     @Test
     fun moveThroughWholeApp() {
         onView(withId(R.id.nextFlashcardButton)).check(matches(isDisplayed()))
-        onView(withId(R.id.drawerLayout)).perform(DrawerActions.open())
+        onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(click())
         onView(withId(R.id.navDrawer)).perform(navigateTo(R.id.navList))
         onView(withId(R.id.flashcardRecyclerView)).check(matches(isDisplayed()))
         onView(withId(R.id.drawerLayout)).perform(DrawerActions.open())

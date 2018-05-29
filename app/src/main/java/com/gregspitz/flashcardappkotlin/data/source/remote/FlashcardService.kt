@@ -3,6 +3,7 @@ package com.gregspitz.flashcardappkotlin.data.source.remote
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import retrofit2.Call
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.POST
 
@@ -23,6 +24,7 @@ interface FlashcardService {
         fun create(): FlashcardService {
             val retrofit = Retrofit.Builder()
                     .baseUrl(BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create())
                     .build()
             return retrofit.create(FlashcardService::class.java)
         }

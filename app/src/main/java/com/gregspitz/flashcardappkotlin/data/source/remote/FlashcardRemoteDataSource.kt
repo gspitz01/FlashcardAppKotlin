@@ -11,51 +11,30 @@ class FlashcardRemoteDataSource : FlashcardDataSource {
     private val flashcardService = FlashcardService.create()
 
     override fun getFlashcards(callback: FlashcardDataSource.GetFlashcardsCallback) {
-        val call = flashcardService.getFlashcards()
-        call.enqueue(object: Callback<List<Flashcard>> {
-            override fun onFailure(call: Call<List<Flashcard>>?, t: Throwable?) {
-                callback.onDataNotAvailable()
-            }
-
-            override fun onResponse(call: Call<List<Flashcard>>?, response: Response<List<Flashcard>>) {
-                val flashcards = response.body()
-                flashcards?.let {
-                    callback.onFlashcardsLoaded(it)
-                }
-            }
-
-        })
+        val flashcards = flashcardService.getFlashcards().execute().body()
+        if (flashcards != null) {
+            callback.onFlashcardsLoaded(flashcards)
+        } else {
+            callback.onDataNotAvailable()
+        }
     }
 
     override fun getFlashcard(flashcardId: String, callback: FlashcardDataSource.GetFlashcardCallback) {
-        val call = flashcardService.getFlashcardById(flashcardId)
-        call.enqueue(object: Callback<Flashcard> {
-            override fun onFailure(call: Call<Flashcard>?, t: Throwable?) {
-                callback.onDataNotAvailable()
-            }
-
-            override fun onResponse(call: Call<Flashcard>?, response: Response<Flashcard>) {
-                val flashcard = response.body()
-                flashcard?.let {
-                    callback.onFlashcardLoaded(it)
-                }
-            }
-
-        })
+        val flashcard = flashcardService.getFlashcardById(flashcardId).execute().body()
+        if (flashcard != null) {
+            callback.onFlashcardLoaded(flashcard)
+        } else {
+            callback.onDataNotAvailable()
+        }
     }
 
     override fun saveFlashcard(flashcard: Flashcard, callback: FlashcardDataSource.SaveFlashcardCallback) {
-        val call = flashcardService.saveFlashcard(flashcard)
-        call.enqueue(object: Callback<Flashcard> {
-            override fun onFailure(call: Call<Flashcard>?, t: Throwable?) {
-                callback.onSaveFailed()
-            }
-
-            override fun onResponse(call: Call<Flashcard>?, response: Response<Flashcard>?) {
-                callback.onSaveSuccessful()
-            }
-
-        })
+        val returnFlashcard = flashcardService.saveFlashcard(flashcard).execute().body()
+        if (returnFlashcard != null) {
+            callback.onSaveSuccessful()
+        } else {
+            callback.onSaveFailed()
+        }
     }
 
     override fun deleteAllFlashcards() {
