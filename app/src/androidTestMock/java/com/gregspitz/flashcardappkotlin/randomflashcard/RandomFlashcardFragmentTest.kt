@@ -29,6 +29,8 @@ import android.support.test.runner.AndroidJUnit4
 import android.view.View
 import android.widget.TextView
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
+import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_1
+import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_2
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.SingleFragmentActivity
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
@@ -44,10 +46,6 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 class RandomFlashcardFragmentTest {
-
-    private val flashcard1 = Flashcard("0", "Front", "Back")
-
-    private val flashcard2 = Flashcard("1", "Tag Team", "Back Again")
 
     private var firstText = ""
 
@@ -65,13 +63,13 @@ class RandomFlashcardFragmentTest {
 
     @Test
     fun atStart_showsFrontOfOneFlashcardAndClickTurnsFlashcard() {
-        addFlashcardsToDataSource(flashcard1)
+        addFlashcardsToDataSource(FLASHCARD_1)
 
         launchActivity()
 
-        onView(withId(R.id.flashcardSide)).check(matches(withText(flashcard1.front)))
+        onView(withId(R.id.flashcardSide)).check(matches(withText(FLASHCARD_1.front)))
                 .perform(click())
-                .check(matches(withText(flashcard1.back)))
+                .check(matches(withText(FLASHCARD_1.back)))
     }
 
     @Test
@@ -84,37 +82,37 @@ class RandomFlashcardFragmentTest {
 
     @Test
     fun nextFlashcardButtonClick_loadsDifferentFlashcard() {
-        addFlashcardsToDataSource(flashcard1, flashcard2)
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity()
 
         onView(withId(R.id.flashcardSide))
-                .check(matches(withTextOfOneOf(flashcard1.front, flashcard2.front)))
+                .check(matches(withTextOfOneOf(FLASHCARD_1.front, FLASHCARD_2.front)))
         onView(withId(R.id.nextFlashcardButton)).perform(click())
-        val secondText = getSecondText(flashcard1.front, flashcard2.front)
+        val secondText = getSecondText(FLASHCARD_1.front, FLASHCARD_2.front)
         onView(withId(R.id.flashcardSide)).check(matches(withText(secondText)))
     }
 
     @Test
     fun onScreenRotation_maintainsSameFlashcard() {
         // Make sure emulator or device currently allows screen rotation for this test to work
-        addFlashcardsToDataSource(flashcard1, flashcard2)
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity()
 
         testRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         onView(withId(R.id.flashcardSide))
-                .check(matches(withTextOfOneOf(flashcard1.front, flashcard2.front)))
+                .check(matches(withTextOfOneOf(FLASHCARD_1.front, FLASHCARD_2.front)))
         testRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         onView(withId(R.id.flashcardSide)).check(matches(withText(firstText)))
     }
 
     @Test
     fun ifOnlyOneFlashcard_newFlashcardButtonClickLoadsSameFlashcard() {
-        addFlashcardsToDataSource(flashcard1)
+        addFlashcardsToDataSource(FLASHCARD_1)
         launchActivity()
 
-        onView(withId(R.id.flashcardSide)).check(matches(withText(flashcard1.front)))
+        onView(withId(R.id.flashcardSide)).check(matches(withText(FLASHCARD_1.front)))
         onView(withId(R.id.nextFlashcardButton)).perform(click())
-        onView(withId(R.id.flashcardSide)).check(matches(withText(flashcard1.front)))
+        onView(withId(R.id.flashcardSide)).check(matches(withText(FLASHCARD_1.front)))
     }
 
     private fun getSecondText(text1: String, text2: String): String {

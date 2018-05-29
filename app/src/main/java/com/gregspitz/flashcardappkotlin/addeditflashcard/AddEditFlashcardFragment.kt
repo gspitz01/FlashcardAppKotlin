@@ -97,11 +97,13 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
 
     override fun showFlashcard(flashcard: Flashcard) {
         this.flashcard = flashcard
+        flashcardEditCategory.setText(flashcard.category)
         flashcardEditFront.setText(flashcard.front)
         flashcardEditBack.setText(flashcard.back)
     }
 
     override fun showNewFlashcard() {
+        flashcardEditCategory.setText("")
         flashcardEditFront.setText("")
         flashcardEditBack.setText("")
     }

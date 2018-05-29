@@ -33,6 +33,8 @@ import android.support.v4.view.ViewPager
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
+import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_1
+import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_2
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.R.id.detailContent
 import com.gregspitz.flashcardappkotlin.SingleFragmentActivity
@@ -52,10 +54,6 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class FlashcardListFragmentTest {
 
-    private val flashcard1 = Flashcard("0", "A front", "A back")
-
-    private val flashcard2 = Flashcard("1", "A different front", "A different back")
-
     private val dataSource = FlashcardApplication.repoComponent.exposeLocalDataSource()
 
     @Rule @JvmField
@@ -69,31 +67,31 @@ class FlashcardListFragmentTest {
 
     @Test
     fun flashcardRecyclerView_showsFlashcardFronts() {
-        addFlashcardsToDataSource(flashcard1, flashcard2)
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity()
         onView(withId(R.id.flashcardRecyclerView))
-                .check(matches(hasFlashcardFrontForPosition(0, flashcard1)))
+                .check(matches(hasFlashcardFrontForPosition(0, FLASHCARD_1)))
         onView(withId(R.id.flashcardRecyclerView))
-                .check(matches(hasFlashcardFrontForPosition(1, flashcard2)))
+                .check(matches(hasFlashcardFrontForPosition(1, FLASHCARD_2)))
         onView(withId(R.id.flashcardListMessages)).check(matches(not(isDisplayed())))
     }
 
     @Test
     fun detailsFragment_showsFirstFlashcardDetails() {
-        addFlashcardsToDataSource(flashcard1, flashcard2)
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity()
-        checkDetailViewMatchesFlashcard(flashcard1)
+        checkDetailViewMatchesFlashcard(FLASHCARD_1)
     }
 
     @Test
     fun launchWithId_showsThatFlashcardInDetails() {
-        addFlashcardsToDataSource(flashcard1, flashcard2)
-        launchActivity(flashcard2.id)
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
+        launchActivity(FLASHCARD_2.id)
         val viewPagerIdlingResource = registerViewPagerIdlingResource()
         // The idling resource seems to not work here, not sure why
         // so I am forced, against my better judgment, to do this:
         Thread.sleep(500)
-        checkDetailViewMatchesFlashcard(flashcard2)
+        checkDetailViewMatchesFlashcard(FLASHCARD_2)
         unregisterViewPagerIdlingResource(viewPagerIdlingResource)
     }
 
@@ -114,45 +112,45 @@ class FlashcardListFragmentTest {
 
     @Test
     fun clickFlashcard_showsFlashcardDetails() {
-        addFlashcardsToDataSource(flashcard1, flashcard2)
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity()
         onView(withId(R.id.flashcardRecyclerView))
                 .perform(actionOnItemAtPosition<RecyclerView.ViewHolder>(1, click()))
-        checkDetailViewMatchesFlashcard(flashcard2)
+        checkDetailViewMatchesFlashcard(FLASHCARD_2)
     }
 
     @Test
     fun swipeLeftDetailView_showsNextFlashcard() {
-        addFlashcardsToDataSource(flashcard1, flashcard2)
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity()
         val viewPagerIdlingResource = registerViewPagerIdlingResource()
         onView(withId(R.id.detailContent)).perform(swipeLeft())
-        checkDetailViewMatchesFlashcard(flashcard2)
+        checkDetailViewMatchesFlashcard(FLASHCARD_2)
         unregisterViewPagerIdlingResource(viewPagerIdlingResource)
     }
 
     @Test
     fun swipeLeftThenRightDetailView_showsFirstFlashcardAgain() {
-        addFlashcardsToDataSource(flashcard1, flashcard2)
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity()
         val viewPagerIdlingResource = registerViewPagerIdlingResource()
         onView(withId(R.id.detailContent))
                 .perform(swipeLeft())
         onView(withId(R.id.detailContent))
                 .perform(swipeRight())
-        checkDetailViewMatchesFlashcard(flashcard1)
+        checkDetailViewMatchesFlashcard(FLASHCARD_1)
         unregisterViewPagerIdlingResource(viewPagerIdlingResource)
     }
 
     @Test
     fun swipingDetailView_recyclerViewFollows() {
-        val flashcard3 = Flashcard("2", "Front2", "Back2")
-        val flashcard4 = Flashcard("3", "Front3", "Back3")
-        val flashcard5 = Flashcard("4", "Front4", "Back4")
-        val flashcard6 = Flashcard("5", "Front5", "Back5")
-        val flashcard7 = Flashcard("6", "Front6", "Back6")
-        val flashcard8 = Flashcard("7", "Front7", "Back7")
-        addFlashcardsToDataSource(flashcard1, flashcard2, flashcard3, flashcard4, flashcard5,
+        val flashcard3 = Flashcard("2", "Category2", "Front2", "Back2")
+        val flashcard4 = Flashcard("3", "Category3", "Front3", "Back3")
+        val flashcard5 = Flashcard("4", "Category4", "Front4", "Back4")
+        val flashcard6 = Flashcard("5", "Category5", "Front5", "Back5")
+        val flashcard7 = Flashcard("6", "Category6", "Front6", "Back6")
+        val flashcard8 = Flashcard("7", "Category7", "Front7", "Back7")
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2, flashcard3, flashcard4, flashcard5,
                 flashcard6, flashcard7, flashcard8)
         launchActivity()
         val viewPagerIdlingResource = registerViewPagerIdlingResource()
@@ -165,37 +163,37 @@ class FlashcardListFragmentTest {
 
     @Test
     fun clickEditFlashcardInDetailView_showsEditFlashcardView() {
-        addFlashcardsToDataSource(flashcard1, flashcard2)
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity()
         clickDetailViewEditButton()
-        checkForAddEditFlashcardFragment(flashcard1.front, flashcard1.back)
+        checkForAddEditFlashcardFragment(FLASHCARD_1.front, FLASHCARD_1.back)
     }
 
     @Test
     fun orientationChangeAndThenClickEditFlashcardInDetailView_showsEditFlashcardView() {
-        addFlashcardsToDataSource(flashcard1, flashcard2)
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity()
         testRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         testRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         clickDetailViewEditButton()
-        checkForAddEditFlashcardFragment(flashcard1.front, flashcard1.back)
+        checkForAddEditFlashcardFragment(FLASHCARD_1.front, FLASHCARD_1.back)
     }
 
     @Test
     fun detailViewSwipeThenClickEditFlashcard_showsEditFlashcardView() {
-        addFlashcardsToDataSource(flashcard1, flashcard2)
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity()
         val viewPagerIdlingResource = registerViewPagerIdlingResource()
         onView(withId(R.id.detailContent)).perform(swipeLeft())
         clickDetailViewEditButton()
-        checkForAddEditFlashcardFragment(flashcard2.front, flashcard2.back)
+        checkForAddEditFlashcardFragment(FLASHCARD_2.front, FLASHCARD_2.back)
         unregisterViewPagerIdlingResource(viewPagerIdlingResource)
     }
 
 
     @Test
     fun clickAddFlashcardFab_showsAddEditFlashcardView() {
-        addFlashcardsToDataSource(flashcard1, flashcard2)
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity()
         onView(withId(R.id.addFlashcardFab)).perform(click())
         checkForAddEditFlashcardFragment("", "")
