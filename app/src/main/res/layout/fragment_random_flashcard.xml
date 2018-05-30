@@ -18,9 +18,10 @@
     <TextView
         android:id="@+id/flashcardCategory"
         style="@style/TextAppearance.AppCompat.Headline"
-        android:layout_gravity="center"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textAlignment="center"/>
 
     <TextView
         android:id="@+id/flashcardSide"
