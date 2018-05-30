@@ -87,10 +87,6 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     kapt "android.arch.persistence.room:compiler:$rootProject.ext.archRoomVersion"
 
-    // Retrofit
-    implementation "com.squareup.retrofit2:retrofit:$rootProject.ext.retrofitVersion"
-    implementation "com.squareup.retrofit2:converter-gson:$rootProject.ext.retrofitVersion"
-
     // Dagger
     implementation "com.google.dagger:dagger-android:$rootProject.ext.daggerVersion"
     implementation "com.google.dagger:dagger-android-support:$rootProject.ext.daggerVersion"

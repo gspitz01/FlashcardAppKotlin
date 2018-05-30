@@ -32,7 +32,4 @@ interface RepoComponent {
 
     @VisibleForTesting
     fun exposeLocalDataSource() : FakeFlashcardLocalDataSource
-
-    @VisibleForTesting
-    fun exposeRemoteDataSource() : FakeFlashcardRemoteDataSource
 }
