@@ -56,9 +56,11 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class FlashcardListFragmentTest {
 
+    // TODO: fix RecyclerView clicks on items after several headers
+
     private val dataSource = FlashcardApplication.repoComponent.exposeRepository()
-    private val localDataSource = FlashcardApplication.repoComponent.exposeLocalDataSource()
-    private val remoteDataSource = FlashcardApplication.repoComponent.exposeRemoteDataSource()
+    private val localDataSource =
+            FlashcardApplication.repoComponent.exposeLocalDataSource()
 
     @Rule @JvmField
     val testRule = ActivityTestRule<SingleFragmentActivity>(
@@ -109,7 +111,6 @@ class FlashcardListFragmentTest {
     @Test
     fun failedToLoadFlashcards_showsFailedToLoadMessage() {
         localDataSource.setFailure(true)
-        remoteDataSource.setFailure(true)
         launchActivity()
         onView(withId(R.id.flashcardListMessages))
                 .check(matches(withText(R.string.failed_to_load_flashcard_text)))

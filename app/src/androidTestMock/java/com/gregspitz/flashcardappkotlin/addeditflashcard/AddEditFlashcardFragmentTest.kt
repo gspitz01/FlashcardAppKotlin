@@ -47,8 +47,8 @@ import org.junit.runner.RunWith
 class AddEditFlashcardFragmentTest {
 
     private val dataSource = FlashcardApplication.repoComponent.exposeRepository()
-    private val localDataSource = FlashcardApplication.repoComponent.exposeLocalDataSource()
-    private val remoteDataSource = FlashcardApplication.repoComponent.exposeRemoteDataSource()
+    private val localDataSource =
+            FlashcardApplication.repoComponent.exposeLocalDataSource()
 
     @Rule
     @JvmField
@@ -117,7 +117,6 @@ class AddEditFlashcardFragmentTest {
     @Test
     fun saveFailed_showsSaveFailedToast() {
         localDataSource.setFailure(true)
-        remoteDataSource.setFailure(true)
         launchActivityWithFlashcardId(FLASHCARD_1.id)
         onView(withId(R.id.saveFlashcardButton)).perform(click())
         checkForToast(R.string.save_failed_toast_text)
