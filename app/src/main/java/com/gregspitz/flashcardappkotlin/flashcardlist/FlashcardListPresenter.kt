@@ -66,8 +66,8 @@ class FlashcardListPresenter(private val useCaseHandler: UseCaseHandler,
                 })
     }
 
-    override fun onFlashcardClick(flashcardPosition: Int) {
-        view.showFlashcardDetailsUi(flashcardPosition)
+    override fun onFlashcardClick(recyclerPosition: Int) {
+        view.showFlashcardDetailsUi(recyclerPosition)
     }
 
 }

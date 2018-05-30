@@ -38,7 +38,7 @@ interface FlashcardListContract {
 
         fun setDetailView(flashcardId: String)
 
-        fun showFlashcardDetailsUi(flashcardPosition: Int)
+        fun showFlashcardDetailsUi(recyclerPosition: Int)
 
         fun showEditFlashcard(flashcardId: String)
 
@@ -51,7 +51,7 @@ interface FlashcardListContract {
 
         fun loadFlashcards()
 
-        fun onFlashcardClick(flashcardPosition: Int)
+        fun onFlashcardClick(recyclerPosition: Int)
     }
 
     interface ViewModel {

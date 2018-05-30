@@ -24,7 +24,7 @@ import android.support.test.espresso.IdlingResource
 import android.support.test.espresso.ViewInteraction
 import android.support.test.espresso.action.ViewActions.*
 import android.support.test.espresso.assertion.ViewAssertions.matches
-import android.support.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
+import android.support.test.espresso.contrib.RecyclerViewActions
 import android.support.test.espresso.contrib.RecyclerViewActions.scrollToPosition
 import android.support.test.espresso.matcher.BoundedMatcher
 import android.support.test.espresso.matcher.ViewMatchers.*
@@ -56,7 +56,12 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class FlashcardListFragmentTest {
 
-    // TODO: fix RecyclerView clicks on items after several headers
+    private val flashcard3 = Flashcard("2", "Category2", "Front2", "Back2")
+    private val flashcard4 = Flashcard("3", "Category3", "Front3", "Back3")
+    private val flashcard5 = Flashcard("4", "Category4", "Front4", "Back4")
+    private val flashcard6 = Flashcard("5", "Category5", "Front5", "Back5")
+    private val flashcard7 = Flashcard("6", "Category6", "Front6", "Back6")
+    private val flashcard8 = Flashcard("7", "Category7", "Front7", "Back7")
 
     private val dataSource = FlashcardApplication.repoComponent.exposeRepository()
     private val localDataSource =
@@ -118,11 +123,20 @@ class FlashcardListFragmentTest {
 
     @Test
     fun clickFlashcard_showsFlashcardDetails() {
-        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2, flashcard3, flashcard4, flashcard5,
+                flashcard6, flashcard7, flashcard8)
         launchActivity()
+        val viewPagerIdlingResource = registerViewPagerIdlingResource()
         onView(withId(R.id.flashcardRecyclerView))
-                .perform(actionOnItemAtPosition<RecyclerView.ViewHolder>(3, click()))
-        checkDetailViewMatchesFlashcard(FLASHCARD_2)
+                .perform(RecyclerViewActions
+                        .scrollTo<RecyclerView.ViewHolder>(hasDescendant(
+                                withText(flashcard8.front))))
+                .perform(RecyclerViewActions
+                        .actionOnItem<RecyclerView.ViewHolder>(
+                                hasDescendant(withText(flashcard8.front)),
+                                click()))
+        checkDetailViewMatchesFlashcard(flashcard8)
+        unregisterViewPagerIdlingResource(viewPagerIdlingResource)
     }
 
     @Test
@@ -150,12 +164,6 @@ class FlashcardListFragmentTest {
 
     @Test
     fun swipingDetailView_recyclerViewFollows() {
-        val flashcard3 = Flashcard("2", "Category2", "Front2", "Back2")
-        val flashcard4 = Flashcard("3", "Category3", "Front3", "Back3")
-        val flashcard5 = Flashcard("4", "Category4", "Front4", "Back4")
-        val flashcard6 = Flashcard("5", "Category5", "Front5", "Back5")
-        val flashcard7 = Flashcard("6", "Category6", "Front6", "Back6")
-        val flashcard8 = Flashcard("7", "Category7", "Front7", "Back7")
         addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2, flashcard3, flashcard4, flashcard5,
                 flashcard6, flashcard7, flashcard8)
         launchActivity()

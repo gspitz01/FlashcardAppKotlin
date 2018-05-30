@@ -13,7 +13,6 @@ import android.view.ViewGroup
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.MainFragmentRouter
 import com.gregspitz.flashcardappkotlin.R
-import com.gregspitz.flashcardappkotlin.R.id.detailContent
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardFragment
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
@@ -42,6 +41,7 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
 
     // A map to figure out the recycler position from the pager position for auto-scrolling
     private val pagerPositionToRecyclerPositionMap: MutableMap<Int, Int> = mutableMapOf()
+    private val recyclerPositionToPagerPositionMap: MutableMap<Int, Int> = mutableMapOf()
 
     private var active = false
 
@@ -116,7 +116,6 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
                         }
                     }
                 }
-
             }
         }
     }
@@ -132,6 +131,7 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
                 fragment.arguments = bundle
                 fragments.add(fragment)
                 pagerPositionToRecyclerPositionMap[pagerPosition] = index
+                recyclerPositionToPagerPositionMap[index] = pagerPosition
                 pagerPosition++
             }
         }
@@ -171,8 +171,10 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
                 .showAddEditFlashcard(AddEditFlashcardFragment.newFlashcardExtra)
     }
 
-    override fun showFlashcardDetailsUi(flashcardPosition: Int) {
-        detailContent.currentItem = flashcardPosition
+    override fun showFlashcardDetailsUi(recyclerPosition: Int) {
+        recyclerPositionToPagerPositionMap[recyclerPosition]?.let {
+            detailContent.currentItem = it
+        }
     }
 
     override fun showEditFlashcard(flashcardId: String) {
