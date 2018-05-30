@@ -33,6 +33,9 @@ class GetFlashcards @Inject constructor(private val flashcardRepository: Flashca
     override fun executeUseCase(requestValues: RequestValues) {
         flashcardRepository.getFlashcards(object: FlashcardDataSource.GetFlashcardsCallback {
             override fun onFlashcardsLoaded(flashcards: List<Flashcard>) {
+                // TODO: sort the list of Flashcards by category before translation here
+                // Turn the list of Flashcards into a list of FlashcardListItems with
+                // Category headers
                 val listWithCategories = mutableListOf<FlashcardListItem>()
                 for (flashcard in flashcards) {
                     if (!listWithCategories.contains(Category(flashcard.category))) {

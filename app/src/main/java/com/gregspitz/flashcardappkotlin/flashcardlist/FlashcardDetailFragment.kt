@@ -26,6 +26,9 @@ import com.gregspitz.flashcardappkotlin.R.id.*
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import kotlinx.android.synthetic.main.fragment_flashcard_detail.*
 
+/**
+ * A Fragment showing the details of a particular Flashcard
+ */
 class FlashcardDetailFragment : Fragment() {
 
     private var flashcard: Flashcard? = null

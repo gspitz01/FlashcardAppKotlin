@@ -24,7 +24,7 @@ import kotlinx.android.parcel.Parcelize
 import java.util.*
 
 /**
- * An immutable text flashcard with a category (as a String), front and a back
+ * An immutable text flashcard with a category (as a String), a front and a back
  */
 @SuppressLint("ParcelCreator")
 @Parcelize

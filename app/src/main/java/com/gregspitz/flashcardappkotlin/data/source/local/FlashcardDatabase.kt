@@ -21,9 +21,9 @@ import android.arch.persistence.room.RoomDatabase
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 
 /**
- * Room database for flashcards
+ * Room database for Flashcards
  */
-@Database(entities = arrayOf(Flashcard::class), version = 1)
+@Database(entities = [(Flashcard::class)], version = 1)
 abstract class FlashcardDatabase : RoomDatabase() {
 
     abstract fun flashcardDao(): FlashcardDao

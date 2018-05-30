@@ -20,14 +20,23 @@ import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 
 /**
- * Local data source accepts a Room DAO for flashcards
+ * Local data source accepts a Room DAO for Flashcards
  */
 class FlashcardLocalDataSource(private val flashcardDao: FlashcardDao) : FlashcardDataSource {
 
+    /**
+     * Get all Flashcards from the dao
+     * @param callback to be called on success or failure
+     */
     override fun getFlashcards(callback: FlashcardDataSource.GetFlashcardsCallback) {
         callback.onFlashcardsLoaded(flashcardDao.getFlashcards())
     }
 
+    /**
+     * Get a single Flashcard from a dao based on the Flashcard id
+     * @param flashcardId the id of the Flashcard to be found
+     * @param callback to be called on success or failure
+     */
     override fun getFlashcard(flashcardId: String, callback: FlashcardDataSource.GetFlashcardCallback) {
         val flashcard = flashcardDao.getFlashcard(flashcardId)
         if (flashcard == null) {
@@ -37,12 +46,21 @@ class FlashcardLocalDataSource(private val flashcardDao: FlashcardDao) : Flashca
         }
     }
 
+    /**
+     * Save a Flashcard to the dao
+     * Currently no mechanism for failed save as inserts will always replace any conflicting content
+     * @param flashcard the Flashcard to be saved
+     * @param callback to be called on success or failure
+     */
     override fun saveFlashcard(flashcard: Flashcard,
                                callback: FlashcardDataSource.SaveFlashcardCallback) {
         flashcardDao.insertFlashcard(flashcard)
         callback.onSaveSuccessful()
     }
 
+    /**
+     * Delete all the Flashcards from the dao
+     */
     override fun deleteAllFlashcards() {
         flashcardDao.deleteFlashcards()
     }

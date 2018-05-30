@@ -40,13 +40,17 @@ class AddEditFlashcardPresenter (
 
     override fun start() {
         flashcardId = view.getIdFromArguments()
-        if (flashcardId == AddEditFlashcardFragment.newFlashcardExtra) {
+        if (flashcardId == AddEditFlashcardFragment.newFlashcardId) {
             view.showNewFlashcard()
         } else {
             loadFlashcard(flashcardId)
         }
     }
 
+    /**
+     * Get a specific Flashcard from the repo based on its id
+     * @param flashcardId the id of the Flashcard to be loaded
+     */
     override fun loadFlashcard(flashcardId: String) {
         view.setLoadingIndicator(true)
         useCaseHandler.execute(getFlashcard, GetFlashcard.RequestValues(flashcardId),
@@ -68,6 +72,10 @@ class AddEditFlashcardPresenter (
                 })
     }
 
+    /**
+     * Save a Flashcard to the repo
+     * @param flashcard the Flashcard to be saved
+     */
     override fun saveFlashcard(flashcard: Flashcard) {
         useCaseHandler.execute(saveFlashcard, SaveFlashcard.RequestValues(flashcard),
                 object: UseCase.UseCaseCallback<SaveFlashcard.ResponseValue> {

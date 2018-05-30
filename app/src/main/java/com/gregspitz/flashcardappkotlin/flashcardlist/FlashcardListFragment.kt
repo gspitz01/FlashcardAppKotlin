@@ -23,31 +23,32 @@ import javax.inject.Inject
 
 private const val FLASHCARD_ID = "flashcard_id"
 
+/**
+ * Fragment for listing all Flashcards with a RecyclerView
+ */
 class FlashcardListFragment : Fragment(), FlashcardListContract.View {
 
+    // Dagger Dependency Injection
+    @Inject lateinit var getFlashcards: GetFlashcards
+    @Inject lateinit var useCaseHandler: UseCaseHandler
+
     private lateinit var presenter : FlashcardListContract.Presenter
-
-    @Inject
-    lateinit var getFlashcards: GetFlashcards
-
-    @Inject
-    lateinit var useCaseHandler: UseCaseHandler
-
-    private lateinit var recyclerAdapter : FlashcardRecyclerAdapter
-
     private lateinit var viewModel: FlashcardListViewModel
 
+    private lateinit var recyclerAdapter : FlashcardRecyclerAdapter
     private lateinit var pagerAdapter: FlashcardDetailPagerAdapter
 
     // A map to figure out the recycler position from the pager position for auto-scrolling
     private val pagerPositionToRecyclerPositionMap: MutableMap<Int, Int> = mutableMapOf()
+    // And vice versa
     private val recyclerPositionToPagerPositionMap: MutableMap<Int, Int> = mutableMapOf()
 
+    // Active onResume; inactive onPause
     private var active = false
-
     private var flashcardId: String? = null
 
     companion object {
+        // Represents that no particular Flashcard was asked to be shown in the detail view
         const val noParticularFlashcardExtra = "-1"
 
         fun newInstance(flashcardId: String) = FlashcardListFragment().apply {
@@ -74,9 +75,13 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Setup the RecyclerView
         flashcardRecyclerView.layoutManager = LinearLayoutManager(activity)
         recyclerAdapter = FlashcardRecyclerAdapter(emptyList())
         flashcardRecyclerView.adapter = recyclerAdapter
+
+        // Setup the viewPager
         pagerAdapter = FlashcardDetailPagerAdapter(childFragmentManager, listOf())
         detailContent.adapter = pagerAdapter
         detailContent.addOnPageChangeListener(object: ViewPager.OnPageChangeListener {
@@ -86,12 +91,14 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
                                         positionOffsetPixels: Int) {}
 
             override fun onPageSelected(position: Int) {
+                // Have RecyclerView scroll when the ViewPager is swiped
                 pagerPositionToRecyclerPositionMap[position]?.let {
                     flashcardRecyclerView.scrollToPosition(it)
                 }
             }
         })
 
+        // Observe on the ViewModel
         val flashcardsObserver = Observer<List<FlashcardListItem>> {
             if (it != null) {
                 flashcardListMessages.visibility = View.GONE
@@ -103,9 +110,40 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
 
         viewModel.flashcards.observe(this, flashcardsObserver)
 
+        // Create the presenter
         FlashcardListPresenter(useCaseHandler, this, viewModel, getFlashcards)
     }
 
+
+    /**
+     * Initialize the PagerAdapter to have Fragments of details for each Flashcard
+     * Also setup mapping between the indices of the ViewPager and
+     * the RecyclerView for clicking and scroll-following
+     * @param flashcards the list of Flashcards (from the ViewModel)
+     */
+    private fun initPagerAdapter(flashcards: List<FlashcardListItem>) {
+        val fragments = mutableListOf<FlashcardDetailFragment>()
+        var pagerPosition = 0
+        for ((index, flashcard) in flashcards.withIndex()) {
+            if (flashcard is Flashcard) {
+                val bundle = Bundle()
+                bundle.putParcelable(FlashcardDetailFragment.flashcardBundleId, flashcard)
+                val fragment = FlashcardDetailFragment()
+                fragment.arguments = bundle
+                fragments.add(fragment)
+
+                pagerPositionToRecyclerPositionMap[pagerPosition] = index
+                recyclerPositionToPagerPositionMap[index] = pagerPosition
+                pagerPosition++
+            }
+        }
+        pagerAdapter.setFragments(fragments)
+    }
+
+    /**
+     * Set the ViewPager to the correct Fragment as represented by the field flashcardId
+     * @param flashcards the list of Flashcards (from the ViewModel)
+     */
     private fun moveToDetailsFromArgument(flashcards: List<FlashcardListItem>) {
         if (flashcardId != null && flashcardId != noParticularFlashcardExtra) {
             for ((index, flashcard) in flashcards.withIndex()) {
@@ -120,28 +158,11 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
         }
     }
 
-    private fun initPagerAdapter(flashcards: List<FlashcardListItem>) {
-        val fragments = mutableListOf<FlashcardDetailFragment>()
-        var pagerPosition = 0
-        for ((index, flashcard) in flashcards.withIndex()) {
-            if (flashcard is Flashcard) {
-                val bundle = Bundle()
-                bundle.putParcelable(FlashcardDetailFragment.flashcardBundleId, flashcard)
-                val fragment = FlashcardDetailFragment()
-                fragment.arguments = bundle
-                fragments.add(fragment)
-                pagerPositionToRecyclerPositionMap[pagerPosition] = index
-                recyclerPositionToPagerPositionMap[index] = pagerPosition
-                pagerPosition++
-            }
-        }
-        pagerAdapter.setFragments(fragments)
-    }
-
     override fun onResume() {
         super.onResume()
         active = true
         presenter.start()
+        // if restarting, move to the correct fragment
         viewModel.flashcards.value?.let { moveToDetailsFromArgument(it) }
     }
 
@@ -150,6 +171,10 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
         active = false
     }
 
+    /**
+     * Set the Flashcard id to be shown in the detail ViewPager
+     * @param flashcardId id of the Flashcard to be shown
+     */
     override fun setDetailView(flashcardId: String) {
         this.flashcardId = flashcardId
     }
@@ -158,25 +183,42 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
         // TODO: implement this
     }
 
+    /**
+     * Show message if Flashcards failed to load
+     */
     override fun showFailedToLoadFlashcards() {
         flashcardListMessages.setText(R.string.failed_to_load_flashcard_text)
     }
 
+    /**
+     * Show message if there are no Flashcards to show
+     */
     override fun showNoFlashcardsToLoad() {
         flashcardListMessages.setText(R.string.no_flashcards_to_show_text)
     }
 
+    /**
+     * Tell router (containing Activity) to move to the add Flashcard view
+     */
     override fun showAddFlashcard() {
         (activity as MainFragmentRouter)
-                .showAddEditFlashcard(AddEditFlashcardFragment.newFlashcardExtra)
+                .showAddEditFlashcard(AddEditFlashcardFragment.newFlashcardId)
     }
 
+    /**
+     * Move the ViewPager to the Fragment associated with a particular Flashcard
+     * @param recyclerPosition the position in the RecyclerView of the Flashcard to be shown
+     */
     override fun showFlashcardDetailsUi(recyclerPosition: Int) {
         recyclerPositionToPagerPositionMap[recyclerPosition]?.let {
             detailContent.currentItem = it
         }
     }
 
+    /**
+     * Tell router (containing Activity) to move to the edit Flashcard view
+     * @param flashcardId id of the Flashcard to be edited
+     */
     override fun showEditFlashcard(flashcardId: String) {
         (activity as MainFragmentRouter).showAddEditFlashcard(flashcardId)
     }
@@ -185,6 +227,9 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
         return active
     }
 
+    /**
+     * Set presenter and button click listeners
+     */
     override fun setPresenter(presenter: FlashcardListContract.Presenter) {
         this.presenter = presenter
         recyclerAdapter.setPresenter(this.presenter)

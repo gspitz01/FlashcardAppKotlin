@@ -38,6 +38,9 @@ class GetRandomFlashcard @Inject constructor(private val flashcardRepository: Fl
 
     class ResponseValue(val flashcard: Flashcard) : UseCase.ResponseValue
 
+    /**
+     * Get a random Flashcard from the repo
+     */
     inner class RandomFlashcardRepoGet(
             private val flashcardId: String?,
             private val useCaseCallback: UseCaseCallback<ResponseValue>
@@ -49,6 +52,7 @@ class GetRandomFlashcard @Inject constructor(private val flashcardRepository: Fl
             when {
                 flashcards.size > 1 -> {
                     var flashcard: Flashcard?
+                    // Keep track of number attempts just in case (see below)
                     var attempts = 0
                     var broke = false
                     do {
@@ -72,6 +76,7 @@ class GetRandomFlashcard @Inject constructor(private val flashcardRepository: Fl
                     }
                 }
                 flashcards.size == 1 -> {
+                    // if only one Flashcard, just return it
                     useCaseCallback.onSuccess(ResponseValue(flashcards[0]))
                 }
                 else -> useCaseCallback.onError()

@@ -16,19 +16,19 @@ import com.gregspitz.flashcardappkotlin.randomflashcard.domain.usecase.GetRandom
 import kotlinx.android.synthetic.main.fragment_random_flashcard.*
 import javax.inject.Inject
 
-
+/**
+ * Fragment for showing a random Flashcard
+ */
 class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
 
+    // Dagger Dependency Injection
+    @Inject lateinit var getRandomFlashcard: GetRandomFlashcard
+    @Inject lateinit var useCaseHandler: UseCaseHandler
+
     private lateinit var presenter: RandomFlashcardContract.Presenter
-
-    @Inject
-    lateinit var getRandomFlashcard: GetRandomFlashcard
-
-    @Inject
-    lateinit var useCaseHandler: UseCaseHandler
-
     private lateinit var viewModel: RandomFlashcardViewModel
 
+    // Active onResume; inactive onPause
     private var active = false
 
     companion object {
@@ -51,6 +51,7 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Observe the Flashcard on the ViewModel
         val randomFlashcardObserver = Observer<Flashcard> {
             flashcardCategory.text = it?.category
             when (viewModel.flashcardSide.value) {
@@ -59,6 +60,7 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
             }
         }
 
+        // Observe the FlashcardSide on the ViewModel
         val flashcardSideObserver = Observer<FlashcardSide> {
             when (it) {
                 FlashcardSide.FRONT -> flashcardSide.text = viewModel.randomFlashcard.value?.front
@@ -69,6 +71,7 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
         viewModel.randomFlashcard.observe(this, randomFlashcardObserver)
         viewModel.flashcardSide.observe(this, flashcardSideObserver)
 
+        // Create the presenter
         RandomFlashcardPresenter(useCaseHandler, this, viewModel, getRandomFlashcard)
     }
 
@@ -89,6 +92,9 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
         // TODO: fill this in
     }
 
+    /**
+     * Show message if the Flashcard could not be loaded
+     */
     override fun showFailedToLoadFlashcard() {
         flashcardSide.setText(R.string.failed_to_load_flashcard_text)
     }
@@ -97,6 +103,10 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
         return active
     }
 
+    /**
+     * Set the presenter and the click listeners
+     * @param presenter the presenter (as created in onViewCreated)
+     */
     override fun setPresenter(presenter: RandomFlashcardContract.Presenter) {
         this.presenter = presenter
         flashcardSide.setOnClickListener {

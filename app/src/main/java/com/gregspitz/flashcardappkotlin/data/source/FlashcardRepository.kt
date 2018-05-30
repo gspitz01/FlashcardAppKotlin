@@ -19,15 +19,22 @@ package com.gregspitz.flashcardappkotlin.data.source
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 
 /**
- * Data source for flashcards
+ * Repository for Flashcards
+ * Uses a local data source (i.e. Room database) and a cache
  */
 open class FlashcardRepository(private val localDataSource: FlashcardDataSource)
     : FlashcardDataSource {
 
+    // The cache
     private val cache = mutableMapOf<String, Flashcard>()
+
     // Tells repo to go straight to local source for call to getFlashcards(), updates cache
     private var cacheDirty = true
 
+    /**
+     * Get all Flashcards from either the cache or the local data source
+     * @param callback to be called with either success or failure
+     */
     override fun getFlashcards(callback: FlashcardDataSource.GetFlashcardsCallback) {
         // If cache is dirty or empty try to get from local source
         if (cacheDirty || cache.isEmpty()) {
@@ -38,6 +45,11 @@ open class FlashcardRepository(private val localDataSource: FlashcardDataSource)
         }
     }
 
+    /**
+     * Get a single Flashcard either from the cache or the local data source
+     * @param flashcardId the id of the Flashcard to be found
+     * @param callback to be called with either success or failure
+     */
     override fun getFlashcard(flashcardId: String,
                               callback: FlashcardDataSource.GetFlashcardCallback) {
         // Try to get it from the cache first
@@ -50,25 +62,42 @@ open class FlashcardRepository(private val localDataSource: FlashcardDataSource)
 
     }
 
+    /**
+     * Save a Flashcard to the local data source
+     * Sets the cache dirty so it will be updated on next call to getFlashcards
+     * @param flashcard the Flashcard to be saved
+     * @param callback to be called on either success or failure
+     */
     override fun saveFlashcard(flashcard: Flashcard,
                                callback: FlashcardDataSource.SaveFlashcardCallback) {
         localDataSource.saveFlashcard(flashcard, callback)
         cacheDirty = true
     }
 
+    /**
+     * Delete all the Flashcards from the local data source and the cache
+     */
     override fun deleteAllFlashcards() {
         localDataSource.deleteAllFlashcards()
         cache.clear()
         cacheDirty = true
     }
 
+    /**
+     * Set cache dirty so it will be updated on next call to getFlashcards
+     */
     override fun refreshFlashcards() {
         cacheDirty = true
     }
 
+    /**
+     * Get a single Flashcard from the local data source
+     * @param flashcardId the id of the Flashcard to be found
+     * @param callback to be called on either success or failure
+     */
     private fun getFlashcardFromLocalSource(flashcardId: String,
                                             callback: FlashcardDataSource.GetFlashcardCallback) {
-        localDataSource.getFlashcard(flashcardId, object: FlashcardDataSource.GetFlashcardCallback {
+        localDataSource.getFlashcard(flashcardId, object : FlashcardDataSource.GetFlashcardCallback {
             override fun onFlashcardLoaded(flashcard: Flashcard) {
                 callback.onFlashcardLoaded(flashcard)
             }
@@ -79,8 +108,13 @@ open class FlashcardRepository(private val localDataSource: FlashcardDataSource)
         })
     }
 
+    /**
+     * Get all Flashcards from the local data source
+     * Update the cache
+     * @param callback to be called on either success or failure
+     */
     private fun getFlashcardsFromLocalSource(callback: FlashcardDataSource.GetFlashcardsCallback) {
-        localDataSource.getFlashcards(object: FlashcardDataSource.GetFlashcardsCallback {
+        localDataSource.getFlashcards(object : FlashcardDataSource.GetFlashcardsCallback {
             override fun onFlashcardsLoaded(flashcards: List<Flashcard>) {
                 updateCache(flashcards)
                 callback.onFlashcardsLoaded(flashcards)
@@ -93,6 +127,10 @@ open class FlashcardRepository(private val localDataSource: FlashcardDataSource)
         })
     }
 
+    /**
+     * Update the cache
+     * @param flashcards list of Flashcards to replace current contents of cache
+     */
     private fun updateCache(flashcards: List<Flashcard>) {
         cache.clear()
         flashcards.forEach {

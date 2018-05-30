@@ -22,6 +22,7 @@ import com.gregspitz.flashcardappkotlin.data.model.FlashcardListItem
 
 /**
  * ViewModel for FlashcardListActivity
+ * Contains a list of FlashcardListItems
  */
 class FlashcardListViewModel : ViewModel(), FlashcardListContract.ViewModel {
 

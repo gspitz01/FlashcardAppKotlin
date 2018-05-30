@@ -21,6 +21,9 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 
+/**
+ * PagerAdapter for FlashcardDetailFragments
+ */
 class FlashcardDetailPagerAdapter(fragmentManager: FragmentManager,
                                   private var fragments: List<Fragment>)
     : FragmentStatePagerAdapter(fragmentManager) {

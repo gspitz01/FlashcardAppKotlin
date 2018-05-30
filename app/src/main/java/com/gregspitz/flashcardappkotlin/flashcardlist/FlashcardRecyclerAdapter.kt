@@ -28,7 +28,7 @@ import kotlinx.android.synthetic.main.category_list_holder.view.*
 import kotlinx.android.synthetic.main.flashcard_list_holder.view.*
 
 /**
- * Recycler adapter to hold a list of Flashcards
+ * Recycler adapter to hold a list of FlashcardListItems
  */
 class FlashcardRecyclerAdapter(private var flashcards: List<FlashcardListItem>)
     : RecyclerView.Adapter<FlashcardRecyclerAdapter.Holder>() {
@@ -39,11 +39,13 @@ class FlashcardRecyclerAdapter(private var flashcards: List<FlashcardListItem>)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         return when (viewType) {
             VIEW_TYPE_FLASHCARD -> {
+                // An actual Flashcard
                 val view = LayoutInflater.from(parent.context).inflate(R.layout.flashcard_list_holder,
                         parent, false)
                 FlashcardHolder(view)
             }
             else -> {
+                // A Category header
                 val view = LayoutInflater.from(parent.context).inflate(R.layout.category_list_holder,
                         parent, false)
                 CategoryHolder(view)
@@ -82,6 +84,9 @@ class FlashcardRecyclerAdapter(private var flashcards: List<FlashcardListItem>)
 
     open inner class Holder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
+    /**
+     * ViewHolder for an actual Flashcard
+     */
     inner class FlashcardHolder(itemView: View) : Holder(itemView) {
         fun setFlashcard(flashcard: Flashcard) {
             itemView.flashcardFront.text = flashcard.front
@@ -91,6 +96,9 @@ class FlashcardRecyclerAdapter(private var flashcards: List<FlashcardListItem>)
         }
     }
 
+    /**
+     * ViewHolder for a CategoryHeader
+     */
     inner class CategoryHolder(itemView: View) : Holder(itemView) {
         fun setCategory(category: Category) {
             itemView.categoryName.text = category.name

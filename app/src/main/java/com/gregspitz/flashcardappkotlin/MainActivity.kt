@@ -10,8 +10,13 @@ import com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListFragment
 import com.gregspitz.flashcardappkotlin.randomflashcard.RandomFlashcardFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
+/**
+ * The only Activity which holds all the Fragment views
+ * Serves as the router
+ */
 class MainActivity : AppCompatActivity(), MainFragmentRouter {
 
+    // Start with a RandomFlashcardFragment (a.k.a. the game)
     private val randomFlashcardFragment = RandomFlashcardFragment.newInstance()
     private var flashcardListFragment: FlashcardListFragment? = null
     private var addEditFlashcardFragment: AddEditFlashcardFragment? = null
@@ -42,7 +47,7 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
                     return@setNavigationItemSelectedListener true
                 }
                 R.id.newFlashcard -> {
-                    showAddEditFlashcard(AddEditFlashcardFragment.newFlashcardExtra)
+                    showAddEditFlashcard(AddEditFlashcardFragment.newFlashcardId)
                     drawerLayout.closeDrawers()
                     return@setNavigationItemSelectedListener true
                 }
@@ -73,6 +78,10 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
                 .commit()
     }
 
+    /**
+     * Change view to AddEditFlashcardFragment
+     * @param flashcardId id of Flashcard to be shown
+     */
     override fun showAddEditFlashcard(flashcardId: String) {
         var wasNull = false
         if (addEditFlashcardFragment == null) {
@@ -85,6 +94,10 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
         }
     }
 
+    /**
+     * Change view to FlashcardListFragment
+     * @param flashcardId id of Flashcard to be shown in detail view
+     */
     override fun showFlashcardList(flashcardId: String) {
         if (flashcardListFragment == null) {
             flashcardListFragment = FlashcardListFragment.newInstance(flashcardId)
@@ -94,6 +107,9 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
         replaceFragment(flashcardListFragment!!)
     }
 
+    /**
+     * Change view to RandomFlashcardFragment (a.k.a. the game)
+     */
     override fun showRandomFlashcard() {
         replaceFragment(randomFlashcardFragment)
     }
