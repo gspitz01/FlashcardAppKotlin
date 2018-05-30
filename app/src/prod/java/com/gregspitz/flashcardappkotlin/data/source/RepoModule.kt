@@ -26,7 +26,6 @@ import com.gregspitz.flashcardappkotlin.InitialData
 import com.gregspitz.flashcardappkotlin.data.source.local.FlashcardDao
 import com.gregspitz.flashcardappkotlin.data.source.local.FlashcardDatabase
 import com.gregspitz.flashcardappkotlin.data.source.local.FlashcardLocalDataSource
-import com.gregspitz.flashcardappkotlin.data.source.remote.FlashcardRemoteDataSource
 import dagger.Module
 import dagger.Provides
 import java.util.concurrent.Executors
@@ -53,6 +52,7 @@ class RepoModule {
                             for (flashcard in InitialData.flashcards) {
                                 val contentValues = ContentValues()
                                 contentValues.put("id", flashcard.id)
+                                contentValues.put("category", flashcard.category)
                                 contentValues.put("front", flashcard.front)
                                 contentValues.put("back", flashcard.back)
                                 db.insert("flashcard", SQLiteDatabase.CONFLICT_REPLACE,
@@ -76,14 +76,8 @@ class RepoModule {
     }
 
     @Provides @Singleton
-    fun provideFlashcardRemoteDataSource() : FlashcardRemoteDataSource {
-        return FlashcardRemoteDataSource()
-    }
-
-    @Provides @Singleton
-    fun provideFlashcardRepository(flashcardLocalDataSource: FlashcardLocalDataSource,
-                                   flashcardRemoteDataSource: FlashcardRemoteDataSource)
+    fun provideFlashcardRepository(flashcardLocalDataSource: FlashcardLocalDataSource)
             : FlashcardRepository {
-        return FlashcardRepository(flashcardLocalDataSource, flashcardRemoteDataSource)
+        return FlashcardRepository(flashcardLocalDataSource)
     }
 }
