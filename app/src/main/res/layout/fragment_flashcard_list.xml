@@ -10,38 +10,45 @@
     tools:context="com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListFragment">
 
 
-    <LinearLayout
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <android.support.v4.view.ViewPager
             android:id="@+id/detailContent"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="2">
+            android:layout_width="0dp"
+            android:layout_height="187dp" android:padding="4dp"
+            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
         </android.support.v4.view.ViewPager>
-
-        <TextView
-            android:id="@+id/flashcardListMessages"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/flashcardRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
+            android:layout_width="0dp"
+            android:layout_height="334dp"
+            android:paddingEnd="2dp"
+            android:paddingStart="2dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/flashcardListMessages">
 
         </android.support.v7.widget.RecyclerView>
-    </LinearLayout>
+        <TextView
+            android:id="@+id/flashcardListMessages"
+            android:layout_width="0dp"
+            android:layout_height="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/detailContent"/>
+    </android.support.constraint.ConstraintLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/addFlashcardFab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/add_flashcard_fab_margin"
-        android:src="@android:drawable/btn_plus"
+        android:src="@drawable/ic_add_black_24dp"
         app:layout_anchor="@id/flashcardRecyclerView"
         app:layout_anchorGravity="bottom|end"/>
 
