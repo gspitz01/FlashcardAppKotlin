@@ -81,7 +81,7 @@ class AddEditFlashcardFragmentTest {
 
     @Test
     fun startWithNewFlashcardIntent_showsBlankFields() {
-        launchActivityWithFlashcardId(AddEditFlashcardFragment.newFlashcardExtra)
+        launchActivityWithFlashcardId(AddEditFlashcardFragment.newFlashcardId)
         onView(withId(R.id.flashcardEditCategory)).check(matches(withText("")))
         onView(withId(R.id.flashcardEditFront)).check(matches(withText("")))
         onView(withId(R.id.flashcardEditBack)).check(matches(withText("")))
@@ -131,7 +131,7 @@ class AddEditFlashcardFragmentTest {
 
     @Test
     fun showListButtonClickNewFlashcard_showsFlashcardListViewWithNoParticularFlashcard() {
-        launchActivityWithFlashcardId(AddEditFlashcardFragment.newFlashcardExtra)
+        launchActivityWithFlashcardId(AddEditFlashcardFragment.newFlashcardId)
         onView(withId(R.id.showFlashcardListButton)).perform(click())
         onView(withId(R.id.detailContent)).check(matches(isDisplayed()))
     }
