@@ -16,8 +16,10 @@
 
 package com.gregspitz.flashcardappkotlin
 
+import android.content.pm.ActivityInfo
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.click
+import android.support.test.espresso.action.ViewActions.doubleClick
 import android.support.test.espresso.assertion.ViewAssertions.doesNotExist
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.DrawerActions
@@ -53,5 +55,31 @@ class MainScreenTest {
         onView(withId(R.id.drawerLayout)).perform(DrawerActions.open())
         onView(withId(R.id.navDrawer)).perform(navigateTo(R.id.newFlashcard))
         onView(withId(R.id.saveFlashcardButton)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun orientationChangeOnAddEditView_maintainsCurrentViewWithFlashcardData() {
+        testRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(click())
+        onView(withId(R.id.navDrawer)).perform(navigateTo(R.id.navList))
+        onView(allOf(isDescendantOfA(allOf(hasDescendant(withText(InitialData.flashcards[0].front)),
+                instanceOf(ScrollView::class.java))),
+                withId(R.id.editFlashcardButton))).perform(doubleClick())
+
+        onView(withId(R.id.flashcardEditCategory))
+                .check(matches(withText(InitialData.flashcards[0].category)))
+        onView(withId(R.id.flashcardEditFront))
+                .check(matches(withText(InitialData.flashcards[0].front)))
+        onView(withId(R.id.flashcardEditBack))
+                .check(matches(withText(InitialData.flashcards[0].back)))
+
+        testRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        onView(withId(R.id.flashcardEditCategory))
+                .check(matches(withText(InitialData.flashcards[0].category)))
+        onView(withId(R.id.flashcardEditFront))
+                .check(matches(withText(InitialData.flashcards[0].front)))
+        onView(withId(R.id.flashcardEditBack))
+                .check(matches(withText(InitialData.flashcards[0].back)))
+        onView(withId(R.id.nextFlashcardButton)).check(doesNotExist())
     }
 }

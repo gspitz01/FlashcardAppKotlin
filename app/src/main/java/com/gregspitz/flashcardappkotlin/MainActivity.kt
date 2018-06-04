@@ -32,7 +32,9 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
         }
 
         // Start with the game
-        setFragment(randomFlashcardFragment)
+        if (savedInstanceState == null) {
+            setFragment(randomFlashcardFragment)
+        }
 
         navDrawer.setNavigationItemSelectedListener {
             when (it.itemId) {
