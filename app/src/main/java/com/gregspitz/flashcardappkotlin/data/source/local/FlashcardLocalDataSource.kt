@@ -60,10 +60,10 @@ class FlashcardLocalDataSource(private val flashcardDao: FlashcardDao) : Flashca
 
     /**
      * Delete a single Flashcard from the data source
-     * TODO: implement and test this
      */
     override fun deleteFlashcard(flashcardId: String, callback: FlashcardDataSource.DeleteFlashcardCallback) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        flashcardDao.deleteFlashcard(flashcardId)
+        callback.onDeleteSuccessful()
     }
 
     /**

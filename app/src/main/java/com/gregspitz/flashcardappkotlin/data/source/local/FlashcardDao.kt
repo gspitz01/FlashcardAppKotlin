@@ -40,6 +40,9 @@ interface FlashcardDao {
     @Insert(onConflict = REPLACE)
     fun insertFlashcards(flashcards: List<Flashcard>)
 
+    @Query("DELETE from flashcard where id = :flashcardId")
+    fun deleteFlashcard(flashcardId: String)
+
     @Query("DELETE from flashcard")
     fun deleteFlashcards()
 }

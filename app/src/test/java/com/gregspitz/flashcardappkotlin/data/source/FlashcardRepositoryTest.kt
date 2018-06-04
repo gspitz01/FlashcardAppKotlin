@@ -16,6 +16,7 @@
 
 package com.gregspitz.flashcardappkotlin.data.source
 
+import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_LIST
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.source.local.FlashcardDao
@@ -83,6 +84,21 @@ class FlashcardRepositoryTest {
         flashcardRepository.getFlashcards(getFlashcardsCallback)
         verify(spyLocalDataSource, times(2))
                 .getFlashcards(any())
+    }
+
+    @Test
+    fun deleteFlashcard_deletesFlashcardFromCacheAndCallsDeleteOnLocalDataSource() {
+        // Call getFlashcards once to make sure cache is not dirty
+        getLocalFlashcardsWithArgumentCaptor()
+
+        val deleteFlashcardCallback: FlashcardDataSource.DeleteFlashcardCallback = mock()
+        flashcardRepository.deleteFlashcard(FLASHCARD_1.id, deleteFlashcardCallback)
+        verify(spyLocalDataSource).deleteFlashcard(eq(FLASHCARD_1.id), eq(deleteFlashcardCallback))
+
+        // Prove tries to get FLASHCARD_1 from local source because not found in cache
+        val getFlashcardCallback: FlashcardDataSource.GetFlashcardCallback = mock()
+        flashcardRepository.getFlashcard(FLASHCARD_1.id, getFlashcardCallback)
+        verify(spyLocalDataSource).getFlashcard(FLASHCARD_1.id, getFlashcardCallback)
     }
 
     @Test

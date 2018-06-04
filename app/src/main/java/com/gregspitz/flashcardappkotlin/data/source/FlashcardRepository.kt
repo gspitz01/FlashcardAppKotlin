@@ -77,10 +77,10 @@ open class FlashcardRepository(private val localDataSource: FlashcardDataSource)
 
     /**
      * Delete a single Flashcard from the repository
-     * TODO: implement and test this
      */
     override fun deleteFlashcard(flashcardId: String, callback: FlashcardDataSource.DeleteFlashcardCallback) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        cache.remove(flashcardId)
+        localDataSource.deleteFlashcard(flashcardId, callback)
     }
 
     /**
@@ -106,15 +106,7 @@ open class FlashcardRepository(private val localDataSource: FlashcardDataSource)
      */
     private fun getFlashcardFromLocalSource(flashcardId: String,
                                             callback: FlashcardDataSource.GetFlashcardCallback) {
-        localDataSource.getFlashcard(flashcardId, object : FlashcardDataSource.GetFlashcardCallback {
-            override fun onFlashcardLoaded(flashcard: Flashcard) {
-                callback.onFlashcardLoaded(flashcard)
-            }
-
-            override fun onDataNotAvailable() {
-                callback.onDataNotAvailable()
-            }
-        })
+        localDataSource.getFlashcard(flashcardId, callback)
     }
 
     /**
