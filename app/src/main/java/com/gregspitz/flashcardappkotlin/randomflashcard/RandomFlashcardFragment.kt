@@ -22,8 +22,10 @@ import javax.inject.Inject
 class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
 
     // Dagger Dependency Injection
-    @Inject lateinit var getRandomFlashcard: GetRandomFlashcard
-    @Inject lateinit var useCaseHandler: UseCaseHandler
+    @Inject
+    lateinit var getRandomFlashcard: GetRandomFlashcard
+    @Inject
+    lateinit var useCaseHandler: UseCaseHandler
 
     private lateinit var presenter: RandomFlashcardContract.Presenter
     private lateinit var viewModel: RandomFlashcardViewModel
@@ -55,16 +57,28 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
         val randomFlashcardObserver = Observer<Flashcard> {
             flashcardCategory.text = it?.category
             when (viewModel.flashcardSide.value) {
-                FlashcardSide.FRONT -> flashcardSide.text = it?.front
-                FlashcardSide.BACK -> flashcardSide.text = it?.back
+                FlashcardSide.FRONT -> {
+                    flashcardSide.textAlignment = View.TEXT_ALIGNMENT_CENTER
+                    flashcardSide.text = it?.front
+                }
+                FlashcardSide.BACK -> {
+                    flashcardSide.textAlignment = View.TEXT_ALIGNMENT_VIEW_START
+                    flashcardSide.text = it?.back
+                }
             }
         }
 
         // Observe the FlashcardSide on the ViewModel
         val flashcardSideObserver = Observer<FlashcardSide> {
             when (it) {
-                FlashcardSide.FRONT -> flashcardSide.text = viewModel.randomFlashcard.value?.front
-                FlashcardSide.BACK -> flashcardSide.text = viewModel.randomFlashcard.value?.back
+                FlashcardSide.FRONT -> {
+                    flashcardSide.textAlignment = View.TEXT_ALIGNMENT_CENTER
+                    flashcardSide.text = viewModel.randomFlashcard.value?.front
+                }
+                FlashcardSide.BACK -> {
+                    flashcardSide.textAlignment = View.TEXT_ALIGNMENT_VIEW_START
+                    flashcardSide.text = viewModel.randomFlashcard.value?.back
+                }
             }
         }
 
@@ -109,7 +123,7 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
      */
     override fun setPresenter(presenter: RandomFlashcardContract.Presenter) {
         this.presenter = presenter
-        flashcardSide.setOnClickListener {
+        flashcardCardView.setOnClickListener {
             this@RandomFlashcardFragment.presenter.turnFlashcard()
         }
 
