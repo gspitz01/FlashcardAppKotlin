@@ -1,9 +1,9 @@
 package com.gregspitz.flashcardappkotlin
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
+import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardFragment
 import com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListFragment
@@ -18,8 +18,8 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
 
     // Start with a RandomFlashcardFragment (a.k.a. the game)
     private val randomFlashcardFragment = RandomFlashcardFragment.newInstance()
-    private var flashcardListFragment: FlashcardListFragment? = null
-    private var addEditFlashcardFragment: AddEditFlashcardFragment? = null
+    private lateinit var flashcardListFragment: FlashcardListFragment
+    private lateinit var addEditFlashcardFragment: AddEditFlashcardFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,15 +83,8 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
      * @param flashcardId id of Flashcard to be shown
      */
     override fun showAddEditFlashcard(flashcardId: String) {
-        var wasNull = false
-        if (addEditFlashcardFragment == null) {
-            addEditFlashcardFragment = AddEditFlashcardFragment.newInstance(flashcardId)
-            wasNull = true
-        }
-        replaceFragment(addEditFlashcardFragment!!)
-        if (!wasNull) {
-            addEditFlashcardFragment?.setFlashcard(flashcardId)
-        }
+        addEditFlashcardFragment = AddEditFlashcardFragment.newInstance(flashcardId)
+        replaceFragment(addEditFlashcardFragment)
     }
 
     /**
@@ -99,12 +92,8 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
      * @param flashcardId id of Flashcard to be shown in detail view
      */
     override fun showFlashcardList(flashcardId: String) {
-        if (flashcardListFragment == null) {
-            flashcardListFragment = FlashcardListFragment.newInstance(flashcardId)
-        } else {
-            flashcardListFragment?.setDetailView(flashcardId)
-        }
-        replaceFragment(flashcardListFragment!!)
+        flashcardListFragment = FlashcardListFragment.newInstance(flashcardId)
+        replaceFragment(flashcardListFragment)
     }
 
     /**

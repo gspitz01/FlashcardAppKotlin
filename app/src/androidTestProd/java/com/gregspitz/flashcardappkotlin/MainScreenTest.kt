@@ -18,6 +18,7 @@ package com.gregspitz.flashcardappkotlin
 
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.click
+import android.support.test.espresso.assertion.ViewAssertions.doesNotExist
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.DrawerActions
 import android.support.test.espresso.contrib.NavigationViewActions.navigateTo
@@ -25,6 +26,8 @@ import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
+import android.widget.ScrollView
+import org.hamcrest.CoreMatchers.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -35,6 +38,8 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class MainScreenTest {
+
+    // TODO: fixup UI
 
     @Rule @JvmField
     val testRule = ActivityTestRule<MainActivity>(MainActivity::class.java)

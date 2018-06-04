@@ -146,7 +146,7 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
      */
     private fun moveToDetailsFromArgument(flashcards: List<FlashcardListItem>) {
         if (flashcardId != null && flashcardId != noParticularFlashcardExtra) {
-            for ((index, flashcard) in flashcards.withIndex()) {
+            for ((index, flashcard) in flashcards.filter { it is Flashcard }.withIndex()) {
                 when (flashcard) {
                     is Flashcard -> {
                         if (flashcard.id == flashcardId) {
@@ -233,6 +233,8 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
     override fun setPresenter(presenter: FlashcardListContract.Presenter) {
         this.presenter = presenter
         recyclerAdapter.setPresenter(this.presenter)
-        addFlashcardFab.setOnClickListener { this@FlashcardListFragment.presenter.addFlashcard() }
+        addFlashcardFab.setOnClickListener {
+            this@FlashcardListFragment.presenter.addFlashcard()
+        }
     }
 }

@@ -22,7 +22,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.gregspitz.flashcardappkotlin.R
-import com.gregspitz.flashcardappkotlin.R.id.*
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import kotlinx.android.synthetic.main.fragment_flashcard_detail.*
 
