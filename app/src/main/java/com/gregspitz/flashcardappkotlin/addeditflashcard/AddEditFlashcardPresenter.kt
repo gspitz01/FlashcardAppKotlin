@@ -18,9 +18,11 @@ package com.gregspitz.flashcardappkotlin.addeditflashcard
 
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
+import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.DeleteFlashcard
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.GetFlashcard
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.SaveFlashcard
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListFragment
 
 /**
  * Presenter for AddEditFlashcard view
@@ -29,7 +31,8 @@ class AddEditFlashcardPresenter (
         private val useCaseHandler: UseCaseHandler,
         private val view: AddEditFlashcardContract.View,
         private val getFlashcard: GetFlashcard,
-        private val saveFlashcard: SaveFlashcard
+        private val saveFlashcard: SaveFlashcard,
+        private val deleteFlashcard: DeleteFlashcard
 ) : AddEditFlashcardContract.Presenter {
 
     private lateinit var flashcardId: String
@@ -88,6 +91,23 @@ class AddEditFlashcardPresenter (
                     override fun onError() {
                         if (view.isActive()) {
                             view.showSaveFailed()
+                        }
+                    }
+                })
+    }
+
+    override fun deleteFlashcard(flashcardId: String) {
+        useCaseHandler.execute(deleteFlashcard, DeleteFlashcard.RequestValues(flashcardId),
+                object: UseCase.UseCaseCallback<DeleteFlashcard.ResponseValue> {
+                    override fun onSuccess(response: DeleteFlashcard.ResponseValue) {
+                        if (view.isActive()) {
+                            view.showFlashcardList(FlashcardListFragment.noParticularFlashcardExtra)
+                        }
+                    }
+
+                    override fun onError() {
+                        if (view.isActive()) {
+                            view.showDeleteFailed()
                         }
                     }
                 })

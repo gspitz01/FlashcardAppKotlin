@@ -35,6 +35,7 @@ import org.hamcrest.Matchers
 import org.hamcrest.Matchers.not
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -123,6 +124,24 @@ class AddEditFlashcardFragmentTest {
     }
 
     @Test
+    fun deleteSuccess_deletesFlashcardAndShowsFlashcardListView() {
+        launchActivityWithFlashcardId(FLASHCARD_1.id)
+
+        onView(withId(R.id.deleteFlashcardButton)).perform(click())
+
+        assertTrue(verifyFlashcardNoLongerInRepo(FLASHCARD_1))
+        onView(withId(R.id.detailContent)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun deleteFailure_showsDeleteFailedToast() {
+        localDataSource.setDeleteFailure(true)
+        launchActivityWithFlashcardId(FLASHCARD_1.id)
+        onView(withId(R.id.deleteFlashcardButton)).perform(click())
+        checkForToast(R.string.delete_failed_toast_text)
+    }
+
+    @Test
     fun showListButtonClickIntentWithId_showsFlashcardListViewWithThatFlashcardInDetailView() {
         launchActivityWithFlashcardId(FLASHCARD_1.id)
         onView(withId(R.id.showFlashcardListButton)).perform(click())
@@ -164,6 +183,21 @@ class AddEditFlashcardFragmentTest {
 
                 })
         return savedFlashcards[0]
+    }
+
+    private fun verifyFlashcardNoLongerInRepo(flashcard: Flashcard): Boolean {
+        var returnValue = false
+        dataSource.getFlashcard(flashcard.id, object: FlashcardDataSource.GetFlashcardCallback {
+            override fun onDataNotAvailable() {
+                returnValue = true
+            }
+
+            override fun onFlashcardLoaded(flashcard: Flashcard) {
+                // Ignore
+            }
+        })
+
+        return returnValue
     }
 
     private fun checkDetailViewMatchesFlashcard(flashcard: Flashcard) {

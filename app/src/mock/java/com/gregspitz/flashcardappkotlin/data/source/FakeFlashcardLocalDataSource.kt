@@ -27,6 +27,7 @@ class FakeFlashcardLocalDataSource : FlashcardDataSource {
 
     private val database : MutableMap<String, Flashcard> = mutableMapOf()
     private var failure = false
+    private var deleteFailure = false
 
     override fun getFlashcards(callback: FlashcardDataSource.GetFlashcardsCallback) {
         if (failure) {
@@ -64,7 +65,7 @@ class FakeFlashcardLocalDataSource : FlashcardDataSource {
     }
 
     override fun deleteFlashcard(flashcardId: String, callback: FlashcardDataSource.DeleteFlashcardCallback) {
-        if (failure) {
+        if (deleteFailure) {
             callback.onDeleteFailed()
             return
         }
@@ -88,5 +89,9 @@ class FakeFlashcardLocalDataSource : FlashcardDataSource {
 
     fun setFailure(failure: Boolean) {
         this.failure = failure
+    }
+
+    fun setDeleteFailure(failure: Boolean) {
+        this.deleteFailure = failure
     }
 }

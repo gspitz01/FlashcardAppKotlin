@@ -45,6 +45,8 @@ interface AddEditFlashcardContract {
 
         fun showSaveFailed()
 
+        fun showDeleteFailed()
+
         fun isActive() : Boolean
     }
 
@@ -53,6 +55,8 @@ interface AddEditFlashcardContract {
         fun loadFlashcard(flashcardId: String)
 
         fun saveFlashcard(flashcard: Flashcard)
+
+        fun deleteFlashcard(flashcardId: String)
 
         fun showList()
     }

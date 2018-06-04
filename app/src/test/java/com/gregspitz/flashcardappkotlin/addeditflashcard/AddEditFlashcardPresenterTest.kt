@@ -19,12 +19,15 @@ package com.gregspitz.flashcardappkotlin.addeditflashcard
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
+import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.DeleteFlashcard
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.GetFlashcard
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.SaveFlashcard
+import com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListFragment
 import com.nhaarman.mockito_kotlin.*
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.mockito.InOrder
 
 /**
  * Tests for the implementation of {@link AddEditFlashcardPresenter}
@@ -39,17 +42,24 @@ class AddEditFlashcardPresenterTest {
 
     private val saveFlashcard: SaveFlashcard = mock()
 
+    private val deleteFlashcard: DeleteFlashcard = mock()
+
     private val useCaseHandler: UseCaseHandler = mock()
 
     private val getRequestCaptor = argumentCaptor<GetFlashcard.RequestValues>()
 
     private val saveRequestCaptor = argumentCaptor<SaveFlashcard.RequestValues>()
 
+    private val deleteRequestCaptor = argumentCaptor<DeleteFlashcard.RequestValues>()
+
     private val getFlashcardCallbackCaptor =
             argumentCaptor<UseCase.UseCaseCallback<GetFlashcard.ResponseValue>>()
 
     private val saveFlashcardCallbackCaptor =
             argumentCaptor<UseCase.UseCaseCallback<SaveFlashcard.ResponseValue>>()
+
+    private val deleteFlashcardCallbackCaptor =
+            argumentCaptor<UseCase.UseCaseCallback<DeleteFlashcard.ResponseValue>>()
 
     private lateinit var presenter: AddEditFlashcardPresenter
 
@@ -109,7 +119,9 @@ class AddEditFlashcardPresenterTest {
         inOrder.verify(useCaseHandler).execute(eq(getFlashcard), getRequestCaptor.capture(),
                 getFlashcardCallbackCaptor.capture())
         getFlashcardCallbackCaptor.firstValue.onSuccess(response)
+
         presenter.saveFlashcard(FLASHCARD_1)
+
         inOrder.verify(useCaseHandler).execute(eq(saveFlashcard), saveRequestCaptor.capture(),
                 saveFlashcardCallbackCaptor.capture())
         assertEquals(FLASHCARD_1, saveRequestCaptor.firstValue.flashcard)
@@ -118,10 +130,47 @@ class AddEditFlashcardPresenterTest {
     }
 
     @Test
+    fun deleteSuccess_showsListViewInView() {
+        createAndStartPresenter()
+        val inOrder = getFlashcardsWithUseCaseHandlerInOrder()
+
+        presenter.deleteFlashcard(FLASHCARD_1.id)
+
+        inOrder.verify(useCaseHandler).execute(eq(deleteFlashcard), deleteRequestCaptor.capture(),
+                deleteFlashcardCallbackCaptor.capture())
+        assertEquals(FLASHCARD_1.id, deleteRequestCaptor.firstValue.flashcardId)
+        val deleteResponse = DeleteFlashcard.ResponseValue()
+        deleteFlashcardCallbackCaptor.firstValue.onSuccess(deleteResponse)
+        verify(view).showFlashcardList(FlashcardListFragment.noParticularFlashcardExtra)
+    }
+
+    @Test
+    fun deleteFailed_showsDeleteFailedInView() {
+        createAndStartPresenter()
+        val inOrder = getFlashcardsWithUseCaseHandlerInOrder()
+
+        presenter.deleteFlashcard(FLASHCARD_1.id)
+
+        inOrder.verify(useCaseHandler).execute(eq(deleteFlashcard), deleteRequestCaptor.capture(),
+                deleteFlashcardCallbackCaptor.capture())
+        assertEquals(FLASHCARD_1.id, deleteRequestCaptor.firstValue.flashcardId)
+        deleteFlashcardCallbackCaptor.firstValue.onError()
+        verify(view).showDeleteFailed()
+    }
+
+    @Test
     fun showList_callsShowListViewOnView() {
         createAndStartPresenter()
         presenter.showList()
         verify(view).showFlashcardList(eq(FLASHCARD_1.id))
+    }
+
+    private fun getFlashcardsWithUseCaseHandlerInOrder(): InOrder {
+        val inOrder = inOrder(useCaseHandler)
+        inOrder.verify(useCaseHandler).execute(eq(getFlashcard), getRequestCaptor.capture(),
+                getFlashcardCallbackCaptor.capture())
+        getFlashcardCallbackCaptor.firstValue.onSuccess(response)
+        return inOrder
     }
 
     private fun verifyGetCallbackSuccess() {
@@ -145,6 +194,7 @@ class AddEditFlashcardPresenterTest {
     }
 
     private fun createPresenter(): AddEditFlashcardPresenter {
-        return AddEditFlashcardPresenter(useCaseHandler, view, getFlashcard, saveFlashcard)
+        return AddEditFlashcardPresenter(useCaseHandler, view,
+                getFlashcard, saveFlashcard, deleteFlashcard)
     }
 }

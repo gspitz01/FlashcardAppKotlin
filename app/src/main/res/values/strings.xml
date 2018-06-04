@@ -17,4 +17,6 @@
     <string name="nav_header_title">Where to Go?</string>
     <string name="nav_new_flashcard_title">New Flashcard</string>
     <string name="flashcard_category_hint_text">Category</string>
+    <string name="delete_flashcard_button_text">Delete</string>
+    <string name="delete_failed_toast_text">Delete failed!</string>
 </resources>

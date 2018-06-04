@@ -4,6 +4,7 @@ package com.gregspitz.flashcardappkotlin.addeditflashcard
 import android.os.Bundle
 import android.support.annotation.VisibleForTesting
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.MainFragmentRouter
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
+import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.DeleteFlashcard
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.GetFlashcard
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.SaveFlashcard
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
@@ -29,6 +31,7 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
     // Dagger dependency injection
     @Inject lateinit var getFlashcard: GetFlashcard
     @Inject lateinit var  saveFlashcard: SaveFlashcard
+    @Inject lateinit var deleteFlashcard: DeleteFlashcard
     @Inject lateinit var useCaseHandler: UseCaseHandler
 
     private lateinit var presenter: AddEditFlashcardContract.Presenter
@@ -70,7 +73,7 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         // Create the presenter
-        AddEditFlashcardPresenter(useCaseHandler, this, getFlashcard, saveFlashcard)
+        AddEditFlashcardPresenter(useCaseHandler, this, getFlashcard, saveFlashcard, deleteFlashcard)
     }
 
     override fun onResume() {
@@ -90,7 +93,6 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
      */
     override fun setFlashcard(flashcardId: String) {
         this.flashcardId = flashcardId
-        presenter.loadFlashcard(flashcardId)
     }
 
     override fun setLoadingIndicator(active: Boolean) {
@@ -111,6 +113,7 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
      * @param flashcard the Flashcard to be shown
      */
     override fun showFlashcard(flashcard: Flashcard) {
+        failedToLoadFlashcard.visibility = View.GONE
         this.flashcard = flashcard
         flashcardEditCategory.setText(flashcard.category)
         flashcardEditFront.setText(flashcard.front)
@@ -121,6 +124,7 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
      * Show blank fields for a new Flashcard
      */
     override fun showNewFlashcard() {
+        failedToLoadFlashcard.visibility = View.GONE
         flashcardEditCategory.setText("")
         flashcardEditFront.setText("")
         flashcardEditBack.setText("")
@@ -158,6 +162,14 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
         toast?.show()
     }
 
+    /**
+     * Show a toast to say the deletion attempt failed
+     */
+    override fun showDeleteFailed() {
+        toast = Toast.makeText(activity, R.string.delete_failed_toast_text, Toast.LENGTH_LONG)
+        toast?.show()
+    }
+
     override fun isActive(): Boolean {
         return active
     }
@@ -183,6 +195,12 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
             }
             // flashcard will definitely not be null
             this@AddEditFlashcardFragment.presenter.saveFlashcard(flashcard!!)
+        }
+
+        deleteFlashcardButton.setOnClickListener {
+            flashcard?.let {
+                this@AddEditFlashcardFragment.presenter.deleteFlashcard(it.id)
+            }
         }
 
         showFlashcardListButton.setOnClickListener {
