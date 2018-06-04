@@ -74,6 +74,15 @@ open class FlashcardRepository(private val localDataSource: FlashcardDataSource)
         cacheDirty = true
     }
 
+
+    /**
+     * Delete a single Flashcard from the repository
+     * TODO: implement and test this
+     */
+    override fun deleteFlashcard(flashcardId: String, callback: FlashcardDataSource.DeleteFlashcardCallback) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     /**
      * Delete all the Flashcards from the local data source and the cache
      */

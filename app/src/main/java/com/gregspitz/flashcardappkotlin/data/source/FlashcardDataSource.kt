@@ -50,6 +50,15 @@ interface FlashcardDataSource {
 
     fun saveFlashcard(flashcard: Flashcard, callback: SaveFlashcardCallback)
 
+    interface DeleteFlashcardCallback {
+
+        fun onDeleteSuccessful()
+
+        fun onDeleteFailed()
+    }
+
+    fun deleteFlashcard(flashcardId: String, callback: DeleteFlashcardCallback)
+
     fun deleteAllFlashcards()
 
     fun refreshFlashcards()

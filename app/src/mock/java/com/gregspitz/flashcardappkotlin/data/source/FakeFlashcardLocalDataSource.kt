@@ -22,6 +22,9 @@ import com.gregspitz.flashcardappkotlin.data.model.Flashcard
  * Fake local data source for testing
  */
 class FakeFlashcardLocalDataSource : FlashcardDataSource {
+
+    // TODO: add comments to this
+
     private val database : MutableMap<String, Flashcard> = mutableMapOf()
     private var failure = false
 
@@ -58,6 +61,16 @@ class FakeFlashcardLocalDataSource : FlashcardDataSource {
         database.remove(flashcard.id)
         database[flashcard.id] = flashcard
         callback.onSaveSuccessful()
+    }
+
+    override fun deleteFlashcard(flashcardId: String, callback: FlashcardDataSource.DeleteFlashcardCallback) {
+        if (failure) {
+            callback.onDeleteFailed()
+            return
+        }
+
+        database.remove(flashcardId)
+        callback.onDeleteSuccessful()
     }
 
     override fun deleteAllFlashcards() {
