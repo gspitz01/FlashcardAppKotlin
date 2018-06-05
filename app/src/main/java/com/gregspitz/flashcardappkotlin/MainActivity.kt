@@ -77,6 +77,7 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
     private fun replaceFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
                 .replace(R.id.contentFrame, fragment)
+                .addToBackStack(null)
                 .commit()
     }
 

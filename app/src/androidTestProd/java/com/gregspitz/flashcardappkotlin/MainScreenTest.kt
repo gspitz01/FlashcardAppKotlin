@@ -18,6 +18,7 @@ package com.gregspitz.flashcardappkotlin
 
 import android.content.pm.ActivityInfo
 import android.support.test.espresso.Espresso.onView
+import android.support.test.espresso.Espresso.pressBack
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.action.ViewActions.doubleClick
 import android.support.test.espresso.assertion.ViewAssertions.doesNotExist
@@ -48,23 +49,19 @@ class MainScreenTest {
 
     @Test
     fun moveThroughWholeApp() {
-        onView(withId(R.id.nextFlashcardButton)).check(matches(isDisplayed()))
-        onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(click())
-        onView(withId(R.id.navDrawer)).perform(navigateTo(R.id.navList))
-        onView(withId(R.id.flashcardRecyclerView)).check(matches(isDisplayed()))
+        verifyGameViewVisible()
+        navigateToListViaNavDrawer()
+        verifyListViewVisible()
         onView(withId(R.id.drawerLayout)).perform(DrawerActions.open())
         onView(withId(R.id.navDrawer)).perform(navigateTo(R.id.newFlashcard))
-        onView(withId(R.id.saveFlashcardButton)).check(matches(isDisplayed()))
+        verifyAddEditViewVisible()
     }
 
     @Test
     fun orientationChangeOnAddEditView_maintainsCurrentViewWithFlashcardData() {
         testRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(click())
-        onView(withId(R.id.navDrawer)).perform(navigateTo(R.id.navList))
-        onView(allOf(isDescendantOfA(allOf(hasDescendant(withText(InitialData.flashcards[0].front)),
-                instanceOf(ScrollView::class.java))),
-                withId(R.id.editFlashcardButton))).perform(doubleClick())
+        navigateToListViaNavDrawer()
+        clickOnEditButtonOfFirstInDetailPager()
 
         onView(withId(R.id.flashcardEditCategory))
                 .check(matches(withText(InitialData.flashcards[0].category)))
@@ -81,5 +78,72 @@ class MainScreenTest {
         onView(withId(R.id.flashcardEditBack))
                 .check(matches(withText(InitialData.flashcards[0].back)))
         onView(withId(R.id.nextFlashcardButton)).check(doesNotExist())
+    }
+
+    @Test
+    fun backFunction_worksProperly() {
+        // Start on game view
+        verifyGameViewVisible()
+
+        // Move to List view
+        navigateToListViaNavDrawer()
+        verifyListViewVisible()
+
+        // Press back
+        pressBack()
+        // Should be back at game view
+        verifyGameViewVisible()
+
+        // Move to List view
+        navigateToListViaNavDrawer()
+        verifyListViewVisible()
+
+        // Move to Add/Edit view
+        clickOnEditButtonOfFirstInDetailPager()
+        verifyAddEditViewVisible()
+
+        pressBack()
+        // Should be back at List view
+        verifyListViewVisible()
+
+        pressBack()
+        // Should be back at game view
+        verifyGameViewVisible()
+
+        // Move to Add/Edit view
+        navigateToAddEditViaNavDrawer()
+        verifyAddEditViewVisible()
+
+        pressBack()
+        // Should be back at game view
+        verifyGameViewVisible()
+    }
+
+    private fun verifyGameViewVisible() {
+        onView(withId(R.id.nextFlashcardButton)).check(matches(isDisplayed()))
+    }
+
+    private fun verifyListViewVisible() {
+        onView(withId(R.id.flashcardRecyclerView)).check(matches(isDisplayed()))
+    }
+
+    private fun verifyAddEditViewVisible() {
+        onView(withId(R.id.flashcardEditCategory)).check(matches(isDisplayed()))
+    }
+
+    private fun clickOnEditButtonOfFirstInDetailPager() {
+        onView(allOf(isDescendantOfA(allOf(hasDescendant(withText(InitialData.flashcards[0].front)),
+                instanceOf(ScrollView::class.java))),
+                withId(R.id.editFlashcardButton))).perform(doubleClick())
+    }
+
+    private fun navigateToListViaNavDrawer() {
+        onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(click())
+        onView(withId(R.id.navDrawer)).perform(navigateTo(R.id.navList))
+    }
+
+    private fun navigateToAddEditViaNavDrawer() {
+        onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(click())
+        onView(withId(R.id.navDrawer)).perform(navigateTo(R.id.newFlashcard))
     }
 }
