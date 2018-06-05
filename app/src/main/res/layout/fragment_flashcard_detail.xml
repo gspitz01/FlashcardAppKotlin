@@ -5,6 +5,7 @@
             tools:context="com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardDetailFragment">
 
     <LinearLayout
+        android:id="@+id/flashcardDetailContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">

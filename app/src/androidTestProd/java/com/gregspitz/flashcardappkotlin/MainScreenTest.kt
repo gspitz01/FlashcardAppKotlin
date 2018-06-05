@@ -17,10 +17,10 @@
 package com.gregspitz.flashcardappkotlin
 
 import android.content.pm.ActivityInfo
+import android.support.test.espresso.Espresso
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.Espresso.pressBack
-import android.support.test.espresso.action.ViewActions.click
-import android.support.test.espresso.action.ViewActions.doubleClick
+import android.support.test.espresso.action.ViewActions.*
 import android.support.test.espresso.assertion.ViewAssertions.doesNotExist
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.DrawerActions
@@ -52,14 +52,13 @@ class MainScreenTest {
         verifyGameViewVisible()
         navigateToListViaNavDrawer()
         verifyListViewVisible()
-        onView(withId(R.id.drawerLayout)).perform(DrawerActions.open())
-        onView(withId(R.id.navDrawer)).perform(navigateTo(R.id.newFlashcard))
+        navigateToAddEditViaNavDrawer()
         verifyAddEditViewVisible()
     }
 
     @Test
     fun orientationChangeOnAddEditView_maintainsCurrentViewWithFlashcardData() {
-        testRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
         navigateToListViaNavDrawer()
         clickOnEditButtonOfFirstInDetailPager()
 
@@ -70,7 +69,7 @@ class MainScreenTest {
         onView(withId(R.id.flashcardEditBack))
                 .check(matches(withText(InitialData.flashcards[0].back)))
 
-        testRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
         onView(withId(R.id.flashcardEditCategory))
                 .check(matches(withText(InitialData.flashcards[0].category)))
         onView(withId(R.id.flashcardEditFront))
@@ -78,6 +77,21 @@ class MainScreenTest {
         onView(withId(R.id.flashcardEditBack))
                 .check(matches(withText(InitialData.flashcards[0].back)))
         onView(withId(R.id.nextFlashcardButton)).check(doesNotExist())
+    }
+
+    @Test
+    fun orientationChangeOnListView_maintainsSameDetail() {
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+        navigateToListViaNavDrawer()
+        // Click first for focus
+        onView(withId(R.id.detailPager)).perform(click())
+        onView(withId(R.id.detailPager)).perform(swipeLeft())
+        onView(allOf(isDescendantOfA(withId(R.id.flashcardDetailContent)),
+                withText(InitialData.flashcards[1].back))).check(matches(isDisplayed()))
+
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+        onView(allOf(isDescendantOfA(withId(R.id.flashcardDetailContent)),
+                withText(InitialData.flashcards[1].back))).check(matches(isDisplayed()))
     }
 
     @Test
@@ -102,6 +116,8 @@ class MainScreenTest {
         clickOnEditButtonOfFirstInDetailPager()
         verifyAddEditViewVisible()
 
+        // One of the EditTexts gets focus, so close keyboard before pressing back
+        Espresso.closeSoftKeyboard()
         pressBack()
         // Should be back at List view
         verifyListViewVisible()
@@ -117,6 +133,10 @@ class MainScreenTest {
         pressBack()
         // Should be back at game view
         verifyGameViewVisible()
+    }
+
+    private fun requestOrientation(orientation: Int) {
+        testRule.activity.requestedOrientation = orientation
     }
 
     private fun verifyGameViewVisible() {

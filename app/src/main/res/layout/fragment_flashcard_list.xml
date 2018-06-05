@@ -16,7 +16,7 @@
         android:orientation="vertical">
 
         <android.support.v4.view.ViewPager
-            android:id="@+id/detailContent"
+            android:id="@+id/detailPager"
             android:layout_width="0dp"
             android:layout_height="187dp" android:padding="4dp"
             app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
@@ -40,7 +40,7 @@
             android:layout_height="20dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/detailContent"/>
+            app:layout_constraintTop_toBottomOf="@+id/detailPager"/>
     </android.support.constraint.ConstraintLayout>
 
     <android.support.design.widget.FloatingActionButton

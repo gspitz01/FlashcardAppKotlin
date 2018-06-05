@@ -32,10 +32,10 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
     @Inject lateinit var getFlashcards: GetFlashcards
     @Inject lateinit var useCaseHandler: UseCaseHandler
 
-    private lateinit var presenter : FlashcardListContract.Presenter
+    private lateinit var presenter: FlashcardListContract.Presenter
     private lateinit var viewModel: FlashcardListViewModel
 
-    private lateinit var recyclerAdapter : FlashcardRecyclerAdapter
+    private lateinit var recyclerAdapter: FlashcardRecyclerAdapter
     private lateinit var pagerAdapter: FlashcardDetailPagerAdapter
 
     // A map to figure out the recycler position from the pager position for auto-scrolling
@@ -76,6 +76,11 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Restore state
+        savedInstanceState?.let {
+            flashcardId = savedInstanceState.getString(FLASHCARD_ID)
+        }
+
         // Setup the RecyclerView
         flashcardRecyclerView.layoutManager = LinearLayoutManager(activity)
         recyclerAdapter = FlashcardRecyclerAdapter(emptyList())
@@ -83,18 +88,24 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
 
         // Setup the viewPager
         pagerAdapter = FlashcardDetailPagerAdapter(childFragmentManager, listOf())
-        detailContent.adapter = pagerAdapter
-        detailContent.addOnPageChangeListener(object: ViewPager.OnPageChangeListener {
+        detailPager.adapter = pagerAdapter
+        detailPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {}
 
             override fun onPageScrolled(position: Int, positionOffset: Float,
-                                        positionOffsetPixels: Int) {}
+                                        positionOffsetPixels: Int) {
+            }
 
             override fun onPageSelected(position: Int) {
                 // Have RecyclerView scroll when the ViewPager is swiped
                 pagerPositionToRecyclerPositionMap[position]?.let {
                     flashcardRecyclerView.scrollToPosition(it)
+                    // Save new flashcardId for restoring instance state
+                    if (viewModel.flashcards.value != null) {
+                        flashcardId = (viewModel.flashcards.value!![it] as Flashcard).id
+                    }
                 }
+
             }
         })
 
@@ -150,7 +161,7 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
                 when (flashcard) {
                     is Flashcard -> {
                         if (flashcard.id == flashcardId) {
-                            detailContent?.currentItem = index
+                            detailPager?.currentItem = index
                         }
                     }
                 }
@@ -169,6 +180,13 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
     override fun onPause() {
         super.onPause()
         active = false
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        if (flashcardId != null && flashcardId != noParticularFlashcardExtra) {
+            outState.putString(FLASHCARD_ID, flashcardId)
+        }
     }
 
     /**
@@ -211,7 +229,7 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
      */
     override fun showFlashcardDetailsUi(recyclerPosition: Int) {
         recyclerPositionToPagerPositionMap[recyclerPosition]?.let {
-            detailContent.currentItem = it
+            detailPager.currentItem = it
         }
     }
 

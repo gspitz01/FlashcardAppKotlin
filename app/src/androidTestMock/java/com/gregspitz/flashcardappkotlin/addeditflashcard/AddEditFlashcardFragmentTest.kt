@@ -130,7 +130,7 @@ class AddEditFlashcardFragmentTest {
         onView(withId(R.id.deleteFlashcardButton)).perform(click())
 
         assertTrue(verifyFlashcardNoLongerInRepo(FLASHCARD_1))
-        onView(withId(R.id.detailContent)).check(matches(isDisplayed()))
+        onView(withId(R.id.detailPager)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -152,7 +152,7 @@ class AddEditFlashcardFragmentTest {
     fun showListButtonClickNewFlashcard_showsFlashcardListViewWithNoParticularFlashcard() {
         launchActivityWithFlashcardId(AddEditFlashcardFragment.newFlashcardId)
         onView(withId(R.id.showFlashcardListButton)).perform(click())
-        onView(withId(R.id.detailContent)).check(matches(isDisplayed()))
+        onView(withId(R.id.detailPager)).check(matches(isDisplayed()))
     }
 
     private fun checkForToast(stringId: Int) {
@@ -201,10 +201,10 @@ class AddEditFlashcardFragmentTest {
     }
 
     private fun checkDetailViewMatchesFlashcard(flashcard: Flashcard) {
-        onView(Matchers.allOf(withId(R.id.flashcardFront), isDescendantOfA(withId(R.id.detailContent)),
+        onView(Matchers.allOf(withId(R.id.flashcardFront), isDescendantOfA(withId(R.id.detailPager)),
                 isCompletelyDisplayed()))
                 .check(matches(withText(flashcard.front)))
-        onView(Matchers.allOf(withId(R.id.flashcardBack), isDescendantOfA(withId(R.id.detailContent)),
+        onView(Matchers.allOf(withId(R.id.flashcardBack), isDescendantOfA(withId(R.id.detailPager)),
                 isCompletelyDisplayed()))
                 .check(matches(withText(flashcard.back)))
     }

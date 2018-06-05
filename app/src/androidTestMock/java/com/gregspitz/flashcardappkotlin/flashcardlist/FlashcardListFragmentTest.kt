@@ -37,7 +37,7 @@ import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_2
 import com.gregspitz.flashcardappkotlin.R
-import com.gregspitz.flashcardappkotlin.R.id.detailContent
+import com.gregspitz.flashcardappkotlin.R.id.detailPager
 import com.gregspitz.flashcardappkotlin.SingleFragmentActivity
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
@@ -144,7 +144,7 @@ class FlashcardListFragmentTest {
         addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity()
         val viewPagerIdlingResource = registerViewPagerIdlingResource()
-        onView(withId(R.id.detailContent)).perform(swipeLeft())
+        onView(withId(R.id.detailPager)).perform(swipeLeft())
         checkDetailViewMatchesFlashcard(FLASHCARD_2)
         unregisterViewPagerIdlingResource(viewPagerIdlingResource)
     }
@@ -154,9 +154,9 @@ class FlashcardListFragmentTest {
         addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity()
         val viewPagerIdlingResource = registerViewPagerIdlingResource()
-        onView(withId(R.id.detailContent))
+        onView(withId(R.id.detailPager))
                 .perform(swipeLeft())
-        onView(withId(R.id.detailContent))
+        onView(withId(R.id.detailPager))
                 .perform(swipeRight())
         checkDetailViewMatchesFlashcard(FLASHCARD_1)
         unregisterViewPagerIdlingResource(viewPagerIdlingResource)
@@ -168,7 +168,7 @@ class FlashcardListFragmentTest {
                 flashcard6, flashcard7, flashcard8)
         launchActivity()
         val viewPagerIdlingResource = registerViewPagerIdlingResource()
-        performMultipleSwipes(onView(withId(R.id.detailContent)), 6)
+        performMultipleSwipes(onView(withId(R.id.detailPager)), 6)
         checkDetailViewMatchesFlashcard(flashcard7)
         onView(allOf(isDescendantOfA(withId(R.id.flashcardRecyclerView)),
                 withText(flashcard7.front))).check(matches(isDisplayed()))
@@ -198,7 +198,7 @@ class FlashcardListFragmentTest {
         addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity()
         val viewPagerIdlingResource = registerViewPagerIdlingResource()
-        onView(withId(R.id.detailContent)).perform(swipeLeft())
+        onView(withId(R.id.detailPager)).perform(swipeLeft())
         clickDetailViewEditButton()
         checkForAddEditFlashcardFragment(FLASHCARD_2.front, FLASHCARD_2.back)
         unregisterViewPagerIdlingResource(viewPagerIdlingResource)
@@ -226,18 +226,18 @@ class FlashcardListFragmentTest {
     }
 
     private fun clickDetailViewEditButton() {
-        onView(allOf(withId(R.id.editFlashcardButton), isDescendantOfA(withId(R.id.detailContent)),
+        onView(allOf(withId(R.id.editFlashcardButton), isDescendantOfA(withId(R.id.detailPager)),
                 isCompletelyDisplayed())).perform(click())
     }
 
     private fun checkDetailViewMatchesFlashcard(flashcard: Flashcard) {
-        onView(allOf(withId(R.id.flashcardCategory), isDescendantOfA(withId(R.id.detailContent)),
+        onView(allOf(withId(R.id.flashcardCategory), isDescendantOfA(withId(R.id.detailPager)),
                 isCompletelyDisplayed()))
                 .check(matches(withText(flashcard.category)))
-        onView(allOf(withId(R.id.flashcardFront), isDescendantOfA(withId(R.id.detailContent)),
+        onView(allOf(withId(R.id.flashcardFront), isDescendantOfA(withId(R.id.detailPager)),
                 isCompletelyDisplayed()))
                 .check(matches(withText(flashcard.front)))
-        onView(allOf(withId(R.id.flashcardBack), isDescendantOfA(withId(R.id.detailContent)),
+        onView(allOf(withId(R.id.flashcardBack), isDescendantOfA(withId(R.id.detailPager)),
                 isCompletelyDisplayed()))
                 .check(matches(withText(flashcard.back)))
     }
@@ -246,7 +246,7 @@ class FlashcardListFragmentTest {
         // Force Espresso to wait until fragment is loaded.
         onView(withId(R.id.flashcardRecyclerView)).check(matches(isDisplayed()))
         val detailPager = testRule.activity.supportFragmentManager
-                .fragments[0].view!!.findViewById<ViewPager>(detailContent)
+                .fragments[0].view!!.findViewById<ViewPager>(detailPager)
         val viewPagerIdlingResource = ViewPagerIdlingResource(detailPager, "PagerIdlingResource")
         IdlingRegistry.getInstance().register(viewPagerIdlingResource)
         return viewPagerIdlingResource
