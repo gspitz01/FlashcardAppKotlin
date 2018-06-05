@@ -19,4 +19,7 @@
     <string name="flashcard_category_hint_text">Category</string>
     <string name="delete_flashcard_button_text">Delete</string>
     <string name="delete_failed_toast_text">Delete failed!</string>
+    <string name="confirm_delete_title_text">Delete Flashcard?</string>
+    <string name="confirm_delete_message_text">Are you sure you want to delete this flashcard?
+    </string>
 </resources>

@@ -21,6 +21,7 @@ import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.action.ViewActions.replaceText
 import android.support.test.espresso.assertion.ViewAssertions.matches
+import android.support.test.espresso.matcher.RootMatchers.isDialog
 import android.support.test.espresso.matcher.RootMatchers.withDecorView
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.ActivityTestRule
@@ -127,7 +128,10 @@ class AddEditFlashcardFragmentTest {
     fun deleteSuccess_deletesFlashcardAndShowsFlashcardListView() {
         launchActivityWithFlashcardId(FLASHCARD_1.id)
 
-        onView(withId(R.id.deleteFlashcardButton)).perform(click())
+        clickDeleteFlashcardButton()
+
+        // Alert dialog for confirmation
+        clickOnDeleteDialog(android.R.string.yes)
 
         assertTrue(verifyFlashcardNoLongerInRepo(FLASHCARD_1))
         onView(withId(R.id.detailPager)).check(matches(isDisplayed()))
@@ -137,8 +141,21 @@ class AddEditFlashcardFragmentTest {
     fun deleteFailure_showsDeleteFailedToast() {
         localDataSource.setDeleteFailure(true)
         launchActivityWithFlashcardId(FLASHCARD_1.id)
-        onView(withId(R.id.deleteFlashcardButton)).perform(click())
+
+        clickDeleteFlashcardButton()
+
+        // Alert dialog for confirmation
+        clickOnDeleteDialog(android.R.string.yes)
+
         checkForToast(R.string.delete_failed_toast_text)
+    }
+
+    @Test
+    fun clickNoOnDeleteDialog_returnsToEditView() {
+        launchActivityWithFlashcardId(FLASHCARD_1.id)
+        clickDeleteFlashcardButton()
+        clickOnDeleteDialog(android.R.string.no)
+        onView(withId(R.id.flashcardEditCategory)).check(matches(isDisplayed()))
     }
 
     @Test
@@ -164,8 +181,11 @@ class AddEditFlashcardFragmentTest {
     private fun saveFlashcardsToRepo(vararg flashcards: Flashcard) {
         for (flashcard in flashcards) {
             dataSource.saveFlashcard(flashcard, object : FlashcardDataSource.SaveFlashcardCallback {
-                override fun onSaveSuccessful() { /* ignore */ }
-                override fun onSaveFailed() { /* ignore */ }
+                override fun onSaveSuccessful() { /* ignore */
+                }
+
+                override fun onSaveFailed() { /* ignore */
+                }
             })
         }
     }
@@ -173,21 +193,21 @@ class AddEditFlashcardFragmentTest {
     private fun getFlashcardFromRepoById(id: String): Flashcard {
         val savedFlashcards = mutableListOf<Flashcard>()
         dataSource.getFlashcard(id, object : FlashcardDataSource.GetFlashcardCallback {
-                    override fun onFlashcardLoaded(flashcard: Flashcard) {
-                        savedFlashcards.add(flashcard)
-                    }
+            override fun onFlashcardLoaded(flashcard: Flashcard) {
+                savedFlashcards.add(flashcard)
+            }
 
-                    override fun onDataNotAvailable() {
+            override fun onDataNotAvailable() {
 
-                    }
+            }
 
-                })
+        })
         return savedFlashcards[0]
     }
 
     private fun verifyFlashcardNoLongerInRepo(flashcard: Flashcard): Boolean {
         var returnValue = false
-        dataSource.getFlashcard(flashcard.id, object: FlashcardDataSource.GetFlashcardCallback {
+        dataSource.getFlashcard(flashcard.id, object : FlashcardDataSource.GetFlashcardCallback {
             override fun onDataNotAvailable() {
                 returnValue = true
             }
@@ -213,5 +233,16 @@ class AddEditFlashcardFragmentTest {
     private fun launchActivityWithFlashcardId(flashcardId: String) {
         testRule.launchActivity(Intent())
         testRule.activity.setFragment(AddEditFlashcardFragment.newInstance(flashcardId))
+    }
+
+    private fun clickDeleteFlashcardButton() {
+        onView(withId(R.id.deleteFlashcardButton)).perform(click())
+    }
+
+    private fun clickOnDeleteDialog(responseStringId: Int) {
+        onView(withText(responseStringId))
+                .inRoot(isDialog())
+                .check(matches(isDisplayed()))
+                .perform(click())
     }
 }

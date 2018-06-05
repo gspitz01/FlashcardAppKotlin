@@ -1,10 +1,10 @@
 package com.gregspitz.flashcardappkotlin.addeditflashcard
 
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.support.annotation.VisibleForTesting
 import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,10 +29,14 @@ private const val FLASHCARD_ID = "flashcard_id"
 class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
 
     // Dagger dependency injection
-    @Inject lateinit var getFlashcard: GetFlashcard
-    @Inject lateinit var  saveFlashcard: SaveFlashcard
-    @Inject lateinit var deleteFlashcard: DeleteFlashcard
-    @Inject lateinit var useCaseHandler: UseCaseHandler
+    @Inject
+    lateinit var getFlashcard: GetFlashcard
+    @Inject
+    lateinit var saveFlashcard: SaveFlashcard
+    @Inject
+    lateinit var deleteFlashcard: DeleteFlashcard
+    @Inject
+    lateinit var useCaseHandler: UseCaseHandler
 
     private lateinit var presenter: AddEditFlashcardContract.Presenter
 
@@ -198,9 +202,17 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
         }
 
         deleteFlashcardButton.setOnClickListener {
-            flashcard?.let {
-                this@AddEditFlashcardFragment.presenter.deleteFlashcard(it.id)
-            }
+            AlertDialog.Builder(activity)
+                    .setTitle(R.string.confirm_delete_title_text)
+                    .setMessage(R.string.confirm_delete_message_text)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.yes) { _, _ ->
+                        flashcard?.let {
+                            this@AddEditFlashcardFragment.presenter.deleteFlashcard(it.id)
+                        }
+                    }
+                    .setNegativeButton(android.R.string.no, null)
+                    .show()
         }
 
         showFlashcardListButton.setOnClickListener {
