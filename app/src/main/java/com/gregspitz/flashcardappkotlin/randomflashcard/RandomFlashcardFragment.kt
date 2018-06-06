@@ -127,6 +127,10 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
             this@RandomFlashcardFragment.presenter.turnFlashcard()
         }
 
+        flashcardSide.setOnClickListener {
+            this@RandomFlashcardFragment.presenter.turnFlashcard()
+        }
+
         nextFlashcardButton.setOnClickListener {
             this@RandomFlashcardFragment.presenter.loadNewFlashcard()
         }

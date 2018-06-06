@@ -44,11 +44,17 @@
                 android:layout_gravity="center"
                 android:layout_marginBottom="24dp" android:textAlignment="center"/>
 
-            <TextView
-                android:id="@+id/flashcardSide"
-                style="@style/Base.TextAppearance.AppCompat.Headline"
+            <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/flashcardSide"
+                    style="@style/Base.TextAppearance.AppCompat.Headline"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </ScrollView>
 
         </LinearLayout>
 
