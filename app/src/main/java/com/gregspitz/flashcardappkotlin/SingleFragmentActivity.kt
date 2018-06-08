@@ -1,14 +1,13 @@
 package com.gregspitz.flashcardappkotlin
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.annotation.RestrictTo
 import android.support.v4.app.Fragment
-import android.view.ViewGroup
-import android.widget.FrameLayout
+import android.support.v7.app.AppCompatActivity
 import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardFragment
 import com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListFragment
 import com.gregspitz.flashcardappkotlin.randomflashcard.RandomFlashcardFragment
+import kotlinx.android.synthetic.main.activity_single_fragment.*
 
 /**
  * Container for testing fragments
@@ -18,11 +17,8 @@ class SingleFragmentActivity : AppCompatActivity(), MainFragmentRouter {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val content = FrameLayout(this)
-        content.layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT)
-        content.id = R.id.contentFrame
-        setContentView(content)
+        setContentView(R.layout.activity_single_fragment)
+        setSupportActionBar(toolbar)
     }
 
     fun setFragment(fragment: Fragment) {

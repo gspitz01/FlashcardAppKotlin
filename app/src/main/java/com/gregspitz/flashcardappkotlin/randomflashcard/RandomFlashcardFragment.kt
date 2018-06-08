@@ -4,9 +4,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
@@ -46,6 +44,7 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+        setHasOptionsMenu(true)
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_random_flashcard, container, false)
     }
@@ -89,6 +88,21 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
         RandomFlashcardPresenter(useCaseHandler, this, viewModel, getRandomFlashcard)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater?.inflate(R.menu.random_flashcard_fragment_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return when (item?.itemId) {
+            R.id.nextFlashcardButton -> {
+                presenter.loadNewFlashcard()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         if (viewModel.randomFlashcard.value == null) {
@@ -129,10 +143,6 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
 
         flashcardSide.setOnClickListener {
             this@RandomFlashcardFragment.presenter.turnFlashcard()
-        }
-
-        nextFlashcardButton.setOnClickListener {
-            this@RandomFlashcardFragment.presenter.loadNewFlashcard()
         }
     }
 }
