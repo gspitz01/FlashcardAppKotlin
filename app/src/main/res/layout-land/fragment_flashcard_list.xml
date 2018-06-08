@@ -39,6 +39,7 @@
             android:id="@+id/flashcardListMessages"
             android:layout_width="0dp"
             android:layout_height="20dp"
+            android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/detailPager"
             app:layout_constraintTop_toTopOf="parent"/>
