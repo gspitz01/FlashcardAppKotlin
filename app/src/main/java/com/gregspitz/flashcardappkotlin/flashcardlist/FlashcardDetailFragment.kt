@@ -18,9 +18,7 @@ package com.gregspitz.flashcardappkotlin.flashcardlist
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import kotlinx.android.synthetic.main.fragment_flashcard_detail.*
@@ -43,7 +41,25 @@ class FlashcardDetailFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+        setHasOptionsMenu(true)
         return inflater.inflate(R.layout.fragment_flashcard_detail, container, false)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater?.inflate(R.menu.flashcard_detail_fragment_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return when (item?.itemId) {
+            R.id.editFlashcardButton -> {
+                if (flashcard != null) {
+                    (parentFragment as FlashcardListFragment).showEditFlashcard(flashcard!!.id)
+                }
+                return true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -51,10 +67,5 @@ class FlashcardDetailFragment : Fragment() {
         flashcardCategory.text = flashcard?.category
         flashcardFront.text = flashcard?.front
         flashcardBack.text = flashcard?.back
-        editFlashcardButton.setOnClickListener {
-            if (flashcard != null) {
-                (parentFragment as FlashcardListFragment).showEditFlashcard(flashcard!!.id)
-            }
-        }
     }
 }

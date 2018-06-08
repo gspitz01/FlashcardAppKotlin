@@ -226,8 +226,7 @@ class FlashcardListFragmentTest {
     }
 
     private fun clickDetailViewEditButton() {
-        onView(allOf(withId(R.id.editFlashcardButton), isDescendantOfA(withId(R.id.detailPager)),
-                isCompletelyDisplayed())).perform(click())
+        onView(withId(R.id.editFlashcardButton)).perform(click())
     }
 
     private fun checkDetailViewMatchesFlashcard(flashcard: Flashcard) {
