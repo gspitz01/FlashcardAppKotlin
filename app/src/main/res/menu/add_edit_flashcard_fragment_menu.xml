@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/saveFlashcardButton"
+          android:title="@string/save_flashcard_button_text"
+          android:icon="@drawable/ic_save_black_24dp"
+          app:showAsAction="ifRoom"/>
+    <item android:id="@+id/deleteFlashcardButton"
+          android:title="@string/delete_flashcard_button_text"
+          android:icon="@drawable/ic_delete_black_24dp"
+          app:showAsAction="ifRoom"/>
+    <item android:id="@+id/showFlashcardListButton"
+          android:title="@string/show_flashcard_list_button_text"
+          android:icon="@drawable/ic_list_black_24dp"
+          app:showAsAction="ifRoom"/>
+</menu>

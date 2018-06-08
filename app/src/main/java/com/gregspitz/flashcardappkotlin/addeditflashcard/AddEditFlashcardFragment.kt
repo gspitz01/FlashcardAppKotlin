@@ -5,9 +5,7 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.support.annotation.VisibleForTesting
 import android.support.v4.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.MainFragmentRouter
@@ -71,6 +69,7 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+        setHasOptionsMenu(true)
         return inflater.inflate(R.layout.fragment_add_edit_flashcard, container, false)
     }
 
@@ -78,6 +77,50 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
         super.onViewCreated(view, savedInstanceState)
         // Create the presenter
         AddEditFlashcardPresenter(useCaseHandler, this, getFlashcard, saveFlashcard, deleteFlashcard)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater?.inflate(R.menu.add_edit_flashcard_fragment_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return when (item?.itemId) {
+            R.id.saveFlashcardButton -> {
+                val category = flashcardEditCategory.text.toString()
+                val front = flashcardEditFront.text.toString()
+                val back = flashcardEditBack.text.toString()
+                flashcard = if (flashcard != null) {
+                    // If changing an existing flashcard, create a new one with the same id
+                    Flashcard(flashcard!!.id, category, front, back)
+                } else {
+                    // If no existing flashcard, create a new one with new id
+                    Flashcard(category = category, front = front, back = back)
+                }
+                // flashcard will definitely not be null
+                this@AddEditFlashcardFragment.presenter.saveFlashcard(flashcard!!)
+                return true
+            }
+            R.id.deleteFlashcardButton -> {
+                AlertDialog.Builder(activity)
+                        .setTitle(R.string.confirm_delete_title_text)
+                        .setMessage(R.string.confirm_delete_message_text)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(android.R.string.yes) { _, _ ->
+                            flashcard?.let {
+                                this@AddEditFlashcardFragment.presenter.deleteFlashcard(it.id)
+                            }
+                        }
+                        .setNegativeButton(android.R.string.no, null)
+                        .show()
+                return true
+            }
+            R.id.showFlashcardListButton -> {
+                this@AddEditFlashcardFragment.presenter.showList()
+                return true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onResume() {
@@ -185,39 +228,6 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
      */
     override fun setPresenter(presenter: AddEditFlashcardContract.Presenter) {
         this.presenter = presenter
-
-        saveFlashcardButton.setOnClickListener {
-            val category = flashcardEditCategory.text.toString()
-            val front = flashcardEditFront.text.toString()
-            val back = flashcardEditBack.text.toString()
-            flashcard = if (flashcard != null) {
-                // If changing an existing flashcard, create a new one with the same id
-                Flashcard(flashcard!!.id, category, front, back)
-            } else {
-                // If no existing flashcard, create a new one with new id
-                Flashcard(category = category, front = front, back = back)
-            }
-            // flashcard will definitely not be null
-            this@AddEditFlashcardFragment.presenter.saveFlashcard(flashcard!!)
-        }
-
-        deleteFlashcardButton.setOnClickListener {
-            AlertDialog.Builder(activity)
-                    .setTitle(R.string.confirm_delete_title_text)
-                    .setMessage(R.string.confirm_delete_message_text)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton(android.R.string.yes) { _, _ ->
-                        flashcard?.let {
-                            this@AddEditFlashcardFragment.presenter.deleteFlashcard(it.id)
-                        }
-                    }
-                    .setNegativeButton(android.R.string.no, null)
-                    .show()
-        }
-
-        showFlashcardListButton.setOnClickListener {
-            this@AddEditFlashcardFragment.presenter.showList()
-        }
     }
 
     @VisibleForTesting

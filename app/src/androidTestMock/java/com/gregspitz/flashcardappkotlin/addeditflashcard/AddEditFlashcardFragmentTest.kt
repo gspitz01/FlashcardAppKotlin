@@ -105,7 +105,7 @@ class AddEditFlashcardFragmentTest {
         onView(withId(R.id.flashcardEditCategory)).perform(replaceText(newCategory))
         onView(withId(R.id.flashcardEditFront)).perform(replaceText(newFront))
         onView(withId(R.id.flashcardEditBack)).perform(replaceText(newBack))
-        onView(withId(R.id.saveFlashcardButton)).perform(click())
+        clickSaveFlashcardButton()
 
         // Successful save shows save success toast
         checkForToast(R.string.save_successful_toast_text)
@@ -120,7 +120,7 @@ class AddEditFlashcardFragmentTest {
     fun saveFailed_showsSaveFailedToast() {
         localDataSource.setFailure(true)
         launchActivityWithFlashcardId(FLASHCARD_1.id)
-        onView(withId(R.id.saveFlashcardButton)).perform(click())
+        clickSaveFlashcardButton()
         checkForToast(R.string.save_failed_toast_text)
     }
 
@@ -161,14 +161,14 @@ class AddEditFlashcardFragmentTest {
     @Test
     fun showListButtonClickIntentWithId_showsFlashcardListViewWithThatFlashcardInDetailView() {
         launchActivityWithFlashcardId(FLASHCARD_1.id)
-        onView(withId(R.id.showFlashcardListButton)).perform(click())
+        clickShowListButton()
         checkDetailViewMatchesFlashcard(FLASHCARD_1)
     }
 
     @Test
     fun showListButtonClickNewFlashcard_showsFlashcardListViewWithNoParticularFlashcard() {
         launchActivityWithFlashcardId(AddEditFlashcardFragment.newFlashcardId)
-        onView(withId(R.id.showFlashcardListButton)).perform(click())
+        clickShowListButton()
         onView(withId(R.id.detailPager)).check(matches(isDisplayed()))
     }
 
@@ -235,6 +235,10 @@ class AddEditFlashcardFragmentTest {
         testRule.activity.setFragment(AddEditFlashcardFragment.newInstance(flashcardId))
     }
 
+    private fun clickSaveFlashcardButton() {
+        onView(withId(R.id.saveFlashcardButton)).perform(click())
+    }
+
     private fun clickDeleteFlashcardButton() {
         onView(withId(R.id.deleteFlashcardButton)).perform(click())
     }
@@ -244,5 +248,9 @@ class AddEditFlashcardFragmentTest {
                 .inRoot(isDialog())
                 .check(matches(isDisplayed()))
                 .perform(click())
+    }
+
+    private fun clickShowListButton() {
+        onView(withId(R.id.showFlashcardListButton)).perform(click())
     }
 }
