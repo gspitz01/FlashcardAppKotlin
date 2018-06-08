@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/nextFlashcardButton"
-          android:icon="@drawable/ic_navigate_next_black_24dp"
+          android:icon="@drawable/ic_skip_next_black_24dp"
           android:title="@string/next_flashcard_button_text"
           app:showAsAction="always"/>
 </menu>
