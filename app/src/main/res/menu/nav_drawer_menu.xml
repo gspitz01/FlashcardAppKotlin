@@ -2,11 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/navGame"
-        android:title="@string/nav_game_title"/>
+        android:title="@string/nav_game_title"
+        android:icon="@drawable/ic_videogame_asset_black_24dp"/>
     <item
         android:id="@+id/navList"
-        android:title="@string/nav_list_title"/>
+        android:title="@string/nav_list_title"
+        android:icon="@drawable/ic_list_black_24dp"/>
     <item
         android:id="@+id/newFlashcard"
-        android:title="@string/nav_new_flashcard_title"/>
+        android:title="@string/nav_new_flashcard_title"
+        android:icon="@drawable/ic_fiber_new_black_24dp"/>
 </menu>
