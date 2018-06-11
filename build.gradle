@@ -7,11 +7,12 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.2'
+        classpath 'com.android.tools.build:gradle:3.1.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath('com.dicedmelon.gradle:jacoco-android:0.1.2') {
             exclude group: 'org.codehaus.groovy', module: 'groovy-all'
         }
+        classpath 'com.google.gms:google-services:3.2.0'
     }
 }
 
@@ -32,9 +33,10 @@ ext {
     minSdkVersion = 21
 
     supportLibraryVersion = '27.1.1'
-    constraintLayoutVersion = '1.1.0'
+    constraintLayoutVersion = '1.1.1'
     archLifecycleVersion = '1.1.1'
     archRoomVersion = '1.1.0'
+    firebaseDatabaseVersion = '11.4.2'
     daggerVersion = '2.12'
     kaptDaggerCompilerVersion = '2.13'
     junitVersion = '4.12'

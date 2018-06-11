@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'jacoco-android'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -85,6 +86,7 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:$rootProject.archLifecycleVersion"
     implementation "android.arch.persistence.room:runtime:$rootProject.archRoomVersion"
     implementation "com.android.support:support-v4:$rootProject.supportLibraryVersion"
+    implementation "com.google.firebase:firebase-database:$rootProject.firebaseDatabaseVersion"
     kapt "android.arch.persistence.room:compiler:$rootProject.archRoomVersion"
 
     // Dagger
@@ -103,3 +105,5 @@ dependencies {
 
     androidTestUtil "com.android.support.test:orchestrator:$rootProject.supportTestRunnerVersion"
 }
+
+
