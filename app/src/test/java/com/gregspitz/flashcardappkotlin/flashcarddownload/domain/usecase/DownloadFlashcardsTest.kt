@@ -1,0 +1,77 @@
+package com.gregspitz.flashcardappkotlin.flashcarddownload.domain.usecase
+
+import com.gregspitz.flashcardappkotlin.TestData.CATEGORY_1
+import com.gregspitz.flashcardappkotlin.TestData.CATEGORY_2
+import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_LIST
+import com.gregspitz.flashcardappkotlin.TestUseCaseScheduler
+import com.gregspitz.flashcardappkotlin.UseCase
+import com.gregspitz.flashcardappkotlin.UseCaseHandler
+import com.gregspitz.flashcardappkotlin.data.service.FlashcardDownloadService
+import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
+import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
+import com.nhaarman.mockito_kotlin.*
+import org.junit.Before
+import org.junit.Test
+
+/**
+ * Tests for {@link DownloadFlashcards}
+ */
+class DownloadFlashcardsTest {
+
+    private val categoryList = listOf(CATEGORY_1, CATEGORY_2)
+    private val values =
+            DownloadFlashcards.RequestValues(categoryList)
+
+    private val useCaseHandler = UseCaseHandler(TestUseCaseScheduler())
+
+    private val flashcardDownloadService: FlashcardDownloadService = mock()
+
+    private val downloadCallbackCaptor =
+            argumentCaptor<FlashcardDownloadService.DownloadFlashcardsCallback>()
+
+    private val flashcardRepository: FlashcardRepository = mock()
+
+    private val saveFlashcardCallbackCaptor =
+            argumentCaptor<FlashcardDataSource.SaveFlashcardsCallback>()
+
+    private val callback: UseCase.UseCaseCallback<DownloadFlashcards.ResponseValue> = mock()
+
+    private lateinit var downloadFlashcards: DownloadFlashcards
+
+    @Before
+    fun setup() {
+        downloadFlashcards = DownloadFlashcards(flashcardDownloadService, flashcardRepository)
+        useCaseHandler.execute(downloadFlashcards, values, callback)
+    }
+
+    @Test
+    fun successFromDownloadService_successfulSaveToRepository_callsSuccessOnCallback() {
+        verify(flashcardDownloadService).downloadFlashcardsByCategory(eq(categoryList),
+                downloadCallbackCaptor.capture())
+        downloadCallbackCaptor.firstValue.onFlashcardsDownloaded(FLASHCARD_LIST)
+        verify(flashcardRepository).saveFlashcards(eq(FLASHCARD_LIST),
+                saveFlashcardCallbackCaptor.capture())
+        saveFlashcardCallbackCaptor.firstValue.onSaveSuccessful()
+        verify(callback).onSuccess(any())
+    }
+
+    @Test
+    fun successFromDownloadService_failedSaveOnRepo_callsErrorOnCallback() {
+        verify(flashcardDownloadService).downloadFlashcardsByCategory(eq(categoryList),
+                downloadCallbackCaptor.capture())
+        downloadCallbackCaptor.firstValue.onFlashcardsDownloaded(FLASHCARD_LIST)
+        verify(flashcardRepository).saveFlashcards(eq(FLASHCARD_LIST),
+                saveFlashcardCallbackCaptor.capture())
+        saveFlashcardCallbackCaptor.firstValue.onSaveFailed()
+        verify(callback).onError()
+    }
+
+    @Test
+    fun failureFromDownloadService_doesNotCallRepo_callsErrorOnCallback() {
+        verify(flashcardDownloadService).downloadFlashcardsByCategory(eq(categoryList),
+                downloadCallbackCaptor.capture())
+        downloadCallbackCaptor.firstValue.onDataNotAvailable()
+        verify(callback).onError()
+        verifyNoMoreInteractions(flashcardRepository)
+    }
+}
