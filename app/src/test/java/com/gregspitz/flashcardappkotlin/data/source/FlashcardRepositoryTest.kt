@@ -87,6 +87,22 @@ class FlashcardRepositoryTest {
     }
 
     @Test
+    fun saveFlashcards_callsSaveFlashcardsToLocalDataSourceAndSetsCacheDirty() {
+        // Call getFlashcard to make sure cache is not dirty
+        getLocalFlashcardsWithArgumentCaptor()
+
+        val saveFlashcardsCallback: FlashcardDataSource.SaveFlashcardsCallback = mock()
+        val newFlashcard = Flashcard("100", "Category", "Fronter", "Backer")
+        val newFlashcardsList = listOf(newFlashcard)
+        flashcardRepository.saveFlashcards(newFlashcardsList, saveFlashcardsCallback)
+        verify(spyLocalDataSource).saveFlashcards(eq(newFlashcardsList), eq(saveFlashcardsCallback))
+
+        // Prove cache is dirty again
+        flashcardRepository.getFlashcards(getFlashcardsCallback)
+        verify(spyLocalDataSource, times(2)).getFlashcards(any())
+    }
+
+    @Test
     fun deleteFlashcard_deletesFlashcardFromCacheAndCallsDeleteOnLocalDataSource() {
         // Call getFlashcards once to make sure cache is not dirty
         getLocalFlashcardsWithArgumentCaptor()

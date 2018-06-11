@@ -74,6 +74,16 @@ open class FlashcardRepository(private val localDataSource: FlashcardDataSource)
         cacheDirty = true
     }
 
+    /**
+     * Save multiple Flashcards to the local data source
+     * Sets the cache dirty so it will be updated on next call to getFlashcards
+     * @param flashcards List of Flashcards to be saved
+     * @param callback to be called on either success or failure
+     */
+    override fun saveFlashcards(flashcards: List<Flashcard>, callback: FlashcardDataSource.SaveFlashcardsCallback) {
+        localDataSource.saveFlashcards(flashcards, callback)
+        cacheDirty = true
+    }
 
     /**
      * Delete a single Flashcard from the repository

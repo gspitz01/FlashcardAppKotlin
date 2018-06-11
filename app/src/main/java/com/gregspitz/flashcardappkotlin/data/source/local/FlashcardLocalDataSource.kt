@@ -58,6 +58,11 @@ class FlashcardLocalDataSource(private val flashcardDao: FlashcardDao) : Flashca
         callback.onSaveSuccessful()
     }
 
+    override fun saveFlashcards(flashcards: List<Flashcard>, callback: FlashcardDataSource.SaveFlashcardsCallback) {
+        flashcardDao.insertFlashcards(flashcards)
+        callback.onSaveSuccessful()
+    }
+
     /**
      * Delete a single Flashcard from the data source
      */

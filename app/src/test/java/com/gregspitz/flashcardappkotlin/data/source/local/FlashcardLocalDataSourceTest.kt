@@ -56,11 +56,20 @@ class FlashcardLocalDataSourceTest {
     }
 
     @Test
-    fun saveFlashcard_insertsFlashcardIntoDaoAndCallSaveSuccessfulOnCallback() {
+    fun saveFlashcard_insertsFlashcardIntoDaoAndCallsSaveSuccessfulOnCallback() {
         val saveFlashcardCallback: FlashcardDataSource.SaveFlashcardCallback = mock()
         flashcardLocalDataSource.saveFlashcard(FLASHCARD_1, saveFlashcardCallback)
         verify(mockFlashcardDao).insertFlashcard(eq(FLASHCARD_1))
         verify(saveFlashcardCallback).onSaveSuccessful()
+    }
+
+    @Test
+    fun saveFlashcards_insertsFlashcardsIntoDaoAndCallsSaveSuccessfulOnCallback() {
+        val saveFlaschardsCallback: FlashcardDataSource.SaveFlashcardsCallback = mock()
+        val flashcardList = listOf(FLASHCARD_1)
+        flashcardLocalDataSource.saveFlashcards(flashcardList, saveFlaschardsCallback)
+        verify(mockFlashcardDao).insertFlashcards(eq(flashcardList))
+        verify(saveFlaschardsCallback).onSaveSuccessful()
     }
 
     @Test
