@@ -3,6 +3,7 @@ package com.gregspitz.flashcardappkotlin.flashcarddownload
 import com.gregspitz.flashcardappkotlin.BasePresenter
 import com.gregspitz.flashcardappkotlin.BaseView
 import com.gregspitz.flashcardappkotlin.data.model.Category
+import com.gregspitz.flashcardappkotlin.data.service.model.DownloadCategory
 
 interface FlashcardDownloadContract {
 
@@ -10,7 +11,7 @@ interface FlashcardDownloadContract {
 
         fun setLoadingIndicator(active: Boolean)
 
-        fun showDownloadCategories(categoriesToNumberOfFlashcardsMap: Map<Category, Int>)
+        fun showDownloadCategories(downloadCategories: List<DownloadCategory>)
 
         fun showFailedToGetDownloadCategories()
 

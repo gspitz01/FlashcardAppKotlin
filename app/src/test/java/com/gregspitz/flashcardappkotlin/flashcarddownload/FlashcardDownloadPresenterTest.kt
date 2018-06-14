@@ -5,6 +5,7 @@ import com.gregspitz.flashcardappkotlin.TestData.CATEGORY_2
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.data.model.Category
+import com.gregspitz.flashcardappkotlin.data.service.model.DownloadCategory
 import com.gregspitz.flashcardappkotlin.flashcarddownload.domain.usecase.DownloadFlashcards
 import com.gregspitz.flashcardappkotlin.flashcarddownload.domain.usecase.GetDownloadCategories
 import com.nhaarman.mockito_kotlin.*
@@ -21,10 +22,10 @@ class FlashcardDownloadPresenterTest {
     private val getDownloadCategories: GetDownloadCategories = mock()
     private val getDownloadCallbackCaptor =
             argumentCaptor<UseCase.UseCaseCallback<GetDownloadCategories.ResponseValue>>()
-    private val categoriesToNumberOfFlashcardsMap =
-            mapOf(CATEGORY_1 to 2, CATEGORY_2 to 4)
+    private val downloadCategories =
+            listOf(DownloadCategory(CATEGORY_1.name, 2), DownloadCategory(CATEGORY_2.name, 4))
     private val getDownloadResponse =
-            GetDownloadCategories.ResponseValue(categoriesToNumberOfFlashcardsMap)
+            GetDownloadCategories.ResponseValue(downloadCategories)
 
     private val downloadFlashcards: DownloadFlashcards = mock()
     private val downloadRequestCaptor =
@@ -103,7 +104,9 @@ class FlashcardDownloadPresenterTest {
     }
 
     private fun getCategories(): List<Category> =
-        categoriesToNumberOfFlashcardsMap.keys.toList()
+            downloadCategories.map {
+                Category(it.name)
+            }
 
     private fun verifyLoadDownloadCategoriesSuccess() {
         verifyViewLoadingIndicator(true)
@@ -111,6 +114,6 @@ class FlashcardDownloadPresenterTest {
                 getDownloadCallbackCaptor.capture())
         getDownloadCallbackCaptor.firstValue.onSuccess(getDownloadResponse)
         verifyViewLoadingIndicator(false)
-        verify(view).showDownloadCategories(eq(categoriesToNumberOfFlashcardsMap))
+        verify(view).showDownloadCategories(eq(downloadCategories))
     }
 }

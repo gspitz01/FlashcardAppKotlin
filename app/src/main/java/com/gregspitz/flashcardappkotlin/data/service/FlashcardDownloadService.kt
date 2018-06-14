@@ -2,12 +2,13 @@ package com.gregspitz.flashcardappkotlin.data.service
 
 import com.gregspitz.flashcardappkotlin.data.model.Category
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.data.service.model.DownloadCategory
 
 interface FlashcardDownloadService {
 
     interface GetDownloadCategoriesCallback {
 
-        fun onCategoriesLoaded(categoryToNumberOfFlashcardsMap: Map<Category, Int>)
+        fun onCategoriesLoaded(downloadCategories: List<DownloadCategory>)
 
         fun onDataNotAvailable()
     }

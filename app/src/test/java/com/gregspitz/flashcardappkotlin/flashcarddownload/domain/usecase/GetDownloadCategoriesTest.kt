@@ -6,6 +6,7 @@ import com.gregspitz.flashcardappkotlin.TestUseCaseScheduler
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.data.service.FlashcardDownloadService
+import com.gregspitz.flashcardappkotlin.data.service.model.DownloadCategory
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -40,10 +41,11 @@ class GetDownloadCategoriesTest {
     @Test
     fun onExecute_successFromService_callsSuccessOnCallback() {
         verify(flashcardDownloadService).getDownloadCategories(downloadCallbackCaptor.capture())
-        val numberOfFlashcardsMap = mapOf(CATEGORY_1 to 4, CATEGORY_2 to 3)
-        downloadCallbackCaptor.firstValue.onCategoriesLoaded(numberOfFlashcardsMap)
+        val downloadCategories =
+                listOf(DownloadCategory(CATEGORY_1.name, 4), DownloadCategory(CATEGORY_2.name, 3))
+        downloadCallbackCaptor.firstValue.onCategoriesLoaded(downloadCategories)
         verify(callback).onSuccess(responseCaptor.capture())
-        assertEquals(numberOfFlashcardsMap, responseCaptor.firstValue.categoryToNumberOfFlashcardsMap)
+        assertEquals(downloadCategories, responseCaptor.firstValue.downloadCategories)
     }
 
     @Test

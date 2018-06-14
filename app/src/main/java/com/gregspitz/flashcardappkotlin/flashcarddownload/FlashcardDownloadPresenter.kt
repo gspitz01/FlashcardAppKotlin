@@ -25,7 +25,7 @@ class FlashcardDownloadPresenter(
                     override fun onSuccess(response: GetDownloadCategories.ResponseValue) {
                         if (view.isActive()) {
                             view.setLoadingIndicator(false)
-                            view.showDownloadCategories(response.categoryToNumberOfFlashcardsMap)
+                            view.showDownloadCategories(response.downloadCategories)
                         }
                     }
 
