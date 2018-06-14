@@ -22,7 +22,11 @@ import com.gregspitz.flashcardappkotlin.UseCaseThreadPoolScheduler
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.DeleteFlashcard
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.GetFlashcard
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.SaveFlashcard
+import com.gregspitz.flashcardappkotlin.data.service.FlashcardDownloadService
+import com.gregspitz.flashcardappkotlin.data.source.FakeFlashcardDownloadService
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
+import com.gregspitz.flashcardappkotlin.flashcarddownload.domain.usecase.DownloadFlashcards
+import com.gregspitz.flashcardappkotlin.flashcarddownload.domain.usecase.GetDownloadCategories
 import com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase.GetFlashcards
 import com.gregspitz.flashcardappkotlin.randomflashcard.domain.usecase.GetRandomFlashcard
 import dagger.Module
@@ -67,5 +71,17 @@ class UseCaseModule {
     @Provides
     fun provideGetRandomFlashcard(flashcardRepository: FlashcardRepository) : GetRandomFlashcard {
         return GetRandomFlashcard(flashcardRepository)
+    }
+
+    @Provides
+    fun provideDownloadFlashcards(flashcardDownloadService: FlashcardDownloadService,
+                                  flashcardRepository: FlashcardRepository) : DownloadFlashcards {
+        return DownloadFlashcards(flashcardDownloadService, flashcardRepository)
+    }
+
+    @Provides
+    fun provideGetDownloadCategories(flashcardDownloadService: FlashcardDownloadService)
+        : GetDownloadCategories {
+        return GetDownloadCategories(flashcardDownloadService)
     }
 }
