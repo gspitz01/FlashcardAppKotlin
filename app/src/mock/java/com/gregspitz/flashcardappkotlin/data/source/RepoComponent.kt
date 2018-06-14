@@ -17,6 +17,7 @@
 package com.gregspitz.flashcardappkotlin.data.source
 
 import android.support.annotation.VisibleForTesting
+import com.gregspitz.flashcardappkotlin.data.service.FlashcardDownloadService
 import com.gregspitz.flashcardappkotlin.di.AppModule
 import dagger.Component
 import javax.inject.Singleton
@@ -32,4 +33,7 @@ interface RepoComponent {
 
     @VisibleForTesting
     fun exposeLocalDataSource() : FakeFlashcardLocalDataSource
+
+    @VisibleForTesting
+    fun exposeFlashcardDownloadService() : FlashcardDownloadService
 }

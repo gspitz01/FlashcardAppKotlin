@@ -16,6 +16,7 @@
 
 package com.gregspitz.flashcardappkotlin.data.source
 
+import com.gregspitz.flashcardappkotlin.data.service.FlashcardDownloadService
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -35,5 +36,10 @@ class RepoModule {
     fun provideRepository(flashcardLocalDataSource: FakeFlashcardLocalDataSource)
             : FlashcardRepository {
         return FlashcardRepository(flashcardLocalDataSource)
+    }
+
+    @Provides @Singleton
+    fun provideFlashcardDownloadService(): FlashcardDownloadService {
+        return FakeFlashcardDownloadService()
     }
 }

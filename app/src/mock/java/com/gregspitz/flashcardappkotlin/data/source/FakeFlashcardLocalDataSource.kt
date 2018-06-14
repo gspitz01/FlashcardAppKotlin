@@ -64,6 +64,19 @@ class FakeFlashcardLocalDataSource : FlashcardDataSource {
         callback.onSaveSuccessful()
     }
 
+    override fun saveFlashcards(flashcards: List<Flashcard>, callback: FlashcardDataSource.SaveFlashcardsCallback) {
+        if (failure) {
+            callback.onSaveFailed()
+            return
+        }
+
+        for (flashcard in flashcards) {
+            database.remove(flashcard.id)
+            database[flashcard.id] = flashcard
+        }
+        callback.onSaveSuccessful()
+    }
+
     override fun deleteFlashcard(flashcardId: String, callback: FlashcardDataSource.DeleteFlashcardCallback) {
         if (deleteFailure) {
             callback.onDeleteFailed()
