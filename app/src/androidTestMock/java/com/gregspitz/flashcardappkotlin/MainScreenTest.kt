@@ -30,10 +30,10 @@ class MainScreenTest {
 
         // Type in some data
         onView(withId(R.id.flashcardEditCategory))
-                .perform(typeText(InitialData.flashcards[0].category))
-        onView(withId(R.id.flashcardEditFront)).perform(typeText(InitialData.flashcards[0].front))
+                .perform(typeText(MockTestData.FLASHCARD_1.category))
+        onView(withId(R.id.flashcardEditFront)).perform(typeText(MockTestData.FLASHCARD_1.front))
         onView(withId(R.id.flashcardEditBack))
-                .perform(typeText(InitialData.flashcards[0].back), closeSoftKeyboard())
+                .perform(typeText(MockTestData.FLASHCARD_1.back), closeSoftKeyboard())
 
         // Save flashcard
         onView(withId(R.id.saveFlashcardButton)).perform(click())
@@ -48,11 +48,11 @@ class MainScreenTest {
 
         // Edit view shows correct fields
         onView(withId(R.id.flashcardEditCategory))
-                .check(matches(withText(InitialData.flashcards[0].category)))
+                .check(matches(withText(MockTestData.FLASHCARD_1.category)))
         onView(withId(R.id.flashcardEditFront))
-                .check(matches(withText(InitialData.flashcards[0].front)))
+                .check(matches(withText(MockTestData.FLASHCARD_1.front)))
         onView(withId(R.id.flashcardEditBack))
-                .check(matches(withText(InitialData.flashcards[0].back)))
+                .check(matches(withText(MockTestData.FLASHCARD_1.back)))
         onView(withId(R.id.failedToLoadFlashcard)).check(matches(not(isDisplayed())))
 
         // Move back to list
