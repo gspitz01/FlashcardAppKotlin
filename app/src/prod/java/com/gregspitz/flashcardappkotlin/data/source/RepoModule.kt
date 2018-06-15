@@ -23,6 +23,8 @@ import android.arch.persistence.room.RoomDatabase
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import com.gregspitz.flashcardappkotlin.InitialData
+import com.gregspitz.flashcardappkotlin.data.service.FirebaseFlashcardDownloadService
+import com.gregspitz.flashcardappkotlin.data.service.FlashcardDownloadService
 import com.gregspitz.flashcardappkotlin.data.source.local.FlashcardDao
 import com.gregspitz.flashcardappkotlin.data.source.local.FlashcardDatabase
 import com.gregspitz.flashcardappkotlin.data.source.local.FlashcardLocalDataSource
@@ -36,6 +38,11 @@ import javax.inject.Singleton
  */
 @Module
 class RepoModule {
+
+    @Provides @Singleton
+    fun provideFlashcardDownloadService() : FlashcardDownloadService {
+        return FirebaseFlashcardDownloadService()
+    }
 
     @Provides @Singleton
     fun provideFlashcardDatabase(application: Application) : FlashcardDatabase {

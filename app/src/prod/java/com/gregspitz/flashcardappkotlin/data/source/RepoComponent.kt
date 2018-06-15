@@ -16,6 +16,7 @@
 
 package com.gregspitz.flashcardappkotlin.data.source
 
+import com.gregspitz.flashcardappkotlin.data.service.FlashcardDownloadService
 import com.gregspitz.flashcardappkotlin.di.AppModule
 import dagger.Component
 import javax.inject.Singleton
@@ -27,4 +28,6 @@ import javax.inject.Singleton
 @Component(modules = [(AppModule::class), (RepoModule::class)])
 interface RepoComponent {
     fun exposeRepository() : FlashcardRepository
+
+    fun exposeFlashcardDownloadService(): FlashcardDownloadService
 }
