@@ -6,6 +6,7 @@ import android.support.v4.view.GravityCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardFragment
+import com.gregspitz.flashcardappkotlin.flashcarddownload.FlashcardDownloadFragment
 import com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListFragment
 import com.gregspitz.flashcardappkotlin.randomflashcard.RandomFlashcardFragment
 import kotlinx.android.synthetic.main.activity_main.*
@@ -20,6 +21,7 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
     private val randomFlashcardFragment = RandomFlashcardFragment.newInstance()
     private lateinit var flashcardListFragment: FlashcardListFragment
     private lateinit var addEditFlashcardFragment: AddEditFlashcardFragment
+    private lateinit var flashcardDownloadFragment: FlashcardDownloadFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +52,11 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
                 }
                 R.id.newFlashcard -> {
                     showAddEditFlashcard(AddEditFlashcardFragment.newFlashcardId)
+                    drawerLayout.closeDrawers()
+                    return@setNavigationItemSelectedListener true
+                }
+                R.id.downloadFlashcardsList -> {
+                    showFlashcardDownload()
                     drawerLayout.closeDrawers()
                     return@setNavigationItemSelectedListener true
                 }
@@ -97,6 +104,14 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
     override fun showFlashcardList(flashcardId: String) {
         flashcardListFragment = FlashcardListFragment.newInstance(flashcardId)
         replaceFragment(flashcardListFragment)
+    }
+
+    /**
+     * Change view to FlashcardDownloadFragment
+     */
+    override fun showFlashcardDownload() {
+        flashcardDownloadFragment = FlashcardDownloadFragment.newInstance()
+        replaceFragment(flashcardDownloadFragment)
     }
 
     /**

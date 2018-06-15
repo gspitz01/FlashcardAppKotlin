@@ -12,4 +12,8 @@
         android:id="@+id/newFlashcard"
         android:title="@string/nav_new_flashcard_title"
         android:icon="@drawable/ic_fiber_new_black_24dp"/>
+    <item
+        android:id="@+id/downloadFlashcardsList"
+        android:title="@string/nav_download_flashcards_title"
+        android:icon="@drawable/ic_cloud_download_black_24dp"/>
 </menu>

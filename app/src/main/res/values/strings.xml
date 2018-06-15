@@ -30,4 +30,5 @@
     <string name="action_many_selected">Categories selected</string>
     <string name="download_flashcards_successful">Download successful!</string>
     <string name="download_flashcards_failed">Failed download!</string>
+    <string name="nav_download_flashcards_title">Download flashcards</string>
 </resources>
