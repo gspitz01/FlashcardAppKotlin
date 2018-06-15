@@ -7,13 +7,15 @@ import com.gregspitz.flashcardappkotlin.data.service.FlashcardDownloadService
 import com.gregspitz.flashcardappkotlin.data.service.model.DownloadCategory
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
+import com.gregspitz.flashcardappkotlin.flashcarddownload.DownloadCategoryFlexItem
 
 class DownloadFlashcards(private val downloadService: FlashcardDownloadService,
                          private val repository: FlashcardRepository)
     : UseCase<DownloadFlashcards.RequestValues, DownloadFlashcards.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues) {
-        downloadService.downloadFlashcardsByCategory(requestValues.categories,
+        val categories = requestValues.categories.map { it.downloadCategory }
+        downloadService.downloadFlashcardsByCategory(categories,
                 object: FlashcardDownloadService.DownloadFlashcardsCallback {
                     override fun onFlashcardsDownloaded(flashcards: List<Flashcard>) {
                         repository.saveFlashcards(flashcards,
@@ -34,7 +36,7 @@ class DownloadFlashcards(private val downloadService: FlashcardDownloadService,
                 })
     }
 
-    class RequestValues(val categories: List<DownloadCategory>) : UseCase.RequestValues
+    class RequestValues(val categories: List<DownloadCategoryFlexItem>) : UseCase.RequestValues
 
     class ResponseValue : UseCase.ResponseValue
 }

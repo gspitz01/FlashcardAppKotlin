@@ -3,6 +3,7 @@ package com.gregspitz.flashcardappkotlin.flashcarddownload.domain.usecase
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.data.service.FlashcardDownloadService
 import com.gregspitz.flashcardappkotlin.data.service.model.DownloadCategory
+import com.gregspitz.flashcardappkotlin.flashcarddownload.DownloadCategoryFlexItem
 
 class GetDownloadCategories(private val flashcardDownloadService: FlashcardDownloadService)
     : UseCase<GetDownloadCategories.RequestValues, GetDownloadCategories.ResponseValue>() {
@@ -12,9 +13,11 @@ class GetDownloadCategories(private val flashcardDownloadService: FlashcardDownl
                 object: FlashcardDownloadService.GetDownloadCategoriesCallback {
                     override fun onCategoriesLoaded(
                             downloadCategories: List<DownloadCategory>) {
-
+                        val flexItems = downloadCategories.map {
+                            DownloadCategoryFlexItem(it)
+                        }
                         getUseCaseCallback()
-                                .onSuccess(ResponseValue(downloadCategories))
+                                .onSuccess(ResponseValue(flexItems))
                     }
 
                     override fun onDataNotAvailable() {
@@ -25,5 +28,5 @@ class GetDownloadCategories(private val flashcardDownloadService: FlashcardDownl
 
     class RequestValues : UseCase.RequestValues
 
-    class ResponseValue(val downloadCategories: List<DownloadCategory>) : UseCase.ResponseValue
+    class ResponseValue(val downloadCategories: List<DownloadCategoryFlexItem>) : UseCase.ResponseValue
 }

@@ -7,6 +7,7 @@ import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.data.service.FlashcardDownloadService
 import com.gregspitz.flashcardappkotlin.data.service.model.DownloadCategory
+import com.gregspitz.flashcardappkotlin.flashcarddownload.DownloadCategoryFlexItem
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -43,9 +44,11 @@ class GetDownloadCategoriesTest {
         verify(flashcardDownloadService).getDownloadCategories(downloadCallbackCaptor.capture())
         val downloadCategories =
                 listOf(DownloadCategory(CATEGORY_1.name, 4), DownloadCategory(CATEGORY_2.name, 3))
+        val flexItems =
+                downloadCategories.map { DownloadCategoryFlexItem(it) }
         downloadCallbackCaptor.firstValue.onCategoriesLoaded(downloadCategories)
         verify(callback).onSuccess(responseCaptor.capture())
-        assertEquals(downloadCategories, responseCaptor.firstValue.downloadCategories)
+        assertEquals(flexItems, responseCaptor.firstValue.downloadCategories)
     }
 
     @Test

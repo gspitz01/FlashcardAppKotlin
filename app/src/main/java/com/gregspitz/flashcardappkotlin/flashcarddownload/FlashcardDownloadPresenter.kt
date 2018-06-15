@@ -39,7 +39,7 @@ class FlashcardDownloadPresenter(
                 })
     }
 
-    override fun downloadFlashcards(categories: List<DownloadCategory>) {
+    override fun downloadFlashcards(categories: List<DownloadCategoryFlexItem>) {
         view.setLoadingIndicator(true)
 
         useCaseHandler.execute(downloadFlashcards, DownloadFlashcards.RequestValues(categories),

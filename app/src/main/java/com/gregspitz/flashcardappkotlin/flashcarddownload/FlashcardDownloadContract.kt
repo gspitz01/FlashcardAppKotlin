@@ -11,7 +11,7 @@ interface FlashcardDownloadContract {
 
         fun setLoadingIndicator(active: Boolean)
 
-        fun showDownloadCategories(downloadCategories: List<DownloadCategory>)
+        fun showDownloadCategories(downloadCategories: List<DownloadCategoryFlexItem>)
 
         fun showFailedToGetDownloadCategories()
 
@@ -26,6 +26,6 @@ interface FlashcardDownloadContract {
 
         fun loadDownloadCategories()
 
-        fun downloadFlashcards(categories: List<DownloadCategory>)
+        fun downloadFlashcards(categories: List<DownloadCategoryFlexItem>)
     }
 }

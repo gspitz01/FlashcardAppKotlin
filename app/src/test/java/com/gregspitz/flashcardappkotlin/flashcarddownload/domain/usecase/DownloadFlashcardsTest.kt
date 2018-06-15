@@ -7,8 +7,10 @@ import com.gregspitz.flashcardappkotlin.TestUseCaseScheduler
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.data.service.FlashcardDownloadService
+import com.gregspitz.flashcardappkotlin.data.service.model.DownloadCategory
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
+import com.gregspitz.flashcardappkotlin.flashcarddownload.DownloadCategoryFlexItem
 import com.nhaarman.mockito_kotlin.*
 import org.junit.Before
 import org.junit.Test
@@ -18,9 +20,13 @@ import org.junit.Test
  */
 class DownloadFlashcardsTest {
 
-    private val categoryList = listOf(CATEGORY_1, CATEGORY_2)
+    private val downloadCategoryList =
+            listOf(DownloadCategory(CATEGORY_1.name, 4),
+                    DownloadCategory(CATEGORY_2.name, 5))
+    private val downloadCategoryFlexItems =
+            downloadCategoryList.map { DownloadCategoryFlexItem(it) }
     private val values =
-            DownloadFlashcards.RequestValues(categoryList)
+            DownloadFlashcards.RequestValues(downloadCategoryFlexItems)
 
     private val useCaseHandler = UseCaseHandler(TestUseCaseScheduler())
 
@@ -46,7 +52,7 @@ class DownloadFlashcardsTest {
 
     @Test
     fun successFromDownloadService_successfulSaveToRepository_callsSuccessOnCallback() {
-        verify(flashcardDownloadService).downloadFlashcardsByCategory(eq(categoryList),
+        verify(flashcardDownloadService).downloadFlashcardsByCategory(eq(downloadCategoryList),
                 downloadCallbackCaptor.capture())
         downloadCallbackCaptor.firstValue.onFlashcardsDownloaded(FLASHCARD_LIST)
         verify(flashcardRepository).saveFlashcards(eq(FLASHCARD_LIST),
@@ -57,7 +63,7 @@ class DownloadFlashcardsTest {
 
     @Test
     fun successFromDownloadService_failedSaveOnRepo_callsErrorOnCallback() {
-        verify(flashcardDownloadService).downloadFlashcardsByCategory(eq(categoryList),
+        verify(flashcardDownloadService).downloadFlashcardsByCategory(eq(downloadCategoryList),
                 downloadCallbackCaptor.capture())
         downloadCallbackCaptor.firstValue.onFlashcardsDownloaded(FLASHCARD_LIST)
         verify(flashcardRepository).saveFlashcards(eq(FLASHCARD_LIST),
@@ -68,7 +74,7 @@ class DownloadFlashcardsTest {
 
     @Test
     fun failureFromDownloadService_doesNotCallRepo_callsErrorOnCallback() {
-        verify(flashcardDownloadService).downloadFlashcardsByCategory(eq(categoryList),
+        verify(flashcardDownloadService).downloadFlashcardsByCategory(eq(downloadCategoryList),
                 downloadCallbackCaptor.capture())
         downloadCallbackCaptor.firstValue.onDataNotAvailable()
         verify(callback).onError()

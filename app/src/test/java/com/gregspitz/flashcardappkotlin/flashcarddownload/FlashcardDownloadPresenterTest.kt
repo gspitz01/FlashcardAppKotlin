@@ -24,8 +24,10 @@ class FlashcardDownloadPresenterTest {
             argumentCaptor<UseCase.UseCaseCallback<GetDownloadCategories.ResponseValue>>()
     private val downloadCategories =
             listOf(DownloadCategory(CATEGORY_1.name, 2), DownloadCategory(CATEGORY_2.name, 4))
+    private val downloadCategoryFlexItems =
+            downloadCategories.map { DownloadCategoryFlexItem(it) }
     private val getDownloadResponse =
-            GetDownloadCategories.ResponseValue(downloadCategories)
+            GetDownloadCategories.ResponseValue(downloadCategoryFlexItems)
 
     private val downloadFlashcards: DownloadFlashcards = mock()
     private val downloadRequestCaptor =
@@ -68,12 +70,11 @@ class FlashcardDownloadPresenterTest {
 
     @Test
     fun onDownloadFlashcards_successFromUseCase_callsSuccessOnView() {
-        val categories = getCategories()
-        presenter.downloadFlashcards(categories)
+        presenter.downloadFlashcards(downloadCategoryFlexItems)
         verifyViewLoadingIndicator(true)
         verify(useCaseHandler).execute(eq(downloadFlashcards), downloadRequestCaptor.capture(),
                 downloadCallbackCaptor.capture())
-        assertEquals(categories, downloadRequestCaptor.firstValue.categories)
+        assertEquals(downloadCategoryFlexItems, downloadRequestCaptor.firstValue.categories)
         val downloadResponse = DownloadFlashcards.ResponseValue()
         downloadCallbackCaptor.firstValue.onSuccess(downloadResponse)
         verifyViewLoadingIndicator(false)
@@ -82,12 +83,11 @@ class FlashcardDownloadPresenterTest {
 
     @Test
     fun onDownloadFlashcards_failureFromUseCase_callsFailureOnView() {
-        val categories = getCategories()
-        presenter.downloadFlashcards(categories)
+        presenter.downloadFlashcards(downloadCategoryFlexItems)
         verifyViewLoadingIndicator(true)
         verify(useCaseHandler).execute(eq(downloadFlashcards), downloadRequestCaptor.capture(),
                 downloadCallbackCaptor.capture())
-        assertEquals(categories, downloadRequestCaptor.firstValue.categories)
+        assertEquals(downloadCategoryFlexItems, downloadRequestCaptor.firstValue.categories)
         downloadCallbackCaptor.firstValue.onError()
         verifyViewLoadingIndicator(false)
         verify(view).showFlashcardDownloadFailure()
@@ -103,17 +103,12 @@ class FlashcardDownloadPresenterTest {
         inOrder.verify(view).setLoadingIndicator(active)
     }
 
-    private fun getCategories(): List<Category> =
-            downloadCategories.map {
-                Category(it.name)
-            }
-
     private fun verifyLoadDownloadCategoriesSuccess() {
         verifyViewLoadingIndicator(true)
         verify(useCaseHandler).execute(eq(getDownloadCategories), any(),
                 getDownloadCallbackCaptor.capture())
         getDownloadCallbackCaptor.firstValue.onSuccess(getDownloadResponse)
         verifyViewLoadingIndicator(false)
-        verify(view).showDownloadCategories(eq(downloadCategories))
+        verify(view).showDownloadCategories(eq(downloadCategoryFlexItems))
     }
 }

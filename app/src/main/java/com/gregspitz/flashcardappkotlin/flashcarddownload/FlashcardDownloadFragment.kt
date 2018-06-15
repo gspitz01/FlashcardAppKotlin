@@ -34,7 +34,6 @@ class FlashcardDownloadFragment : Fragment(), FlashcardDownloadContract.View,
 
     private lateinit var presenter: FlashcardDownloadContract.Presenter
 
-    //    private lateinit var recyclerAdapter: DownloadCategoriesRecyclerAdapter
     private lateinit var flexRecyclerAdapter: FlexibleAdapter<DownloadCategoryFlexItem>
 
     private var actionMode: ActionMode? = null
@@ -70,11 +69,8 @@ class FlashcardDownloadFragment : Fragment(), FlashcardDownloadContract.View,
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        recyclerAdapter = DownloadCategoriesRecyclerAdapter(listOf())
         categoriesRecyclerView.layoutManager = LinearLayoutManager(activity)
         categoriesRecyclerView.adapter = flexRecyclerAdapter
-//        categoriesRecyclerView.adapter = recyclerAdapter
-
 
         FlashcardDownloadPresenter(useCaseHandler, this,
                 getDownloadCategory, downloadFlashcards)
@@ -123,7 +119,7 @@ class FlashcardDownloadFragment : Fragment(), FlashcardDownloadContract.View,
             R.id.downloadFlashcardsButton -> {
                 presenter.downloadFlashcards(flexRecyclerAdapter.currentItems.withIndex()
                         .filter { it.index in flexRecyclerAdapter.selectedPositions }
-                        .map { it.value.downloadCategory })
+                        .map { it.value })
                 true
             }
             else -> false
@@ -165,12 +161,8 @@ class FlashcardDownloadFragment : Fragment(), FlashcardDownloadContract.View,
         // TODO: implement this
     }
 
-    override fun showDownloadCategories(downloadCategories: List<DownloadCategory>) {
-//        recyclerAdapter.setDownloadCategories(downloadCategories)
-        val flexCategories = downloadCategories.map {
-            DownloadCategoryFlexItem(it)
-        }
-        flexRecyclerAdapter.updateDataSet(flexCategories)
+    override fun showDownloadCategories(downloadCategories: List<DownloadCategoryFlexItem>) {
+        flexRecyclerAdapter.updateDataSet(downloadCategories)
     }
 
     override fun showFailedToGetDownloadCategories() {
