@@ -1,6 +1,7 @@
 package com.gregspitz.flashcardappkotlin.flashcarddownload
 
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.assertion.ViewAssertions
@@ -71,8 +72,7 @@ class FlashcardDownloadFragmentTest {
         addCategoriesToDownloadService(downloadCategories)
         launchActivity()
         scrollToAndClickPosition(1)
-        onView(withId(R.id.downloadFlashcardsButton))
-                .check(matches(allOf(isDisplayed(), isEnabled())))
+        verifyDownloadFlashcardButtonDisplayedAndEnabled()
         val title = "1 ${activityRule.activity.getString(R.string.action_one_selected)}"
         onView(withText(title)).check(matches(isDisplayed()))
     }
@@ -83,10 +83,22 @@ class FlashcardDownloadFragmentTest {
         launchActivity()
         scrollToAndClickPosition(0)
         scrollToAndClickPosition(1)
-        onView(withId(R.id.downloadFlashcardsButton))
-                .check(matches(allOf(isDisplayed(), isEnabled())))
-        val title = "2 ${activityRule.activity.getString(R.string.action_many_selected)}"
-        onView(withText(title)).check(matches(isDisplayed()))
+        verifyDownloadFlashcardButtonDisplayedAndEnabled()
+        verifyMultipleCountActionTitleDisplayed(2)
+    }
+
+    @Test
+    fun onRotation_maintainsSelection() {
+        addCategoriesToDownloadService(downloadCategories)
+        launchActivity()
+        activityRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        scrollToAndClickPosition(0)
+        scrollToAndClickPosition(1)
+        verifyDownloadFlashcardButtonDisplayedAndEnabled()
+        verifyMultipleCountActionTitleDisplayed(2)
+        activityRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        verifyDownloadFlashcardButtonDisplayedAndEnabled()
+        verifyMultipleCountActionTitleDisplayed(2)
     }
 
     @Test
@@ -130,8 +142,18 @@ class FlashcardDownloadFragmentTest {
         downloadService.addDownloadCategories(downloadCategories)
     }
 
+    private fun verifyDownloadFlashcardButtonDisplayedAndEnabled() {
+        onView(withId(R.id.downloadFlashcardsButton))
+                .check(matches(allOf(isDisplayed(), isEnabled())))
+    }
+
     private fun clickDownloadFlashcardButton() {
         onView(withId(R.id.downloadFlashcardsButton)).perform(click())
+    }
+
+    private fun verifyMultipleCountActionTitleDisplayed(count: Int) {
+        val title = "$count ${activityRule.activity.getString(R.string.action_many_selected)}"
+        onView(withText(title)).check(matches(isDisplayed()))
     }
 
     private fun scrollToAndVerifyPosition(position: Int, category: Category, count: Int) {

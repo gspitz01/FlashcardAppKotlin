@@ -21,14 +21,11 @@
     <string name="confirm_delete_title_text">Delete Flashcard?</string>
     <string name="confirm_delete_message_text">Are you sure you want to delete this flashcard?
     </string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="failed_to_load_download_categories_text">Could not load categories!</string>
     <string name="download_flashcards_button_text">Download</string>
     <string name="action_one_selected">Category selected</string>
     <string name="action_many_selected">Categories selected</string>
     <string name="download_flashcards_successful">Download successful!</string>
-    <string name="download_flashcards_failed">Failed download!</string>
+    <string name="download_flashcards_failed">Download failed!</string>
     <string name="nav_download_flashcards_title">Download flashcards</string>
 </resources>

@@ -48,6 +48,18 @@ class FlashcardDownloadFragment : Fragment(), FlashcardDownloadContract.View,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FlashcardApplication.useCaseComponent.inject(this)
+        // Instantiate recycler adapter
+        flexRecyclerAdapter = FlexibleAdapter(listOf())
+        flexRecyclerAdapter.addListener(this)
+
+        // Restore instance state
+        if (savedInstanceState != null) {
+            flexRecyclerAdapter.onRestoreInstanceState(savedInstanceState)
+            if (flexRecyclerAdapter.selectedItemCount > 0) {
+                actionMode = activity?.startActionMode(this)
+                setActionModeContentTitle(flexRecyclerAdapter.selectedItemCount)
+            }
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -59,8 +71,6 @@ class FlashcardDownloadFragment : Fragment(), FlashcardDownloadContract.View,
         super.onViewCreated(view, savedInstanceState)
 
 //        recyclerAdapter = DownloadCategoriesRecyclerAdapter(listOf())
-        flexRecyclerAdapter = FlexibleAdapter(listOf())
-        flexRecyclerAdapter.addListener(this)
         categoriesRecyclerView.layoutManager = LinearLayoutManager(activity)
         categoriesRecyclerView.adapter = flexRecyclerAdapter
 //        categoriesRecyclerView.adapter = recyclerAdapter
@@ -79,6 +89,11 @@ class FlashcardDownloadFragment : Fragment(), FlashcardDownloadContract.View,
     override fun onPause() {
         super.onPause()
         active = false
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        flexRecyclerAdapter.onSaveInstanceState(outState)
+        super.onSaveInstanceState(outState)
     }
 
     /**
