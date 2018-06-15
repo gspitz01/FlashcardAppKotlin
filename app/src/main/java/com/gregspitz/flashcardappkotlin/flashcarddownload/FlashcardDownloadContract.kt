@@ -26,6 +26,6 @@ interface FlashcardDownloadContract {
 
         fun loadDownloadCategories()
 
-        fun downloadFlashcards(categories: List<Category>)
+        fun downloadFlashcards(categories: List<DownloadCategory>)
     }
 }

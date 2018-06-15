@@ -4,6 +4,7 @@ import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.data.model.Category
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.service.FlashcardDownloadService
+import com.gregspitz.flashcardappkotlin.data.service.model.DownloadCategory
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
 
@@ -33,7 +34,7 @@ class DownloadFlashcards(private val downloadService: FlashcardDownloadService,
                 })
     }
 
-    class RequestValues(val categories: List<Category>) : UseCase.RequestValues
+    class RequestValues(val categories: List<DownloadCategory>) : UseCase.RequestValues
 
     class ResponseValue : UseCase.ResponseValue
 }

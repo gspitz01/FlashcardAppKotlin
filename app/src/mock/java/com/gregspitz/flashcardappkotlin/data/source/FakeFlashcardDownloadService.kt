@@ -7,10 +7,14 @@ import com.gregspitz.flashcardappkotlin.data.service.model.DownloadCategory
 
 class FakeFlashcardDownloadService : FlashcardDownloadService {
 
-    private val downloadCategories = mutableListOf<DownloadCategory>()
+    private val downloadCategories =
+            mutableListOf<DownloadCategory>(DownloadCategory("Barf", 4),
+            DownloadCategory("Junk", 5), DownloadCategory("Argument", 9))
     var categoriesFailure = false
     private val flashcards = mutableListOf<Flashcard>()
     var flashcardFailure = false
+    // Categories that were asked to be downloaded
+    val attemptedDownloadCategories = mutableListOf<DownloadCategory>()
 
     override fun getDownloadCategories(callback: FlashcardDownloadService.GetDownloadCategoriesCallback) {
         if (categoriesFailure) {
@@ -20,7 +24,11 @@ class FakeFlashcardDownloadService : FlashcardDownloadService {
         callback.onCategoriesLoaded(downloadCategories)
     }
 
-    override fun downloadFlashcardsByCategory(categories: List<Category>, callback: FlashcardDownloadService.DownloadFlashcardsCallback) {
+    override fun downloadFlashcardsByCategory(
+            categories: List<DownloadCategory>,
+            callback: FlashcardDownloadService.DownloadFlashcardsCallback) {
+
+        attemptedDownloadCategories.addAll(categories)
         if (flashcardFailure) {
             callback.onDataNotAvailable()
             return
@@ -31,6 +39,7 @@ class FakeFlashcardDownloadService : FlashcardDownloadService {
     fun deleteAll() {
         downloadCategories.clear()
         flashcards.clear()
+        attemptedDownloadCategories.clear()
         categoriesFailure = false
         flashcardFailure = false
     }
@@ -38,5 +47,4 @@ class FakeFlashcardDownloadService : FlashcardDownloadService {
     fun addDownloadCategories(downloadCategories: List<DownloadCategory>) {
         this.downloadCategories.addAll(downloadCategories)
     }
-
 }
