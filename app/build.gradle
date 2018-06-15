@@ -87,8 +87,15 @@ dependencies {
     implementation "android.arch.persistence.room:runtime:$rootProject.archRoomVersion"
     implementation "com.android.support:support-v4:$rootProject.supportLibraryVersion"
     implementation "com.google.firebase:firebase-database:$rootProject.firebaseDatabaseVersion"
-    implementation 'com.android.support:support-v4:27.1.1'
+    implementation "com.android.support:support-v4:$rootProject.supportLibraryVersion"
     kapt "android.arch.persistence.room:compiler:$rootProject.archRoomVersion"
+
+    // Flexible Adapter
+    // https://github.com/davideas/FlexibleAdapter
+    implementation "eu.davidea:flexible-adapter:$rootProject.flexibleAdapterVersion"
+    implementation "eu.davidea:flexible-adapter-ui:$rootProject.flexibleAdapterUiVersion"
+    implementation "eu.davidea:flexible-adapter-livedata:$rootProject.flexibleAdapterLiveDataVersion"
+    implementation "eu.davidea:flexible-adapter-databinding:$rootProject.flexibleAdapterDataBindingVersion"
 
     // Dagger
     implementation "com.google.dagger:dagger-android:$rootProject.daggerVersion"

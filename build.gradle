@@ -1,7 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '1.2.41'
+    ext.kotlin_version = '1.2.50'
     repositories {
         google()
         jcenter()
@@ -33,9 +33,13 @@ ext {
     minSdkVersion = 21
 
     supportLibraryVersion = '27.1.1'
-    constraintLayoutVersion = '1.1.1'
+    constraintLayoutVersion = '1.1.2'
     archLifecycleVersion = '1.1.1'
     archRoomVersion = '1.1.0'
+    flexibleAdapterVersion = '5.0.5'
+    flexibleAdapterUiVersion = '1.0.0-b5'
+    flexibleAdapterLiveDataVersion = '1.0.0-b2'
+    flexibleAdapterDataBindingVersion = '1.0.0-b3'
     firebaseDatabaseVersion = '11.4.2'
     daggerVersion = '2.12'
     kaptDaggerCompilerVersion = '2.13'
