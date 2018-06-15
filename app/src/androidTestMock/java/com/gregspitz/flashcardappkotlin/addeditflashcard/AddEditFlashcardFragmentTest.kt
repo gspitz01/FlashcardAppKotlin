@@ -30,6 +30,7 @@ import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.SingleFragmentActivity
+import com.gregspitz.flashcardappkotlin.TestUtils
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import org.hamcrest.Matchers
@@ -108,7 +109,7 @@ class AddEditFlashcardFragmentTest {
         clickSaveFlashcardButton()
 
         // Successful save shows save success toast
-        checkForToast(R.string.save_successful_toast_text)
+        TestUtils.checkForToast(testRule, R.string.save_successful_toast_text)
 
         val savedFlashcard = getFlashcardFromRepoById(FLASHCARD_1.id)
         assertEquals(newCategory, savedFlashcard.category)
@@ -121,7 +122,7 @@ class AddEditFlashcardFragmentTest {
         localDataSource.setFailure(true)
         launchActivityWithFlashcardId(FLASHCARD_1.id)
         clickSaveFlashcardButton()
-        checkForToast(R.string.save_failed_toast_text)
+        TestUtils.checkForToast(testRule, R.string.save_failed_toast_text)
     }
 
     @Test
@@ -147,7 +148,7 @@ class AddEditFlashcardFragmentTest {
         // Alert dialog for confirmation
         clickOnDeleteDialog(android.R.string.yes)
 
-        checkForToast(R.string.delete_failed_toast_text)
+        TestUtils.checkForToast(testRule, R.string.delete_failed_toast_text)
     }
 
     @Test
@@ -170,12 +171,6 @@ class AddEditFlashcardFragmentTest {
         launchActivityWithFlashcardId(AddEditFlashcardFragment.newFlashcardId)
         clickShowListButton()
         onView(withId(R.id.detailPager)).check(matches(isDisplayed()))
-    }
-
-    private fun checkForToast(stringId: Int) {
-        onView(withText(stringId))
-                .inRoot(withDecorView(not(testRule.activity.window.decorView)))
-                .check(matches(isDisplayed()))
     }
 
     private fun saveFlashcardsToRepo(vararg flashcards: Flashcard) {
