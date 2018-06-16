@@ -22,7 +22,7 @@ import javax.inject.Inject
  * View for FlashcardDownload
  */
 class FlashcardDownloadFragment : Fragment(), FlashcardDownloadContract.View,
-        FlexibleAdapter.OnItemClickListener, ActionMode.Callback {
+        FlexibleAdapter.OnItemClickListener {
 
     // Dagger dependency injection
     @Inject
@@ -35,8 +35,8 @@ class FlashcardDownloadFragment : Fragment(), FlashcardDownloadContract.View,
     private lateinit var presenter: FlashcardDownloadContract.Presenter
 
     private lateinit var flexRecyclerAdapter: FlexibleAdapter<DownloadCategoryFlexItem>
-
-    private var actionMode: ActionMode? = null
+    private var activatedPosition: Int? = null
+    private var isDownloadEnabled = false
 
     private var active = false
 
@@ -50,19 +50,20 @@ class FlashcardDownloadFragment : Fragment(), FlashcardDownloadContract.View,
         // Instantiate recycler adapter
         flexRecyclerAdapter = FlexibleAdapter(listOf())
         flexRecyclerAdapter.addListener(this)
+        flexRecyclerAdapter.mode = SelectableAdapter.Mode.SINGLE
 
-        // Restore instance state
         if (savedInstanceState != null) {
             flexRecyclerAdapter.onRestoreInstanceState(savedInstanceState)
             if (flexRecyclerAdapter.selectedItemCount > 0) {
-                actionMode = activity?.startActionMode(this)
-                setActionModeContentTitle(flexRecyclerAdapter.selectedItemCount)
+                isDownloadEnabled = true
+                activatedPosition = flexRecyclerAdapter.selectedPositions.first()
             }
         }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+        setHasOptionsMenu(true)
         return inflater.inflate(R.layout.fragment_flashcard_download, container, false)
     }
 
@@ -74,6 +75,29 @@ class FlashcardDownloadFragment : Fragment(), FlashcardDownloadContract.View,
 
         FlashcardDownloadPresenter(useCaseHandler, this,
                 getDownloadCategory, downloadFlashcards)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater?.inflate(R.menu.flashcard_download_fragment_menu, menu)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu?) {
+        super.onPrepareOptionsMenu(menu)
+        menu?.findItem(R.id.downloadFlashcardsButton)?.isEnabled = isDownloadEnabled
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return when (item?.itemId) {
+            R.id.downloadFlashcardsButton -> {
+                flexRecyclerAdapter.getItem(flexRecyclerAdapter.selectedPositions.first())
+                        ?.let {
+                            presenter.downloadFlashcards(it)
+                        }
+                return true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onResume() {
@@ -99,62 +123,17 @@ class FlashcardDownloadFragment : Fragment(), FlashcardDownloadContract.View,
      * @return true for itemView activation
      */
     override fun onItemClick(view: View?, position: Int): Boolean {
-        return if (position != RecyclerView.NO_POSITION) {
-            if (actionMode == null) {
-                actionMode = activity?.startActionMode(this)
-            }
-            toggleSelection(position)
-            true
-        } else {
-            false
+        isDownloadEnabled = true
+        activity?.invalidateOptionsMenu()
+        if (position != activatedPosition) {
+            setActivatedPosition(position)
         }
-    }
-
-    /**
-     * ActionMode.Callback methods
-     */
-
-    override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-        return when (item?.itemId) {
-            R.id.downloadFlashcardsButton -> {
-                presenter.downloadFlashcards(flexRecyclerAdapter.currentItems.withIndex()
-                        .filter { it.index in flexRecyclerAdapter.selectedPositions }
-                        .map { it.value })
-                true
-            }
-            else -> false
-        }
-    }
-
-    override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        mode?.menuInflater?.inflate(R.menu.flashcard_download_fragment_menu, menu)
-        flexRecyclerAdapter.mode = SelectableAdapter.Mode.MULTI
         return true
     }
 
-    override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-        return false
-    }
-
-    override fun onDestroyActionMode(mode: ActionMode?) {
-        flexRecyclerAdapter.mode = SelectableAdapter.Mode.IDLE
-        actionMode = null
-    }
-
-    private fun toggleSelection(position: Int) {
+    private fun setActivatedPosition(position: Int) {
+        activatedPosition = position
         flexRecyclerAdapter.toggleSelection(position)
-        val count = flexRecyclerAdapter.selectedItemCount
-        if (count == 0) {
-            actionMode?.finish()
-        } else {
-            setActionModeContentTitle(count)
-        }
-    }
-
-    private fun setActionModeContentTitle(count: Int) {
-        actionMode?.title = "${count.toString()} ${(
-                if (count == 1) activity?.getString(R.string.action_one_selected)
-                else activity?.getString(R.string.action_many_selected))}"
     }
 
     override fun setLoadingIndicator(active: Boolean) {

@@ -21,6 +21,6 @@ interface FlashcardDownloadService {
         fun onDataNotAvailable()
     }
 
-    fun downloadFlashcardsByCategory(categories: List<DownloadCategory>,
+    fun downloadFlashcardsByCategory(category: DownloadCategory,
                                      callback: DownloadFlashcardsCallback)
 }

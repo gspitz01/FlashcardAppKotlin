@@ -56,7 +56,8 @@ class FlashcardDownloadFragmentTest {
         scrollToAndVerifyPosition(0, CATEGORY_1, 3)
         scrollToAndVerifyPosition(1, CATEGORY_2, 4)
 
-        onView(withId(R.id.downloadFlashcardsButton)).check(doesNotExist())
+        onView(withId(R.id.downloadFlashcardsButton))
+                .check(matches(allOf(isDisplayed(), not(isEnabled()))))
     }
 
     @Test
@@ -68,23 +69,11 @@ class FlashcardDownloadFragmentTest {
     }
 
     @Test
-    fun selectCategory_enablesActionModeMenuWithSingleCategorySelectedTitle() {
+    fun selectCategory_enablesDownloadFlashcardButton() {
         addCategoriesToDownloadService(downloadCategories)
         launchActivity()
         scrollToAndClickPosition(1)
         verifyDownloadFlashcardButtonDisplayedAndEnabled()
-        val title = "1 ${activityRule.activity.getString(R.string.action_one_selected)}"
-        onView(withText(title)).check(matches(isDisplayed()))
-    }
-
-    @Test
-    fun selectTwoCategories_enablesActionModeMenuWith2CategoriesSelectedTitle() {
-        addCategoriesToDownloadService(downloadCategories)
-        launchActivity()
-        scrollToAndClickPosition(0)
-        scrollToAndClickPosition(1)
-        verifyDownloadFlashcardButtonDisplayedAndEnabled()
-        verifyMultipleCountActionTitleDisplayed(2)
     }
 
     @Test
@@ -93,32 +82,18 @@ class FlashcardDownloadFragmentTest {
         launchActivity()
         activityRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         scrollToAndClickPosition(0)
-        scrollToAndClickPosition(1)
         verifyDownloadFlashcardButtonDisplayedAndEnabled()
-        verifyMultipleCountActionTitleDisplayed(2)
         activityRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         verifyDownloadFlashcardButtonDisplayedAndEnabled()
-        verifyMultipleCountActionTitleDisplayed(2)
     }
 
     @Test
-    fun selectSingleCategoryAndClickDownloadButton_showsSuccessToast() {
+    fun selectCategoryAndClickDownloadButton_showsSuccessToast() {
         addCategoriesToDownloadService(downloadCategories)
         launchActivity()
         scrollToAndClickPosition(1)
         clickDownloadFlashcardButton()
-        assertEquals(listOf(downloadCategories[1]), downloadService.attemptedDownloadCategories)
-        TestUtils.checkForToast(activityRule, R.string.download_flashcards_successful)
-    }
-
-    @Test
-    fun selectTwoCategoriesAndClickDownloadButton_showsSuccessToast() {
-        addCategoriesToDownloadService(downloadCategories)
-        launchActivity()
-        scrollToAndClickPosition(1)
-        scrollToAndClickPosition(0)
-        clickDownloadFlashcardButton()
-        assertEquals(downloadCategories, downloadService.attemptedDownloadCategories)
+        assertEquals(downloadCategories[1], downloadService.attemptedDownloadCategory)
         TestUtils.checkForToast(activityRule, R.string.download_flashcards_successful)
     }
 
@@ -129,7 +104,7 @@ class FlashcardDownloadFragmentTest {
         launchActivity()
         scrollToAndClickPosition(1)
         clickDownloadFlashcardButton()
-        assertEquals(listOf(downloadCategories[1]), downloadService.attemptedDownloadCategories)
+        assertEquals(downloadCategories[1], downloadService.attemptedDownloadCategory)
         TestUtils.checkForToast(activityRule, R.string.download_flashcards_failed)
     }
 

@@ -15,12 +15,12 @@ class DownloadFlashcards(private val downloadService: FlashcardDownloadService,
     : UseCase<DownloadFlashcards.RequestValues, DownloadFlashcards.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues) {
-        val categories = requestValues.categories.map { it.downloadCategory }
-        downloadService.downloadFlashcardsByCategory(categories,
+        val category = requestValues.category.downloadCategory
+        downloadService.downloadFlashcardsByCategory(category,
                 object: FlashcardDownloadService.DownloadFlashcardsCallback {
                     override fun onFlashcardsDownloaded(downloadFlashcards: List<DownloadFlashcard>) {
                         val flashcards = downloadFlashcards.map {
-                            Flashcard(it.id, it.category.name, it.front, it.back)
+                            Flashcard(it.id, it.categoryName, it.front, it.back)
                         }
                         repository.saveFlashcards(flashcards,
                                 object: FlashcardDataSource.SaveFlashcardsCallback {
@@ -40,7 +40,7 @@ class DownloadFlashcards(private val downloadService: FlashcardDownloadService,
                 })
     }
 
-    class RequestValues(val categories: List<DownloadCategoryFlexItem>) : UseCase.RequestValues
+    class RequestValues(val category: DownloadCategoryFlexItem) : UseCase.RequestValues
 
     class ResponseValue : UseCase.ResponseValue
 }

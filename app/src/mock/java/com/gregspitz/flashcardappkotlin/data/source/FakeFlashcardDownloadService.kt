@@ -13,9 +13,11 @@ class FakeFlashcardDownloadService : FlashcardDownloadService {
     private val flashcards = mutableListOf<DownloadFlashcard>()
     var flashcardFailure = false
     // Categories that were asked to be downloaded
-    val attemptedDownloadCategories = mutableListOf<DownloadCategory>()
+    var attemptedDownloadCategory: DownloadCategory? = null
 
-    override fun getDownloadCategories(callback: FlashcardDownloadService.GetDownloadCategoriesCallback) {
+    override fun getDownloadCategories(
+            callback: FlashcardDownloadService.GetDownloadCategoriesCallback) {
+
         if (categoriesFailure) {
             callback.onDataNotAvailable()
             return
@@ -24,10 +26,10 @@ class FakeFlashcardDownloadService : FlashcardDownloadService {
     }
 
     override fun downloadFlashcardsByCategory(
-            categories: List<DownloadCategory>,
+            category: DownloadCategory,
             callback: FlashcardDownloadService.DownloadFlashcardsCallback) {
 
-        attemptedDownloadCategories.addAll(categories)
+        attemptedDownloadCategory = category
         if (flashcardFailure) {
             callback.onDataNotAvailable()
             return
@@ -38,7 +40,7 @@ class FakeFlashcardDownloadService : FlashcardDownloadService {
     fun deleteAll() {
         downloadCategories.clear()
         flashcards.clear()
-        attemptedDownloadCategories.clear()
+        attemptedDownloadCategory = null
         categoriesFailure = false
         flashcardFailure = false
     }
