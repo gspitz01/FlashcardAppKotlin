@@ -1,8 +1,7 @@
 package com.gregspitz.flashcardappkotlin.data.service
 
-import com.gregspitz.flashcardappkotlin.data.model.Category
-import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.service.model.DownloadCategory
+import com.gregspitz.flashcardappkotlin.data.service.model.DownloadFlashcard
 
 interface FlashcardDownloadService {
 
@@ -17,7 +16,7 @@ interface FlashcardDownloadService {
 
     interface DownloadFlashcardsCallback {
 
-        fun onFlashcardsDownloaded(flashcards: List<Flashcard>)
+        fun onFlashcardsDownloaded(downloadFlashcards: List<DownloadFlashcard>)
 
         fun onDataNotAvailable()
     }

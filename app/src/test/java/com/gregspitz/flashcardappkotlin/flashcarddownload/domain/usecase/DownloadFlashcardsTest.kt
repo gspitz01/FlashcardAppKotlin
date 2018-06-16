@@ -8,6 +8,7 @@ import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.data.service.FlashcardDownloadService
 import com.gregspitz.flashcardappkotlin.data.service.model.DownloadCategory
+import com.gregspitz.flashcardappkotlin.data.service.model.DownloadFlashcard
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
 import com.gregspitz.flashcardappkotlin.flashcarddownload.DownloadCategoryFlexItem
@@ -27,6 +28,10 @@ class DownloadFlashcardsTest {
             downloadCategoryList.map { DownloadCategoryFlexItem(it) }
     private val values =
             DownloadFlashcards.RequestValues(downloadCategoryFlexItems)
+
+    private val downloadFlashcardList = FLASHCARD_LIST.map {
+        DownloadFlashcard(it.id, DownloadCategory(it.category), it.front, it.back)
+    }
 
     private val useCaseHandler = UseCaseHandler(TestUseCaseScheduler())
 
@@ -54,7 +59,7 @@ class DownloadFlashcardsTest {
     fun successFromDownloadService_successfulSaveToRepository_callsSuccessOnCallback() {
         verify(flashcardDownloadService).downloadFlashcardsByCategory(eq(downloadCategoryList),
                 downloadCallbackCaptor.capture())
-        downloadCallbackCaptor.firstValue.onFlashcardsDownloaded(FLASHCARD_LIST)
+        downloadCallbackCaptor.firstValue.onFlashcardsDownloaded(downloadFlashcardList)
         verify(flashcardRepository).saveFlashcards(eq(FLASHCARD_LIST),
                 saveFlashcardCallbackCaptor.capture())
         saveFlashcardCallbackCaptor.firstValue.onSaveSuccessful()
@@ -65,7 +70,7 @@ class DownloadFlashcardsTest {
     fun successFromDownloadService_failedSaveOnRepo_callsErrorOnCallback() {
         verify(flashcardDownloadService).downloadFlashcardsByCategory(eq(downloadCategoryList),
                 downloadCallbackCaptor.capture())
-        downloadCallbackCaptor.firstValue.onFlashcardsDownloaded(FLASHCARD_LIST)
+        downloadCallbackCaptor.firstValue.onFlashcardsDownloaded(downloadFlashcardList)
         verify(flashcardRepository).saveFlashcards(eq(FLASHCARD_LIST),
                 saveFlashcardCallbackCaptor.capture())
         saveFlashcardCallbackCaptor.firstValue.onSaveFailed()

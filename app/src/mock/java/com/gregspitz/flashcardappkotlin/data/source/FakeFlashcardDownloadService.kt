@@ -1,9 +1,8 @@
 package com.gregspitz.flashcardappkotlin.data.source
 
-import com.gregspitz.flashcardappkotlin.data.model.Category
-import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.service.FlashcardDownloadService
 import com.gregspitz.flashcardappkotlin.data.service.model.DownloadCategory
+import com.gregspitz.flashcardappkotlin.data.service.model.DownloadFlashcard
 
 class FakeFlashcardDownloadService : FlashcardDownloadService {
 
@@ -11,7 +10,7 @@ class FakeFlashcardDownloadService : FlashcardDownloadService {
             mutableListOf<DownloadCategory>(DownloadCategory("Barf", 4),
             DownloadCategory("Junk", 5), DownloadCategory("Argument", 9))
     var categoriesFailure = false
-    private val flashcards = mutableListOf<Flashcard>()
+    private val flashcards = mutableListOf<DownloadFlashcard>()
     var flashcardFailure = false
     // Categories that were asked to be downloaded
     val attemptedDownloadCategories = mutableListOf<DownloadCategory>()
