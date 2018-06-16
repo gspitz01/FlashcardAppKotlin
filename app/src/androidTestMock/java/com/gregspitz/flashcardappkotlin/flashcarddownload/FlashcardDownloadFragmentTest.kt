@@ -126,11 +126,6 @@ class FlashcardDownloadFragmentTest {
         onView(withId(R.id.downloadFlashcardsButton)).perform(click())
     }
 
-    private fun verifyMultipleCountActionTitleDisplayed(count: Int) {
-        val title = "$count ${activityRule.activity.getString(R.string.action_many_selected)}"
-        onView(withText(title)).check(matches(isDisplayed()))
-    }
-
     private fun scrollToAndVerifyPosition(position: Int, category: Category, count: Int) {
         onView(withId(R.id.categoriesRecyclerView))
                 .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(position))
