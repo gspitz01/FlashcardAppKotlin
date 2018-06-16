@@ -5,5 +5,5 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class DownloadFlashcard(val id: String = "",
-                             val categoryName: String = "",
+                             val category_name: String = "", val category_id: String = "",
                              val front: String = "", val back: String = "") : Parcelable

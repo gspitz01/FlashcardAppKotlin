@@ -2,8 +2,6 @@ package com.gregspitz.flashcardappkotlin.flashcarddownload
 
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
-import com.gregspitz.flashcardappkotlin.data.model.Category
-import com.gregspitz.flashcardappkotlin.data.service.model.DownloadCategory
 import com.gregspitz.flashcardappkotlin.flashcarddownload.domain.usecase.DownloadFlashcards
 import com.gregspitz.flashcardappkotlin.flashcarddownload.domain.usecase.GetDownloadCategories
 import com.gregspitz.flashcardappkotlin.flashcarddownload.domain.usecase.SaveFlashcards

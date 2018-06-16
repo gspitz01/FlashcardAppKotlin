@@ -4,13 +4,11 @@ package com.gregspitz.flashcardappkotlin.flashcarddownload
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.*
 import android.widget.Toast
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
-import com.gregspitz.flashcardappkotlin.data.service.model.DownloadCategory
 import com.gregspitz.flashcardappkotlin.flashcarddownload.domain.usecase.DownloadFlashcards
 import com.gregspitz.flashcardappkotlin.flashcarddownload.domain.usecase.GetDownloadCategories
 import com.gregspitz.flashcardappkotlin.flashcarddownload.domain.usecase.SaveFlashcards
