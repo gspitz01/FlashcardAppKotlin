@@ -13,6 +13,7 @@ import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.data.service.model.DownloadCategory
 import com.gregspitz.flashcardappkotlin.flashcarddownload.domain.usecase.DownloadFlashcards
 import com.gregspitz.flashcardappkotlin.flashcarddownload.domain.usecase.GetDownloadCategories
+import com.gregspitz.flashcardappkotlin.flashcarddownload.domain.usecase.SaveFlashcards
 import eu.davidea.flexibleadapter.FlexibleAdapter
 import eu.davidea.flexibleadapter.SelectableAdapter
 import kotlinx.android.synthetic.main.fragment_flashcard_download.*
@@ -29,6 +30,8 @@ class FlashcardDownloadFragment : Fragment(), FlashcardDownloadContract.View,
     lateinit var getDownloadCategory: GetDownloadCategories
     @Inject
     lateinit var downloadFlashcards: DownloadFlashcards
+    @Inject
+    lateinit var saveFlashcards: SaveFlashcards
     @Inject
     lateinit var useCaseHandler: UseCaseHandler
 
@@ -74,7 +77,7 @@ class FlashcardDownloadFragment : Fragment(), FlashcardDownloadContract.View,
         categoriesRecyclerView.adapter = flexRecyclerAdapter
 
         FlashcardDownloadPresenter(useCaseHandler, this,
-                getDownloadCategory, downloadFlashcards)
+                getDownloadCategory, downloadFlashcards, saveFlashcards)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {

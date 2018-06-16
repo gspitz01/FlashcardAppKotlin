@@ -37,49 +37,30 @@ class DownloadFlashcardsTest {
     private val downloadCallbackCaptor =
             argumentCaptor<FlashcardDownloadService.DownloadFlashcardsCallback>()
 
-    private val flashcardRepository: FlashcardRepository = mock()
-
-    private val saveFlashcardCallbackCaptor =
-            argumentCaptor<FlashcardDataSource.SaveFlashcardsCallback>()
-
     private val callback: UseCase.UseCaseCallback<DownloadFlashcards.ResponseValue> = mock()
 
     private lateinit var downloadFlashcards: DownloadFlashcards
 
     @Before
     fun setup() {
-        downloadFlashcards = DownloadFlashcards(flashcardDownloadService, flashcardRepository)
+        downloadFlashcards = DownloadFlashcards(flashcardDownloadService)
         useCaseHandler.execute(downloadFlashcards, values, callback)
     }
 
     @Test
-    fun successFromDownloadService_successfulSaveToRepository_callsSuccessOnCallback() {
+    fun successFromDownloadService_callsSuccessOnCallback() {
         verify(flashcardDownloadService).downloadFlashcardsByCategory(eq(downloadCategory),
                 downloadCallbackCaptor.capture())
         downloadCallbackCaptor.firstValue.onFlashcardsDownloaded(downloadFlashcardList)
-        verify(flashcardRepository).saveFlashcards(eq(FLASHCARD_LIST),
-                saveFlashcardCallbackCaptor.capture())
-        saveFlashcardCallbackCaptor.firstValue.onSaveSuccessful()
         verify(callback).onSuccess(any())
     }
 
-    @Test
-    fun successFromDownloadService_failedSaveOnRepo_callsErrorOnCallback() {
-        verify(flashcardDownloadService).downloadFlashcardsByCategory(eq(downloadCategory),
-                downloadCallbackCaptor.capture())
-        downloadCallbackCaptor.firstValue.onFlashcardsDownloaded(downloadFlashcardList)
-        verify(flashcardRepository).saveFlashcards(eq(FLASHCARD_LIST),
-                saveFlashcardCallbackCaptor.capture())
-        saveFlashcardCallbackCaptor.firstValue.onSaveFailed()
-        verify(callback).onError()
-    }
 
     @Test
-    fun failureFromDownloadService_doesNotCallRepo_callsErrorOnCallback() {
+    fun failureFromDownloadService_callsErrorOnCallback() {
         verify(flashcardDownloadService).downloadFlashcardsByCategory(eq(downloadCategory),
                 downloadCallbackCaptor.capture())
         downloadCallbackCaptor.firstValue.onDataNotAvailable()
         verify(callback).onError()
-        verifyNoMoreInteractions(flashcardRepository)
     }
 }
