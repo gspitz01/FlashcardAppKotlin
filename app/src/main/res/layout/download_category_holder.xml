@@ -1,21 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:paddingBottom="2dp"
+    android:paddingTop="2dp">
 
-    <TextView
-        android:id="@+id/categoryName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        app:layout_constraintStart_toStartOf="parent"/>
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/downloadCategoryHolderView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/flashcardCount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        <TextView
+            android:id="@+id/categoryName"
+            style="@style/Base.TextAppearance.AppCompat.Medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            app:layout_constraintStart_toStartOf="parent"/>
 
-</android.support.constraint.ConstraintLayout>
+        <TextView
+            android:id="@+id/flashcardCount"
+            style="@style/Base.TextAppearance.AppCompat.Medium"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
+    </android.support.constraint.ConstraintLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/downloadCategoryHolderView"
+        android:layout_marginTop="8dp"
+        android:background="@color/colorPrimary"/>
+</RelativeLayout>
+
