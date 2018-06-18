@@ -57,7 +57,9 @@ class GetRandomFlashcardTest {
     }
 
     @Test
-    fun onlyOneFlashcard_nullPreviousFlashcard_getsFlashcardAndCallsSuccessOnCallback() {
+    fun `when only one flashcard and null previous flashcard, gets flashcard and calls success on callback`() {
+        // Request value represents the previous Flashcard
+        // In this null case, there was no previous Flashcard
         val values = GetRandomFlashcard.RequestValues(null)
         useCaseHandler.execute(getRandomFlashcards, values, callback)
         verify(flashcardRepository).getFlashcards(repositoryCallbackCaptor.capture())
@@ -67,7 +69,9 @@ class GetRandomFlashcardTest {
     }
 
     @Test
-    fun onlyOneFlashcard_samePreviousFlashcard_getsFlashcardAndCallsSuccessOnCallback() {
+    fun `when only one flashcard and same previous flashcard, gets flashcard and calls success on callback`() {
+        // This test is to make sure it doesn't run into an infinite loop of trying to find
+        // a different Flashcard from the previous one when there is only one to be had.
         val values = GetRandomFlashcard.RequestValues(FLASHCARD_1.id)
         useCaseHandler.execute(getRandomFlashcards, values, callback)
         verify(flashcardRepository).getFlashcards(repositoryCallbackCaptor.capture())
@@ -77,7 +81,7 @@ class GetRandomFlashcardTest {
     }
 
     @Test
-    fun allFlashcardsHaveSameId_getsFirstFlashcardInListAndCallsSuccessOnCallback() {
+    fun `when all flashcards have same id, gets first flashcard in list and calls success on callback`() {
         val values = GetRandomFlashcard.RequestValues(FLASHCARD_1.id)
         useCaseHandler.execute(getRandomFlashcards, values, callback)
         verify(flashcardRepository).getFlashcards(repositoryCallbackCaptor.capture())
@@ -87,7 +91,8 @@ class GetRandomFlashcardTest {
     }
 
     @Test
-    fun bothFlashcards_getsFlashcardDifferentFromPreviousAndCallsSuccessOnCallback() {
+    fun `gets flashcard different from previous and calls success on callback`() {
+        // The id of the previous Flashcard
         val values = GetRandomFlashcard.RequestValues(FLASHCARD_1.id)
         useCaseHandler.execute(getRandomFlashcards, values, callback)
         verify(flashcardRepository).getFlashcards(repositoryCallbackCaptor.capture())
@@ -97,7 +102,7 @@ class GetRandomFlashcardTest {
     }
 
     @Test
-    fun dataNotAvailable_callsFailureOnCallback() {
+    fun `when data not available, calls failure on callback`() {
         val values = GetRandomFlashcard.RequestValues(null)
         useCaseHandler.execute(getRandomFlashcards, values, callback)
         verify(flashcardRepository).getFlashcards(repositoryCallbackCaptor.capture())
@@ -106,10 +111,11 @@ class GetRandomFlashcardTest {
     }
 
     @Test
-    fun noFlashcardsFromRepository_callsFailureOnCallback() {
+    fun `when no flashcards from repository, calls failure on callback`() {
         val values = GetRandomFlashcard.RequestValues(null)
         useCaseHandler.execute(getRandomFlashcards, values, callback)
         verify(flashcardRepository).getFlashcards(repositoryCallbackCaptor.capture())
+        // Repository replies with empty list
         repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(listOf())
         verify(callback).onError()
     }

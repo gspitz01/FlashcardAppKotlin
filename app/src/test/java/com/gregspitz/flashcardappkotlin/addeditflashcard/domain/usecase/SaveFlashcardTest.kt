@@ -52,13 +52,13 @@ class SaveFlashcardTest {
     }
 
     @Test
-    fun executeUseCase_savesFlashcardToRepositoryAndSuccessCallsCallbackSuccess() {
+    fun `on success from repository, calls success on callback`() {
         repositoryCallbackCaptor.firstValue.onSaveSuccessful()
         verify(callback).onSuccess(any())
     }
 
     @Test
-    fun executeUseCase_savesFlashcardToRepositoryAndFailCallsCallbackFail() {
+    fun `on failure from repository, calls error on callback`() {
         repositoryCallbackCaptor.firstValue.onSaveFailed()
         verify(callback).onError()
     }

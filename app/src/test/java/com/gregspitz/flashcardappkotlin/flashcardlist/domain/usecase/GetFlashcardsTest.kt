@@ -17,6 +17,7 @@
 package com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase
 
 import com.gregspitz.flashcardappkotlin.TestData
+import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_LIST_WITH_CATEGORIES
 import com.gregspitz.flashcardappkotlin.TestUseCaseScheduler
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
@@ -57,14 +58,14 @@ class GetFlashcardsTest {
     }
 
     @Test
-    fun executeUseCase_getsFlashcardsFromRepositoryAndOnSuccessCallsSuccessOnCallback() {
+    fun `gets flashcards from repository and on success calls success on callback`() {
         repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(TestData.FLASHCARD_LIST)
         verify(callback).onSuccess(responseCaptor.capture())
-        assertEquals(TestData.FLASHCARD_LIST_WITH_CATEGORIES, responseCaptor.firstValue.flashcards)
+        assertEquals(FLASHCARD_LIST_WITH_CATEGORIES, responseCaptor.firstValue.flashcards)
     }
 
     @Test
-    fun executeUseCase_getsFlashcardsFromRepositoryAndOnFailureCallsFailOnCallback() {
+    fun `gets flashcards from repository and on failure calls fail on callback`() {
         repositoryCallbackCaptor.firstValue.onDataNotAvailable()
         verify(callback).onError()
     }

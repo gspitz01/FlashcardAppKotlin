@@ -40,7 +40,7 @@ class GetDownloadCategoriesTest {
     }
 
     @Test
-    fun onExecute_successFromService_callsSuccessOnCallback() {
+    fun `success from service, calls success on callback`() {
         verify(flashcardDownloadService).getDownloadCategories(downloadCallbackCaptor.capture())
         val downloadCategories =
                 listOf(DownloadCategory(CATEGORY_1.name, 4), DownloadCategory(CATEGORY_2.name, 3))
@@ -52,7 +52,7 @@ class GetDownloadCategoriesTest {
     }
 
     @Test
-    fun onExecute_failureFromService_callsErrorOnCallback() {
+    fun `failure from service, calls error on callback`() {
         verify(flashcardDownloadService).getDownloadCategories(downloadCallbackCaptor.capture())
         downloadCallbackCaptor.firstValue.onDataNotAvailable()
         verify(callback).onError()

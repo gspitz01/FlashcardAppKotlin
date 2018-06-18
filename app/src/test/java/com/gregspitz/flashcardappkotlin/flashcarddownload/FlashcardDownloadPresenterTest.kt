@@ -19,6 +19,7 @@ class FlashcardDownloadPresenterTest {
 
     private val view: FlashcardDownloadContract.View = mock()
 
+    // InOrder for the view's setLoadingIndicator method
     private val inOrder = inOrder(view)
 
     // GetDownloadCategories use case
@@ -60,18 +61,18 @@ class FlashcardDownloadPresenterTest {
     }
 
     @Test
-    fun onCreation_setsSelfOnView() {
+    fun `on creation sets self on view`() {
         verify(view).setPresenter(presenter)
     }
 
     @Test
-    fun onLoadDownloadCategories_successFromUseCase_callsShowCategoriesOnView() {
+    fun `on load download categories with success from use case, calls show categories on view`() {
         presenter.loadDownloadCategories()
         verifyLoadDownloadCategoriesSuccess()
     }
 
     @Test
-    fun onLoadDownloadCategories_failureFromUseCase_callsFailureOnView() {
+    fun `on load download categories with failure from use case, calls failure on view`() {
         presenter.loadDownloadCategories()
         verifyViewLoadingIndicator(true)
         verify(useCaseHandler).execute(eq(getDownloadCategories), any(),
@@ -82,7 +83,7 @@ class FlashcardDownloadPresenterTest {
     }
 
     @Test
-    fun onDownloadFlashcards_successFromDownload_successFromSave_callsSuccessOnView() {
+    fun `on download flashcards with success from download and success from save, calls success on view`() {
         presenter.downloadFlashcards(downloadCategoryFlexItems[0])
         verifyDownloadFlashcardsSuccess()
 
@@ -97,7 +98,7 @@ class FlashcardDownloadPresenterTest {
     }
 
     @Test
-    fun onDownloadFlashcards_successFromDownload_failureFromSave_callsFailureOnView() {
+    fun `on download flashcards with success from download and failure from save, calls failure on view`() {
         presenter.downloadFlashcards(downloadCategoryFlexItems[0])
         verifyDownloadFlashcardsSuccess()
 
@@ -111,19 +112,21 @@ class FlashcardDownloadPresenterTest {
     }
 
     @Test
-    fun onDownloadFlashcards_failureFromDownload_callsFailureOnView() {
+    fun `on download flashcards with failure from download, calls failure on view`() {
         presenter.downloadFlashcards(downloadCategoryFlexItems[0])
         verifyViewLoadingIndicator(true)
+
         verify(useCaseHandler).execute(eq(downloadFlashcards), downloadRequestCaptor.capture(),
                 downloadCallbackCaptor.capture())
         assertEquals(downloadCategoryFlexItems[0], downloadRequestCaptor.firstValue.category)
         downloadCallbackCaptor.firstValue.onError()
+
         verifyViewLoadingIndicator(false)
         verify(view).showFlashcardDownloadFailure()
     }
 
     @Test
-    fun onStart_loadsDownloadCategories() {
+    fun `on start loads download categories`() {
         presenter.start()
         verifyLoadDownloadCategoriesSuccess()
     }

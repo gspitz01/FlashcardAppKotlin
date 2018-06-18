@@ -32,7 +32,7 @@ class FlashcardLocalDataSourceTest {
     private val flashcardLocalDataSource = FlashcardLocalDataSource(mockFlashcardDao)
 
     @Test
-    fun getFlashcards_getsFlashcardsFromFlashcardDaoAndPassesThemToCallback() {
+    fun `on get flashcards, gets flashcards from flashcard dao and passes them to callback`() {
         whenever(mockFlashcardDao.getFlashcards()).thenReturn(FLASHCARD_LIST)
         val getFlashcardsCallback: FlashcardDataSource.GetFlashcardsCallback = mock()
         flashcardLocalDataSource.getFlashcards(getFlashcardsCallback)
@@ -40,7 +40,7 @@ class FlashcardLocalDataSourceTest {
     }
 
     @Test
-    fun getFlashcardWithAvailableFlashcard_getsFromDaoAndPassesToCallback() {
+    fun `on get flashcard with available flashcard, gets from dao and passes to callback`() {
         whenever(mockFlashcardDao.getFlashcard(eq(FLASHCARD_1.id))).thenReturn(FLASHCARD_1)
         val getFlashcardCallback: FlashcardDataSource.GetFlashcardCallback = mock()
         flashcardLocalDataSource.getFlashcard(FLASHCARD_1.id, getFlashcardCallback)
@@ -48,7 +48,7 @@ class FlashcardLocalDataSourceTest {
     }
 
     @Test
-    fun getFlashcardWithUnavailableFlashcard_callsOnDataNotAvailableOnCallback() {
+    fun `on get flashcard with unavailable flashcard, calls data not available on callback`() {
         whenever(mockFlashcardDao.getFlashcard(FLASHCARD_1.id)).thenReturn(null)
         val getFlashcardCallback: FlashcardDataSource.GetFlashcardCallback = mock()
         flashcardLocalDataSource.getFlashcard(FLASHCARD_1.id, getFlashcardCallback)
@@ -56,7 +56,7 @@ class FlashcardLocalDataSourceTest {
     }
 
     @Test
-    fun saveFlashcard_insertsFlashcardIntoDaoAndCallsSaveSuccessfulOnCallback() {
+    fun `on save flashcard, inserts flashcard into dao and calls save successful on callback`() {
         val saveFlashcardCallback: FlashcardDataSource.SaveFlashcardCallback = mock()
         flashcardLocalDataSource.saveFlashcard(FLASHCARD_1, saveFlashcardCallback)
         verify(mockFlashcardDao).insertFlashcard(eq(FLASHCARD_1))
@@ -64,7 +64,7 @@ class FlashcardLocalDataSourceTest {
     }
 
     @Test
-    fun saveFlashcards_insertsFlashcardsIntoDaoAndCallsSaveSuccessfulOnCallback() {
+    fun `on save flashcards, inserts flashcards into dao and calls save successful on callback`() {
         val saveFlaschardsCallback: FlashcardDataSource.SaveFlashcardsCallback = mock()
         val flashcardList = listOf(FLASHCARD_1)
         flashcardLocalDataSource.saveFlashcards(flashcardList, saveFlaschardsCallback)
@@ -73,7 +73,7 @@ class FlashcardLocalDataSourceTest {
     }
 
     @Test
-    fun deleteFlashcard_deletesSingleFlashcardOnDao() {
+    fun `on delete flashcard, deletes single flashcard from dao`() {
         val deleteFlashcardCallback: FlashcardDataSource.DeleteFlashcardCallback = mock()
         flashcardLocalDataSource.deleteFlashcard(FLASHCARD_1.id, deleteFlashcardCallback)
         verify(mockFlashcardDao).deleteFlashcard(eq(FLASHCARD_1.id))
@@ -81,7 +81,7 @@ class FlashcardLocalDataSourceTest {
     }
 
     @Test
-    fun deleteAllFlashcards_deletesAllFlashcardsOnDao() {
+    fun `on delete all flashcards, deletes all flashcards from dao`() {
         flashcardLocalDataSource.deleteAllFlashcards()
         verify(mockFlashcardDao).deleteFlashcards()
     }

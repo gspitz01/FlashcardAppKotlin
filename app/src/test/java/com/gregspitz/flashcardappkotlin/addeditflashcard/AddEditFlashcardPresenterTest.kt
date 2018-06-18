@@ -38,28 +38,28 @@ class AddEditFlashcardPresenterTest {
 
     private val view: AddEditFlashcardContract.View = mock()
 
+    // InOrder for view's setLoadingIndicator method
+    private val inOrder = inOrder(view)
+
+    // GetFlashcard use case
     private val getFlashcard: GetFlashcard = mock()
-
-    private val saveFlashcard: SaveFlashcard = mock()
-
-    private val deleteFlashcard: DeleteFlashcard = mock()
-
-    private val useCaseHandler: UseCaseHandler = mock()
-
     private val getRequestCaptor = argumentCaptor<GetFlashcard.RequestValues>()
-
-    private val saveRequestCaptor = argumentCaptor<SaveFlashcard.RequestValues>()
-
-    private val deleteRequestCaptor = argumentCaptor<DeleteFlashcard.RequestValues>()
-
     private val getFlashcardCallbackCaptor =
             argumentCaptor<UseCase.UseCaseCallback<GetFlashcard.ResponseValue>>()
 
+    // SaveFlashcard use case
+    private val saveFlashcard: SaveFlashcard = mock()
+    private val saveRequestCaptor = argumentCaptor<SaveFlashcard.RequestValues>()
     private val saveFlashcardCallbackCaptor =
             argumentCaptor<UseCase.UseCaseCallback<SaveFlashcard.ResponseValue>>()
 
+    // DeleteFlashcard use case
+    private val deleteFlashcard: DeleteFlashcard = mock()
+    private val deleteRequestCaptor = argumentCaptor<DeleteFlashcard.RequestValues>()
     private val deleteFlashcardCallbackCaptor =
             argumentCaptor<UseCase.UseCaseCallback<DeleteFlashcard.ResponseValue>>()
+
+    private val useCaseHandler: UseCaseHandler = mock()
 
     private lateinit var presenter: AddEditFlashcardPresenter
 
@@ -70,96 +70,120 @@ class AddEditFlashcardPresenterTest {
     }
 
     @Test
-    fun creation_setsPresenterOnView() {
+    fun `creation sets self on view`() {
         presenter = createPresenter()
         verify(view).setPresenter(presenter)
     }
 
     @Test
-    fun onStart_showsFlashcardInView() {
+    fun `on start, shows flashcard in view`() {
         createAndStartPresenter()
-        val inOrder = inOrder(view)
-        inOrder.verify(view).setLoadingIndicator(true)
+        verifySetViewLoadingIndicator(true)
         verifyGetCallbackSuccess()
         assertEquals(FLASHCARD_1.id, getRequestCaptor.firstValue.flashcardId)
-        inOrder.verify(view).setLoadingIndicator(false)
+        verifySetViewLoadingIndicator(false)
         verify(view).showFlashcard(FLASHCARD_1)
     }
 
     @Test
-    fun onError_showsFailedToLoadInView() {
+    fun `on error, shows failed to load in view`() {
         createAndStartPresenter()
-        val inOrder = inOrder(view)
-        inOrder.verify(view).setLoadingIndicator(true)
+        verifySetViewLoadingIndicator(true)
         verifyGetCallbackFailure()
-        inOrder.verify(view).setLoadingIndicator(false)
+        verifySetViewLoadingIndicator(false)
         verify(view).showFailedToLoadFlashcard()
     }
 
     @Test
-    fun saveFlashcard_savesToRepositoryAndShowsSaveSuccessInView() {
+    fun `on save flashcard, saves to repository and shows save success in view`() {
         createAndStartPresenter()
         val inOrder = inOrder(useCaseHandler)
+        // First get the Flashcard
         inOrder.verify(useCaseHandler).execute(eq(getFlashcard), getRequestCaptor.capture(),
                 getFlashcardCallbackCaptor.capture())
         getFlashcardCallbackCaptor.firstValue.onSuccess(response)
+
+        // Save the Flashcard
         presenter.saveFlashcard(FLASHCARD_1)
+        // Verify use case called
         inOrder.verify(useCaseHandler).execute(eq(saveFlashcard), saveRequestCaptor.capture(),
                 saveFlashcardCallbackCaptor.capture())
+        // Make sure save was called on the correct Flashcard
         assertEquals(FLASHCARD_1, saveRequestCaptor.firstValue.flashcard)
         val saveResponse = SaveFlashcard.ResponseValue()
+
+        // Trigger successful save
         saveFlashcardCallbackCaptor.firstValue.onSuccess(saveResponse)
         verify(view).showSaveSuccessful()
     }
 
     @Test
-    fun saveFailed_showSaveFailedInView() {
+    fun `on save failed, show save failed in view`() {
         createAndStartPresenter()
         val inOrder = inOrder(useCaseHandler)
+        // Get the Flashcard
         inOrder.verify(useCaseHandler).execute(eq(getFlashcard), getRequestCaptor.capture(),
                 getFlashcardCallbackCaptor.capture())
         getFlashcardCallbackCaptor.firstValue.onSuccess(response)
 
+        // Save the Flashcard
         presenter.saveFlashcard(FLASHCARD_1)
 
+        // Verify use case called
         inOrder.verify(useCaseHandler).execute(eq(saveFlashcard), saveRequestCaptor.capture(),
                 saveFlashcardCallbackCaptor.capture())
+        // Make sure save was called on the correct Flashcard
         assertEquals(FLASHCARD_1, saveRequestCaptor.firstValue.flashcard)
+
+        // Trigger failed save
         saveFlashcardCallbackCaptor.firstValue.onError()
         verify(view).showSaveFailed()
     }
 
     @Test
-    fun deleteSuccess_showsListViewInView() {
+    fun `on delete success, shows list view`() {
         createAndStartPresenter()
+        // Get multiple Flashcards
         val inOrder = getFlashcardsWithUseCaseHandlerInOrder()
 
+        // Delete the Flashcard
         presenter.deleteFlashcard(FLASHCARD_1.id)
 
+        // Verify use case called
         inOrder.verify(useCaseHandler).execute(eq(deleteFlashcard), deleteRequestCaptor.capture(),
                 deleteFlashcardCallbackCaptor.capture())
+
+        // Verify correct Flashcard to be deleted
         assertEquals(FLASHCARD_1.id, deleteRequestCaptor.firstValue.flashcardId)
         val deleteResponse = DeleteFlashcard.ResponseValue()
+
+        // Trigger successful delete
         deleteFlashcardCallbackCaptor.firstValue.onSuccess(deleteResponse)
         verify(view).showFlashcardList(FlashcardListFragment.noParticularFlashcardExtra)
     }
 
     @Test
-    fun deleteFailed_showsDeleteFailedInView() {
+    fun `on delete failed, shows delete failed in view`() {
         createAndStartPresenter()
+        // Get Flashcards
         val inOrder = getFlashcardsWithUseCaseHandlerInOrder()
 
+        // Delete the Flashcard
         presenter.deleteFlashcard(FLASHCARD_1.id)
 
+        // Verify use case called
         inOrder.verify(useCaseHandler).execute(eq(deleteFlashcard), deleteRequestCaptor.capture(),
                 deleteFlashcardCallbackCaptor.capture())
+        // Verify correct Flashcard to be deleted
         assertEquals(FLASHCARD_1.id, deleteRequestCaptor.firstValue.flashcardId)
+
+        // Trigger failed delete
         deleteFlashcardCallbackCaptor.firstValue.onError()
         verify(view).showDeleteFailed()
     }
 
     @Test
-    fun showList_callsShowListViewOnView() {
+    fun `on show list, calls show list view on view`() {
         createAndStartPresenter()
         presenter.showList()
         verify(view).showFlashcardList(eq(FLASHCARD_1.id))
@@ -186,6 +210,10 @@ class AddEditFlashcardPresenterTest {
     private fun verifyGetCallback() {
         verify(useCaseHandler).execute(eq(getFlashcard), getRequestCaptor.capture(),
                 getFlashcardCallbackCaptor.capture())
+    }
+
+    private fun verifySetViewLoadingIndicator(active: Boolean) {
+        inOrder.verify(view).setLoadingIndicator(active)
     }
 
     private fun createAndStartPresenter() {

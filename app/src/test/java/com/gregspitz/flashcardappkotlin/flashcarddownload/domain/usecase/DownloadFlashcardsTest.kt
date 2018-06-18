@@ -1,7 +1,6 @@
 package com.gregspitz.flashcardappkotlin.flashcarddownload.domain.usecase
 
 import com.gregspitz.flashcardappkotlin.TestData.CATEGORY_1
-import com.gregspitz.flashcardappkotlin.TestData.CATEGORY_2
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_LIST
 import com.gregspitz.flashcardappkotlin.TestUseCaseScheduler
 import com.gregspitz.flashcardappkotlin.UseCase
@@ -9,8 +8,6 @@ import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.data.service.FlashcardDownloadService
 import com.gregspitz.flashcardappkotlin.data.service.model.DownloadCategory
 import com.gregspitz.flashcardappkotlin.data.service.model.DownloadFlashcard
-import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
-import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
 import com.gregspitz.flashcardappkotlin.flashcarddownload.DownloadCategoryFlexItem
 import com.nhaarman.mockito_kotlin.*
 import org.junit.Before
@@ -48,7 +45,7 @@ class DownloadFlashcardsTest {
     }
 
     @Test
-    fun successFromDownloadService_callsSuccessOnCallback() {
+    fun `success from download service, calls success on callback`() {
         verify(flashcardDownloadService).downloadFlashcardsByCategory(eq(downloadCategory),
                 downloadCallbackCaptor.capture())
         downloadCallbackCaptor.firstValue.onFlashcardsDownloaded(downloadFlashcardList)
@@ -57,7 +54,7 @@ class DownloadFlashcardsTest {
 
 
     @Test
-    fun failureFromDownloadService_callsErrorOnCallback() {
+    fun `failure from download service, calls error on callback`() {
         verify(flashcardDownloadService).downloadFlashcardsByCategory(eq(downloadCategory),
                 downloadCallbackCaptor.capture())
         downloadCallbackCaptor.firstValue.onDataNotAvailable()

@@ -59,14 +59,14 @@ class GetFlashcardTest {
     }
 
     @Test
-    fun executeUseCase_getsFlashcardFromRepoAndOnSuccessCallsSuccessOnCallback() {
+    fun `on success from repository , calls success on callback`() {
         repositoryCallbackCaptor.firstValue.onFlashcardLoaded(FLASHCARD_1)
         verify(callback).onSuccess(responseCaptor.capture())
         assertEquals(FLASHCARD_1, responseCaptor.firstValue.flashcard)
     }
 
     @Test
-    fun executeUseCase_getsFlashcardFromRepoAndOnFailCallsFailOnCallback() {
+    fun `on failure from repository, calls error on callback`() {
         repositoryCallbackCaptor.firstValue.onDataNotAvailable()
         verify(callback).onError()
     }

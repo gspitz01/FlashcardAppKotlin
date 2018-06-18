@@ -43,14 +43,14 @@ class FlashcardRepositoryTest {
     private val flashcardRepository = FlashcardRepository(spyLocalDataSource)
 
     @Test
-    fun getFlashcards_callsGetFlashcardsOnLocalDataSourceFirstTime() {
+    fun `on get flashcards first time, calls get flashcards on local data source`() {
         flashcardRepository.getFlashcards(getFlashcardsCallback)
         verify(spyLocalDataSource).getFlashcards(getFlashcardsArgumentCaptor.capture())
         getFlashcardsArgumentCaptor.firstValue.onFlashcardsLoaded(FLASHCARD_LIST)
     }
 
     @Test
-    fun getFlashcardsSecondTime_getsFlashcardsFromCache() {
+    fun `on get flashcards second time, gets flashcards from cache`() {
         // First call will go to local data source
         flashcardRepository.getFlashcards(getFlashcardsCallback)
         verify(spyLocalDataSource).getFlashcards(getFlashcardsArgumentCaptor.capture())
@@ -63,7 +63,7 @@ class FlashcardRepositoryTest {
     }
 
     @Test
-    fun getFlashcard_callsGetFlashcardOnLocalDataSource() {
+    fun `on get flashcard, calls get flashcard on local data source`() {
         val getFlashcardCallback: FlashcardDataSource.GetFlashcardCallback = mock()
         val flashcardId = "id"
         flashcardRepository.getFlashcard(flashcardId, getFlashcardCallback)
@@ -71,7 +71,7 @@ class FlashcardRepositoryTest {
     }
 
     @Test
-    fun saveFlashcard_callsSaveFlashcardToLocalDataSourceAndSetsCacheDirty() {
+    fun `on save flashcard, calls save flashcard on local data source and sets cache dirty`() {
         // Call getFlashcards to make sure cache is not dirty
         getLocalFlashcardsWithArgumentCaptor()
 
@@ -87,7 +87,7 @@ class FlashcardRepositoryTest {
     }
 
     @Test
-    fun saveFlashcards_callsSaveFlashcardsToLocalDataSourceAndSetsCacheDirty() {
+    fun `on save flashcards, calls save flashcards on local data source and sets cache dirty`() {
         // Call getFlashcard to make sure cache is not dirty
         getLocalFlashcardsWithArgumentCaptor()
 
@@ -103,7 +103,7 @@ class FlashcardRepositoryTest {
     }
 
     @Test
-    fun deleteFlashcard_deletesFlashcardFromCacheAndCallsDeleteOnLocalDataSource() {
+    fun `on delete flashcard, deletes flashcard from cache and calls delete on local data source`() {
         // Call getFlashcards once to make sure cache is not dirty
         getLocalFlashcardsWithArgumentCaptor()
 
@@ -111,33 +111,33 @@ class FlashcardRepositoryTest {
         flashcardRepository.deleteFlashcard(FLASHCARD_1.id, deleteFlashcardCallback)
         verify(spyLocalDataSource).deleteFlashcard(eq(FLASHCARD_1.id), eq(deleteFlashcardCallback))
 
-        // Prove tries to get FLASHCARD_1 from local source because not found in cache
+        // Prove repository tries to get FLASHCARD_1 from local source because not found in cache
         val getFlashcardCallback: FlashcardDataSource.GetFlashcardCallback = mock()
         flashcardRepository.getFlashcard(FLASHCARD_1.id, getFlashcardCallback)
         verify(spyLocalDataSource).getFlashcard(FLASHCARD_1.id, getFlashcardCallback)
     }
 
     @Test
-    fun deleteAllFlashcards_callsDeleteAllFlashcardsOnLocalDataSourceAndSetsCacheDirty() {
+    fun `on delete all flashcards, calls delete all flashcards on local data source and sets cache dirty`() {
         // Call getFlashcards once to make sure cache is not dirty
         getLocalFlashcardsWithArgumentCaptor()
 
         flashcardRepository.deleteAllFlashcards()
         verify(spyLocalDataSource).deleteAllFlashcards()
 
-        // Prove cache is dirty again
+        // Prove cache is dirty again by showing repository calls local data source again
         flashcardRepository.getFlashcards(getFlashcardsCallback)
         verify(spyLocalDataSource, times(2)).getFlashcards(any())
     }
 
     @Test
-    fun refreshFlashcards_setsCacheDirty() {
+    fun `on refresh flashcards, sets cache dirty`() {
         // Call getFlashcards once to make sure cache is not dirty
         getLocalFlashcardsWithArgumentCaptor()
 
         flashcardRepository.refreshFlashcards()
 
-        // Prove cache is dirty again
+        // Prove cache is dirty again by showing repository calls local data source again
         flashcardRepository.getFlashcards(getFlashcardsCallback)
         verify(spyLocalDataSource, times(2)).getFlashcards(any())
     }

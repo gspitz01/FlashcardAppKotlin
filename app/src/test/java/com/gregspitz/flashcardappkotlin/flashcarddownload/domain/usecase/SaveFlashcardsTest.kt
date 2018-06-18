@@ -33,13 +33,13 @@ class SaveFlashcardsTest {
     }
 
     @Test
-    fun onExecute_successFromRepo_callsSuccessOnCallback() {
+    fun `success from repository, calls success on callback`() {
         repoCallbackCaptor.firstValue.onSaveSuccessful()
         verify(callback).onSuccess(any())
     }
 
     @Test
-    fun onExecute_failureFromRepo_callsFailureOnCallback() {
+    fun `failure from repository, calls failure on callback`() {
         repoCallbackCaptor.firstValue.onSaveFailed()
         verify(callback).onError()
     }

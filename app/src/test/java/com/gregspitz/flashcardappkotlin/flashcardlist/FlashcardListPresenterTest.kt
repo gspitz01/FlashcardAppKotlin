@@ -48,13 +48,13 @@ class FlashcardListPresenterTest {
     }
 
     @Test
-    fun creation_setsPresenterOnView() {
+    fun `creation sets presenter on view`() {
         flashcardListPresenter = createPresenter()
         verify(flashcardListView).setPresenter(flashcardListPresenter)
     }
 
     @Test
-    fun startup_showsFlashcardListInView() {
+    fun `startup shows flashcard list in view`() {
         createAndStartPresenter()
         val inOrder = inOrder(flashcardListView)
         inOrder.verify(flashcardListView).setLoadingIndicator(true)
@@ -66,7 +66,7 @@ class FlashcardListPresenterTest {
     }
 
     @Test
-    fun onError_showsFailedToLoadInView() {
+    fun `when error from use case, shows failed to load in view`() {
         createAndStartPresenter()
         verify(useCaseHandler).execute(eq(getFlashcards), any(), useCaseCallbackCaptor.capture())
         useCaseCallbackCaptor.firstValue.onError()
@@ -74,14 +74,14 @@ class FlashcardListPresenterTest {
     }
 
     @Test
-    fun addFlashcard_showsAddFlashcard() {
+    fun `add flashcard shows add flashcard view`() {
         createAndStartPresenter()
         flashcardListPresenter.addFlashcard()
         verify(flashcardListView).showAddFlashcard()
     }
 
     @Test
-    fun onFlashcardClick_showsFlashcardDetails() {
+    fun `on flashcard click shows flashcard details`() {
         createAndStartPresenter()
         flashcardListPresenter.onFlashcardClick(0)
         verify(flashcardListView).showFlashcardDetailsUi(0)

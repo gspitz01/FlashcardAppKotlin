@@ -34,13 +34,13 @@ class DeleteFlashcardTest {
     }
 
     @Test
-    fun execute_onSuccessFromRepo_callsSuccessOnCallback() {
+    fun `on success from repository, calls success on callback`() {
         repositoryCallbackCaptor.firstValue.onDeleteSuccessful()
         verify(callback).onSuccess(any())
     }
 
     @Test
-    fun execute_onFailureFromRepo_callsErrorOnCallback() {
+    fun `on failure from repository, calls error on callback`() {
         repositoryCallbackCaptor.firstValue.onDeleteFailed()
         verify(callback).onError()
     }
