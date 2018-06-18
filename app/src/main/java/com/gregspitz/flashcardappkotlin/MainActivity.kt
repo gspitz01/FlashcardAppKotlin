@@ -1,15 +1,28 @@
 package com.gregspitz.flashcardappkotlin
 
+import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.MenuItem
+import android.widget.Toast
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.Task
 import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardFragment
 import com.gregspitz.flashcardappkotlin.flashcarddownload.FlashcardDownloadFragment
 import com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListFragment
 import com.gregspitz.flashcardappkotlin.randomflashcard.RandomFlashcardFragment
 import kotlinx.android.synthetic.main.activity_main.*
+
+private const val RC_SIGN_IN = 1
+private const val LOG_TAG = "MainActivity"
 
 /**
  * The only Activity which holds all the Fragment views
@@ -17,11 +30,17 @@ import kotlinx.android.synthetic.main.activity_main.*
  */
 class MainActivity : AppCompatActivity(), MainFragmentRouter {
 
+    // TODO: Add tests for login
+    // TODO: show something in display when user is logged in
+
     // Start with a RandomFlashcardFragment (a.k.a. the game)
     private val randomFlashcardFragment = RandomFlashcardFragment.newInstance()
     private lateinit var flashcardListFragment: FlashcardListFragment
     private lateinit var addEditFlashcardFragment: AddEditFlashcardFragment
     private lateinit var flashcardDownloadFragment: FlashcardDownloadFragment
+
+    private lateinit var googleSignInClient: GoogleSignInClient
+    private var googleSignInAccount: GoogleSignInAccount? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +81,40 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
                 }
                 else -> false
             }
+        }
+
+        // Google Sign-In
+        val googleSignInOptions = GoogleSignInOptions
+                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build()
+        googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        googleSignInAccount = GoogleSignIn.getLastSignedInAccount(this)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == RC_SIGN_IN) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+            handleSignInResult(task)
+        }
+    }
+
+    private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>?) {
+        try {
+            googleSignInAccount = completedTask?.getResult(ApiException::class.java)
+            // Successful sign in, show FlashcardDownload
+            showFlashcardDownload()
+        } catch (ex: ApiException) {
+            Log.w(LOG_TAG, "signInResult:failed code = ${ex.statusCode}")
+            // Failed sign in, show AddEditFlashcard
+            showAddEditFlashcard(AddEditFlashcardFragment.newFlashcardId)
+            Toast.makeText(this, R.string.sign_in_failed_text, Toast.LENGTH_LONG).show()
         }
     }
 
@@ -110,6 +163,19 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
      * Change view to FlashcardDownloadFragment
      */
     override fun showFlashcardDownload() {
+        // Download requires sign-in so check before changing fragments
+        if (googleSignInAccount == null) {
+            AlertDialog.Builder(this)
+                    .setMessage(R.string.download_requires_sign_in_message)
+                    .setTitle(R.string.sign_in_dialog_title)
+                    .setPositiveButton(R.string.ok) { _, _ ->
+                        signIn()
+                    }
+                    .setNegativeButton(R.string.no) { _, _ ->
+                        showAddEditFlashcard(AddEditFlashcardFragment.newFlashcardId)
+                    }
+                    .create().show()
+        }
         flashcardDownloadFragment = FlashcardDownloadFragment.newInstance()
         replaceFragment(flashcardDownloadFragment)
     }
@@ -119,5 +185,12 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
      */
     override fun showRandomFlashcard() {
         replaceFragment(randomFlashcardFragment)
+    }
+
+    /**
+     * Google Sign-In
+     */
+    private fun signIn() {
+        startActivityForResult(googleSignInClient.signInIntent, RC_SIGN_IN)
     }
 }

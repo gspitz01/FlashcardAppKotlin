@@ -28,4 +28,11 @@
     <string name="download_flashcards_successful">Download successful!</string>
     <string name="download_flashcards_failed">Download failed!</string>
     <string name="nav_download_flashcards_title">Download flashcards</string>
+    <string name="download_requires_sign_in_message">Download requires Google sign-in. Would you
+        like to sign in?
+    </string>
+    <string name="sign_in_dialog_title">Please Sign In</string>
+    <string name="ok">OK</string>
+    <string name="no">No</string>
+    <string name="sign_in_failed_text">Sign-in failed!</string>
 </resources>
