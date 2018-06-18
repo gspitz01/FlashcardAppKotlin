@@ -86,8 +86,13 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:$rootProject.archLifecycleVersion"
     implementation "android.arch.persistence.room:runtime:$rootProject.archRoomVersion"
     implementation "com.android.support:support-v4:$rootProject.supportLibraryVersion"
+
+    implementation "com.google.firebase:firebase-auth:$rootProject.firebaseAuthVersion"
+    implementation "com.google.android.gms:play-services-auth:$rootProject.playServicesAuthVersion"
+
     implementation "com.google.firebase:firebase-database:$rootProject.firebaseDatabaseVersion"
     implementation "com.android.support:support-v4:$rootProject.supportLibraryVersion"
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     kapt "android.arch.persistence.room:compiler:$rootProject.archRoomVersion"
 
     // Flexible Adapter

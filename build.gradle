@@ -12,7 +12,7 @@ buildscript {
         classpath('com.dicedmelon.gradle:jacoco-android:0.1.2') {
             exclude group: 'org.codehaus.groovy', module: 'groovy-all'
         }
-        classpath 'com.google.gms:google-services:3.2.0'
+        classpath 'com.google.gms:google-services:4.0.1'
     }
 }
 
@@ -40,7 +40,9 @@ ext {
     flexibleAdapterUiVersion = '1.0.0-b5'
     flexibleAdapterLiveDataVersion = '1.0.0-b2'
     flexibleAdapterDataBindingVersion = '1.0.0-b3'
-    firebaseDatabaseVersion = '11.4.2'
+    firebaseDatabaseVersion = '16.0.1'
+    firebaseAuthVersion = '16.0.1'
+    playServicesAuthVersion = '15.0.1'
     daggerVersion = '2.12'
     kaptDaggerCompilerVersion = '2.13'
     junitVersion = '4.12'
