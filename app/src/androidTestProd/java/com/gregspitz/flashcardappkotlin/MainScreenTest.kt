@@ -21,16 +21,17 @@ import android.support.test.espresso.Espresso
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.Espresso.pressBack
 import android.support.test.espresso.action.ViewActions.*
-import android.support.test.espresso.assertion.ViewAssertions.doesNotExist
 import android.support.test.espresso.assertion.ViewAssertions.matches
-import android.support.test.espresso.contrib.DrawerActions
 import android.support.test.espresso.contrib.NavigationViewActions.navigateTo
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
-import android.widget.ScrollView
-import org.hamcrest.CoreMatchers.*
+import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_1
+import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_2
+import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import org.hamcrest.CoreMatchers.allOf
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,63 +44,96 @@ import org.junit.runner.RunWith
 class MainScreenTest {
 
     // TODO: fixup UI
+    // TODO: eventually create test for Google Sign-In using Firebase Test Lab
+
+    private val database = FlashcardApplication.repoComponent.exposeRepository()
 
     @Rule @JvmField
     val testRule = ActivityTestRule<MainActivity>(MainActivity::class.java)
 
+    @Before
+    fun setup() {
+        database.deleteAllFlashcards()
+    }
+
     @Test
-    fun moveThroughWholeApp() {
+    fun navigateThroughWholeAppExceptDownloadView() {
+        // App starts with game view
         verifyGameViewVisible()
+
         navigateToListViaNavDrawer()
         verifyListViewVisible()
+
         navigateToAddEditViaNavDrawer()
         verifyAddEditViewVisible()
     }
 
     @Test
-    fun orientationChangeOnAddEditView_maintainsCurrentViewWithFlashcardData() {
+    fun orientationChangeOnAddEditViewWithPreviouslySaveFlashcard_maintainsCurrentViewWithFlashcardData() {
+        // Initial orientation portrait
         requestOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+        // Save the flashcard
+        saveFlashcard(FLASHCARD_1)
+        // Move away from edit view
         navigateToListViaNavDrawer()
-//        clickOnEditButtonOfFirstInDetailPager()
+        // Move back to edit view of that flashcard
+        clickOnEditButtonInListView()
 
-        // TODO figure out something else for this
-//        onView(withId(R.id.flashcardEditCategory))
-//                .check(matches(withText(InitialData.flashcards[0].category)))
-//        onView(withId(R.id.flashcardEditFront))
-//                .check(matches(withText(InitialData.flashcards[0].front)))
-//        onView(withId(R.id.flashcardEditBack))
-//                .check(matches(withText(InitialData.flashcards[0].back)))
-//
-//        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
-//        onView(withId(R.id.flashcardEditCategory))
-//                .check(matches(withText(InitialData.flashcards[0].category)))
-//        onView(withId(R.id.flashcardEditFront))
-//                .check(matches(withText(InitialData.flashcards[0].front)))
-//        onView(withId(R.id.flashcardEditBack))
-//                .check(matches(withText(InitialData.flashcards[0].back)))
-        onView(withId(R.id.nextFlashcardButton)).check(doesNotExist())
+        // Check flashcard data shows in EditTexts
+        onView(withId(R.id.flashcardEditCategory))
+                .check(matches(withText(FLASHCARD_1.category)))
+        onView(withId(R.id.flashcardEditFront))
+                .check(matches(withText(FLASHCARD_1.front)))
+        onView(withId(R.id.flashcardEditBack))
+                .check(matches(withText(FLASHCARD_1.back)))
+
+        // Change orientation
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+
+        // Verify same flashcard data still in EditTexts
+        onView(withId(R.id.flashcardEditCategory))
+                .check(matches(withText(FLASHCARD_1.category)))
+        onView(withId(R.id.flashcardEditFront))
+                .check(matches(withText(FLASHCARD_1.front)))
+        onView(withId(R.id.flashcardEditBack))
+                .check(matches(withText(FLASHCARD_1.back)))
     }
 
     @Test
     fun orientationChangeOnListView_maintainsSameDetail() {
+        // Initial orientation portrait
         requestOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+
+        // Save Flashcard data
+        saveFlashcard(FLASHCARD_1)
+        saveFlashcard(FLASHCARD_2)
+
         navigateToListViaNavDrawer()
+
         // Click first for focus
         onView(withId(R.id.detailPager)).perform(click())
         onView(withId(R.id.detailPager)).perform(swipeLeft())
 
-        // TODO: figure out something else for this
-//        onView(allOf(isDescendantOfA(withId(R.id.flashcardDetailContent)),
-//                withText(InitialData.flashcards[1].back))).check(matches(isDisplayed()))
-//
-//        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
-//        onView(allOf(isDescendantOfA(withId(R.id.flashcardDetailContent)),
-//                withText(InitialData.flashcards[1].back))).check(matches(isDisplayed()))
+        // Verify flashcard data shown in detail view
+        onView(allOf(isDescendantOfA(withId(R.id.flashcardDetailContent)),
+                withText(FLASHCARD_2.back))).check(matches(isDisplayed()))
+
+        // Change orientation
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+
+        // Verify same flashcard data shown in detail view
+        onView(allOf(isDescendantOfA(withId(R.id.flashcardDetailContent)),
+                withText(FLASHCARD_2.back))).check(matches(isDisplayed()))
     }
 
     @Test
     fun backFunction_worksProperly() {
-        // Start on game view
+        // Save flashcard data
+        saveFlashcard(FLASHCARD_1)
+        saveFlashcard(FLASHCARD_2)
+
+        // Navigate back to game view after save
+        navigateToGameViewViaNavDrawer()
         verifyGameViewVisible()
 
         // Move to List view
@@ -116,7 +150,7 @@ class MainScreenTest {
         verifyListViewVisible()
 
         // Move to Add/Edit view
-//        clickOnEditButtonOfFirstInDetailPager()
+        clickOnEditButtonInListView()
         verifyAddEditViewVisible()
 
         // One of the EditTexts gets focus, so close keyboard before pressing back
@@ -138,6 +172,15 @@ class MainScreenTest {
         verifyGameViewVisible()
     }
 
+    private fun saveFlashcard(newFlashcard: Flashcard) {
+        navigateToAddEditViaNavDrawer()
+        onView(withId(R.id.flashcardEditCategory)).perform(typeText(newFlashcard.category))
+        onView(withId(R.id.flashcardEditFront)).perform(typeText(newFlashcard.front))
+        onView(withId(R.id.flashcardEditBack)).perform(typeText(newFlashcard.back))
+        onView(withId(R.id.saveFlashcardButton)).perform(click())
+        Espresso.closeSoftKeyboard()
+    }
+
     private fun requestOrientation(orientation: Int) {
         testRule.activity.requestedOrientation = orientation
     }
@@ -154,11 +197,9 @@ class MainScreenTest {
         onView(withId(R.id.flashcardEditCategory)).check(matches(isDisplayed()))
     }
 
-//    private fun clickOnEditButtonOfFirstInDetailPager() {
-//        onView(allOf(isDescendantOfA(allOf(hasDescendant(withText(InitialData.flashcards[0].front)),
-//                instanceOf(ScrollView::class.java))),
-//                withId(R.id.editFlashcardButton))).perform(doubleClick())
-//    }
+    private fun clickOnEditButtonInListView() {
+        onView(withId(R.id.editFlashcardButton)).perform(click())
+    }
 
     private fun navigateToListViaNavDrawer() {
         onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(click())
@@ -168,5 +209,10 @@ class MainScreenTest {
     private fun navigateToAddEditViaNavDrawer() {
         onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(click())
         onView(withId(R.id.navDrawer)).perform(navigateTo(R.id.newFlashcard))
+    }
+
+    private fun navigateToGameViewViaNavDrawer() {
+        onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(click())
+        onView(withId(R.id.navDrawer)).perform(navigateTo(R.id.navGame))
     }
 }
