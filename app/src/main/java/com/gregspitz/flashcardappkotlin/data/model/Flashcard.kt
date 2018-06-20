@@ -19,6 +19,7 @@ package com.gregspitz.flashcardappkotlin.data.model
 import android.annotation.SuppressLint
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey
+import android.arch.persistence.room.TypeConverters
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 import java.util.*
@@ -29,6 +30,8 @@ import java.util.*
 @SuppressLint("ParcelCreator")
 @Parcelize
 @Entity(tableName = "flashcard")
+@TypeConverters(FlashcardPriorityTypeConverter::class)
 data class Flashcard(@PrimaryKey val id: String = UUID.randomUUID().toString(),
-                     val category: String, val front: String, val back: String)
+                     val category: String, val front: String, val back: String,
+                     val priority: FlashcardPriority)
     : Parcelable, FlashcardListItem

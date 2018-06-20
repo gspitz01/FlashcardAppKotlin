@@ -19,6 +19,7 @@ package com.gregspitz.flashcardappkotlin.data.source
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_LIST
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
 import com.gregspitz.flashcardappkotlin.data.source.local.FlashcardDao
 import com.gregspitz.flashcardappkotlin.data.source.local.FlashcardLocalDataSource
 import com.nhaarman.mockito_kotlin.*
@@ -76,7 +77,8 @@ class FlashcardRepositoryTest {
         getLocalFlashcardsWithArgumentCaptor()
 
         val saveFlashcardCallback: FlashcardDataSource.SaveFlashcardCallback = mock()
-        val flashcard = Flashcard("0", "Some Category", "Front", "Back")
+        val flashcard = Flashcard("0", "Some Category", "Front", "Back",
+                FlashcardPriority.NEW)
         flashcardRepository.saveFlashcard(flashcard, saveFlashcardCallback)
         verify(spyLocalDataSource).saveFlashcard(eq(flashcard), eq(saveFlashcardCallback))
 
@@ -92,7 +94,8 @@ class FlashcardRepositoryTest {
         getLocalFlashcardsWithArgumentCaptor()
 
         val saveFlashcardsCallback: FlashcardDataSource.SaveFlashcardsCallback = mock()
-        val newFlashcard = Flashcard("100", "Category", "Fronter", "Backer")
+        val newFlashcard = Flashcard("100", "Category", "Fronter", "Backer",
+                FlashcardPriority.NEW)
         val newFlashcardsList = listOf(newFlashcard)
         flashcardRepository.saveFlashcards(newFlashcardsList, saveFlashcardsCallback)
         verify(spyLocalDataSource).saveFlashcards(eq(newFlashcardsList), eq(saveFlashcardsCallback))

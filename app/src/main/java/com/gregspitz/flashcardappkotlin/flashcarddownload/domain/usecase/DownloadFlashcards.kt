@@ -2,6 +2,7 @@ package com.gregspitz.flashcardappkotlin.flashcarddownload.domain.usecase
 
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
 import com.gregspitz.flashcardappkotlin.data.service.FlashcardDownloadService
 import com.gregspitz.flashcardappkotlin.data.service.model.DownloadFlashcard
 import com.gregspitz.flashcardappkotlin.flashcarddownload.DownloadCategoryFlexItem
@@ -15,7 +16,8 @@ class DownloadFlashcards(private val downloadService: FlashcardDownloadService)
                 object: FlashcardDownloadService.DownloadFlashcardsCallback {
                     override fun onFlashcardsDownloaded(downloadFlashcards: List<DownloadFlashcard>) {
                         val flashcards = downloadFlashcards.map {
-                            Flashcard(it.id, it.category_name, it.front, it.back)
+                            Flashcard(it.id, it.category_name, it.front, it.back,
+                                    FlashcardPriority.NEW)
                         }
                         getUseCaseCallback().onSuccess(ResponseValue(flashcards))
                     }
