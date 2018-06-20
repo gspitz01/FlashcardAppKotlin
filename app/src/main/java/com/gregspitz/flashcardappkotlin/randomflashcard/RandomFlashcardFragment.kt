@@ -124,6 +124,7 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
      * Show message if the Flashcard could not be loaded
      */
     override fun showFailedToLoadFlashcard() {
+        flashcardSide.textAlignment = View.TEXT_ALIGNMENT_CENTER
         flashcardSide.setText(R.string.failed_to_load_flashcard_text)
     }
 
