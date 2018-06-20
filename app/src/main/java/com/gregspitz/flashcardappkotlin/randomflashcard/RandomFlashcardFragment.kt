@@ -105,10 +105,10 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
 
     override fun onResume() {
         super.onResume()
+        active = true
         if (viewModel.randomFlashcard.value == null) {
             presenter.start()
         }
-        active = true
     }
 
     override fun onPause() {
