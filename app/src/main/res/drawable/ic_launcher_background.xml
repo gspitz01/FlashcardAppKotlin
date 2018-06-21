@@ -9,39 +9,36 @@
         android:fillColor="#fff"
         android:pathData="M 0 0 H 192 V 192 H 0 V 0 Z" />
     <path
-        android:fillColor="#fff"
-        android:pathData="M 8.25 32.25 H 183.75 V 159.75 H 8.25 V 32.25 Z" />
+        android:pathData="M 8.3 32.3 H 183.8 V 159.8 H 8.3 V 32.3 Z" />
     <path
-        android:fillColor="#000000"
         android:pathData="M183.5,32.5v127H8.5V32.5h175m0.5-0.5H8V160H184V32Z" />
     <path
         android:fillColor="#ba000d"
-        android:pathData="M 8 64.25 H 184 V 64.75 H 8 V 64.25 Z" />
+        android:pathData="M 8 64.3 H 184 V 64.8 H 8 V 64.3 Z" />
     <path
         android:fillColor="#ffd600"
-        android:pathData="M 8 52.25 H 184 V 52.75 H 8 V 52.25 Z" />
+        android:pathData="M 8 52.3 H 184 V 52.8 H 8 V 52.3 Z" />
     <path
         android:fillColor="#ba000d"
-        android:pathData="M 8 100.25 H 184 V 100.75 H 8 V 100.25 Z" />
+        android:pathData="M 8 100.3 H 184 V 100.8 H 8 V 100.3 Z" />
     <path
         android:fillColor="#ba000d"
-        android:pathData="M 8 88.25 H 184 V 88.75 H 8 V 88.25 Z" />
+        android:pathData="M 8 88.3 H 184 V 88.8 H 8 V 88.3 Z" />
     <path
         android:fillColor="#ba000d"
-        android:pathData="M 8 76.25 H 184 V 76.75 H 8 V 76.25 Z" />
+        android:pathData="M 8 76.3 H 184 V 76.8 H 8 V 76.3 Z" />
     <path
         android:fillColor="#ba000d"
-        android:pathData="M 8 112.25 H 184 V 112.75 H 8 V 112.25 Z" />
+        android:pathData="M 8 112.3 H 184 V 112.8 H 8 V 112.3 Z" />
     <path
         android:fillColor="#ba000d"
-        android:pathData="M 8 124.25 H 184 V 124.75 H 8 V 124.25 Z" />
+        android:pathData="M 8 124.3 H 184 V 124.8 H 8 V 124.3 Z" />
     <path
         android:fillColor="#ba000d"
-        android:pathData="M 8 136.25 H 184 V 136.75 H 8 V 136.25 Z" />
+        android:pathData="M 8 136.3 H 184 V 136.8 H 8 V 136.3 Z" />
     <path
         android:fillColor="#ba000d"
-        android:pathData="M 8 148.25 H 184 V 148.75 H 8 V 148.25 Z" />
+        android:pathData="M 8 148.3 H 184 V 148.8 H 8 V 148.3 Z" />
     <path
-        android:fillColor="#000000"
         android:pathData="M183.5,32.5v127H8.5V32.5h175m0.5-0.5H8V160H184V32Z" />
 </vector>
