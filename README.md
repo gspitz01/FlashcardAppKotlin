@@ -6,33 +6,33 @@ Firebase database. The app uses a simple spaced repetition algorithm
 to keep the user learning.
 
 <div style="display: inline-block;">
-    <img src="screenshots/FlashcardList.png"
+    <img src="screenshots/FlashcardList.jpg"
          alt="Flashcard list"
-         style="margin: 0.5em; width: 350px;" />
-    <img src="screenshots/DownloadCategoriesList.png"
+         style="margin: 0.5em;" />
+    <img src="screenshots/DownloadCategoriesList.jpg"
          alt="Download flashcards from Firebase"
-         style="margin: 0.5em; width: 350px;" />
+         style="margin: 0.5em;" />
 </div>
 <div style="display: inline-block;">
-    <img src="screenshots/FlashcardFront.png"
+    <img src="screenshots/FlashcardFront.jpg"
          alt="Flashcard front"
-         style="margin: 0.5em; width: 350px;" />
-    <img src="screenshots/FlashcardBack.png"
+         style="margin: 0.5em;" />
+    <img src="screenshots/FlashcardBack.jpg"
          alt="FlashcardBack"
-         style="margin: 0.5em; width: 350px;" />
+         style="margin: 0.5em;" />
 </div>
 <div style="display: inline-block;">
-    <img src="screenshots/AddFlashcard.png"
+    <img src="screenshots/AddFlashcard.jpg"
          alt="Add a flashcard"
-         style="margin: 0.5em; width: 350px;" />
-    <img src="screenshots/EditFlashcard.png"
+         style="margin: 0.5em;" />
+    <img src="screenshots/EditFlashcard.jpg"
          alt="Edit a flashcard"
-         style="margin: 0.5em; width: 350px;" />
+         style="margin: 0.5em;" />
 </div>
 <div style="display: inline-block;">
-    <img src="screenshots/NavDrawer.png"
+    <img src="screenshots/NavDrawer.jpg"
          alt="Navigation drawer"
-         style="margin: 0.5em; width: 350px;" />
+         style="margin: 0.5em;" />
 </div>
 
 Technologies used:
