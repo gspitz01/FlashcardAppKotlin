@@ -175,9 +175,10 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
                         showAddEditFlashcard(AddEditFlashcardFragment.newFlashcardId)
                     }
                     .create().show()
+        } else {
+            flashcardDownloadFragment = FlashcardDownloadFragment.newInstance()
+            replaceFragment(flashcardDownloadFragment)
         }
-        flashcardDownloadFragment = FlashcardDownloadFragment.newInstance()
-        replaceFragment(flashcardDownloadFragment)
     }
 
     /**
