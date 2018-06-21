@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -22,7 +21,6 @@ import com.gregspitz.flashcardappkotlin.randomflashcard.RandomFlashcardFragment
 import kotlinx.android.synthetic.main.activity_main.*
 
 private const val RC_SIGN_IN = 1
-private const val LOG_TAG = "MainActivity"
 
 /**
  * The only Activity which holds all the Fragment views
@@ -111,7 +109,6 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
             // Successful sign in, show FlashcardDownload
             showFlashcardDownload()
         } catch (ex: ApiException) {
-            Log.w(LOG_TAG, "signInResult:failed code = ${ex.statusCode}")
             // Failed sign in, show AddEditFlashcard
             showAddEditFlashcard(AddEditFlashcardFragment.newFlashcardId)
             Toast.makeText(this, R.string.sign_in_failed_text, Toast.LENGTH_LONG).show()
