@@ -31,10 +31,11 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
     // TODO: Add tests for login
     // TODO: show something in display when user is logged in
 
-    // Start with a RandomFlashcardFragment (a.k.a. the game)
-    private val randomFlashcardFragment = RandomFlashcardFragment.newInstance()
+    // Start with a AddEditFlashcardFragment
+    private var addEditFlashcardFragment =
+            AddEditFlashcardFragment.newInstance(AddEditFlashcardFragment.newFlashcardId)
+    private lateinit var randomFlashcardFragment: RandomFlashcardFragment
     private lateinit var flashcardListFragment: FlashcardListFragment
-    private lateinit var addEditFlashcardFragment: AddEditFlashcardFragment
     private lateinit var flashcardDownloadFragment: FlashcardDownloadFragment
 
     private lateinit var googleSignInClient: GoogleSignInClient
