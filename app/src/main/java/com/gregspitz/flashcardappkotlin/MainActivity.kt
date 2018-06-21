@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
     // Start with a AddEditFlashcardFragment
     private var addEditFlashcardFragment =
             AddEditFlashcardFragment.newInstance(AddEditFlashcardFragment.newFlashcardId)
-    private lateinit var randomFlashcardFragment: RandomFlashcardFragment
+    private val randomFlashcardFragment = RandomFlashcardFragment.newInstance()
     private lateinit var flashcardListFragment: FlashcardListFragment
     private lateinit var flashcardDownloadFragment: FlashcardDownloadFragment
 
@@ -42,6 +42,8 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
     private var googleSignInAccount: GoogleSignInAccount? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Switch from launcher theme to main theme
+        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
@@ -53,7 +55,7 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
 
         // Start with the game
         if (savedInstanceState == null) {
-            setFragment(randomFlashcardFragment)
+            setFragment(addEditFlashcardFragment)
         }
 
         navDrawer.setNavigationItemSelectedListener {
