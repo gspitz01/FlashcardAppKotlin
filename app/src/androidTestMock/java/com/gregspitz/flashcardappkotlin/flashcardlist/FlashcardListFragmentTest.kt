@@ -40,6 +40,7 @@ import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.R.id.detailPager
 import com.gregspitz.flashcardappkotlin.SingleFragmentActivity
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import org.hamcrest.Description
 import org.hamcrest.Matcher
@@ -56,12 +57,18 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class FlashcardListFragmentTest {
 
-    private val flashcard3 = Flashcard("2", "Category2", "Front2", "Back2")
-    private val flashcard4 = Flashcard("3", "Category3", "Front3", "Back3")
-    private val flashcard5 = Flashcard("4", "Category4", "Front4", "Back4")
-    private val flashcard6 = Flashcard("5", "Category5", "Front5", "Back5")
-    private val flashcard7 = Flashcard("6", "Category6", "Front6", "Back6")
-    private val flashcard8 = Flashcard("7", "Category7", "Front7", "Back7")
+    private val flashcard3 = Flashcard("2", "Category2", "Front2", "Back2",
+            FlashcardPriority.NEW)
+    private val flashcard4 = Flashcard("3", "Category3", "Front3", "Back3",
+            FlashcardPriority.NEW)
+    private val flashcard5 = Flashcard("4", "Category4", "Front4", "Back4",
+            FlashcardPriority.NEW)
+    private val flashcard6 = Flashcard("5", "Category5", "Front5", "Back5",
+            FlashcardPriority.NEW)
+    private val flashcard7 = Flashcard("6", "Category6", "Front6", "Back6",
+            FlashcardPriority.NEW)
+    private val flashcard8 = Flashcard("7", "Category7", "Front7", "Back7",
+            FlashcardPriority.NEW)
 
     private val dataSource = FlashcardApplication.repoComponent.exposeRepository()
     private val localDataSource =

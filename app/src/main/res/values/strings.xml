@@ -35,4 +35,10 @@
     <string name="ok">OK</string>
     <string name="no">No</string>
     <string name="sign_in_failed_text">Sign-in failed!</string>
+    <string name="flashcard_priority_urgent_button_text">Very Poorly</string>
+    <string name="flashcard_priority_low_button_text">Very Well</string>
+    <string name="flashcard_priority_medium_button_text">Well</string>
+    <string name="flashcard_priority_high_button_text">Poorly</string>
+    <string name="flashcard_priority_question_text">How well do you feel you knew this card?
+    </string>
 </resources>

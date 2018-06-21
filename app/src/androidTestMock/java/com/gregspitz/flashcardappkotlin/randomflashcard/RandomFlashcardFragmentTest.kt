@@ -34,9 +34,11 @@ import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_2
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.SingleFragmentActivity
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import org.hamcrest.Description
 import org.hamcrest.Matcher
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -121,6 +123,30 @@ class RandomFlashcardFragmentTest {
         onView(withId(R.id.flashcardSide)).check(matches(withText(FLASHCARD_1.front)))
     }
 
+    @Test
+    fun clickLowPriorityButton_savesFlashcardWithLowPriority() {
+        verifyPriorityButtonClickSavesWithThatPriority(R.id.flashcardPriorityLowButton,
+                FlashcardPriority.LOW)
+    }
+
+    @Test
+    fun clickMediumPriorityButton_savesFlashcardWithLowPriority() {
+        verifyPriorityButtonClickSavesWithThatPriority(R.id.flashcardPriorityMediumButton,
+                FlashcardPriority.MEDIUM)
+    }
+
+    @Test
+    fun clickHighPriorityButton_savesFlashcardWithLowPriority() {
+        verifyPriorityButtonClickSavesWithThatPriority(R.id.flashcardPriorityHighButton,
+                FlashcardPriority.HIGH)
+    }
+
+    @Test
+    fun clickUrgentPriorityButton_savesFlashcardWithLowPriority() {
+        verifyPriorityButtonClickSavesWithThatPriority(R.id.flashcardPriorityUrgentButton,
+                FlashcardPriority.URGENT)
+    }
+
     private fun verifyFirstCategoryAndText(flashcard1: Flashcard, flashcard2: Flashcard) {
         onView(withId(R.id.flashcardCategory))
                 .check(matches(withCategoryOfOneOf(flashcard1.category, flashcard2.category)))
@@ -183,6 +209,29 @@ class RandomFlashcardFragmentTest {
                 override fun onSaveFailed() { /* ignore */ }
             })
         }
+    }
+
+    private fun verifyPriorityButtonClickSavesWithThatPriority(buttonId: Int,
+                                                               priority: FlashcardPriority) {
+        addFlashcardsToDataSource(FLASHCARD_1)
+        launchActivity()
+
+        onView(withId(buttonId)).perform(click())
+
+        assertFlashcardSavedWithPriority(priority)
+    }
+
+    private fun assertFlashcardSavedWithPriority(priority: FlashcardPriority) {
+        var savedFlashcard: Flashcard? = null
+        dataSource.getFlashcard(FLASHCARD_1.id, object: FlashcardDataSource.GetFlashcardCallback {
+            override fun onFlashcardLoaded(flashcard: Flashcard) {
+                savedFlashcard = flashcard
+            }
+
+            override fun onDataNotAvailable() { /* ignore */ }
+        })
+
+        assertEquals(priority, savedFlashcard!!.priority)
     }
 
     private fun launchActivity() {

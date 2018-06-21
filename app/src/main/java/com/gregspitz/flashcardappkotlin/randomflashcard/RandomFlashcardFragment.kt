@@ -10,6 +10,7 @@ import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.SaveFlashcard
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardSide
 import com.gregspitz.flashcardappkotlin.randomflashcard.domain.usecase.GetRandomFlashcard
 import kotlinx.android.synthetic.main.fragment_random_flashcard.*
@@ -148,6 +149,22 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
 
         flashcardSide.setOnClickListener {
             this@RandomFlashcardFragment.presenter.turnFlashcard()
+        }
+
+        flashcardPriorityLowButton.setOnClickListener {
+            this@RandomFlashcardFragment.presenter.saveFlashcard(FlashcardPriority.LOW)
+        }
+
+        flashcardPriorityMediumButton.setOnClickListener {
+            this@RandomFlashcardFragment.presenter.saveFlashcard(FlashcardPriority.MEDIUM)
+        }
+
+        flashcardPriorityHighButton.setOnClickListener {
+            this@RandomFlashcardFragment.presenter.saveFlashcard(FlashcardPriority.HIGH)
+        }
+
+        flashcardPriorityUrgentButton.setOnClickListener {
+            this@RandomFlashcardFragment.presenter.saveFlashcard(FlashcardPriority.URGENT)
         }
     }
 }
