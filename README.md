@@ -8,31 +8,31 @@ to keep the user learning.
 <div style="display: inline-block;">
     <img src="screenshots/FlashcardList.png"
          alt="Flashcard list"
-         style="margin: 0.5em;" />
+         style="margin: 0.5em; width: 350px;" />
     <img src="screenshots/DownloadCategoriesList.png"
          alt="Download flashcards from Firebase"
-         style="margin: 0.5em;" />
+         style="margin: 0.5em; width: 350px;" />
 </div>
 <div style="display: inline-block;">
     <img src="screenshots/FlashcardFront.png"
          alt="Flashcard front"
-         style="margin: 0.5em;" />
+         style="margin: 0.5em; width: 350px;" />
     <img src="screenshots/FlashcardBack.png"
          alt="FlashcardBack"
-         style="margin: 0.5em;" />
+         style="margin: 0.5em; width: 350px;" />
 </div>
 <div style="display: inline-block;">
     <img src="screenshots/AddFlashcard.png"
          alt="Add a flashcard"
-         style="margin: 0.5em;" />
+         style="margin: 0.5em; width: 350px;" />
     <img src="screenshots/EditFlashcard.png"
          alt="Edit a flashcard"
-         style="margin: 0.5em;" />
+         style="margin: 0.5em; width: 350px;" />
 </div>
 <div style="display: inline-block;">
     <img src="screenshots/NavDrawer.png"
          alt="Navigation drawer"
-         style="margin: 0.5em;" />
+         style="margin: 0.5em; width: 350px;" />
 </div>
 
 Technologies used:
