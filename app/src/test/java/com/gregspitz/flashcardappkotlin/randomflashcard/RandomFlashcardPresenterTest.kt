@@ -20,7 +20,9 @@ import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_2
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
+import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.SaveFlashcard
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardSide
 import com.gregspitz.flashcardappkotlin.randomflashcard.domain.usecase.GetRandomFlashcard
 import com.nhaarman.mockito_kotlin.*
@@ -37,7 +39,19 @@ class RandomFlashcardPresenterTest {
     private val response1 = GetRandomFlashcard.ResponseValue(FLASHCARD_1)
     private val response2 = GetRandomFlashcard.ResponseValue(FLASHCARD_2)
 
+    // GetRandomFlashcard use case
     private val getRandomFlashcard: GetRandomFlashcard = mock()
+    private val getRandomFlashcardUseCaseCallbackCaptor =
+            argumentCaptor<UseCase.UseCaseCallback<GetRandomFlashcard.ResponseValue>>()
+    private val getRandomFlashcardRequestCaptor =
+            argumentCaptor<GetRandomFlashcard.RequestValues>()
+
+    // SaveFlashcard use case
+    private val saveFlashcard: SaveFlashcard = mock()
+    private val saveFlashcardUseCaseCallbackCaptor =
+            argumentCaptor<UseCase.UseCaseCallback<SaveFlashcard.ResponseValue>>()
+    private val saveFlashcardRequestCaptor =
+            argumentCaptor<SaveFlashcard.RequestValues>()
 
     private val useCaseHandler: UseCaseHandler = mock()
 
@@ -45,10 +59,6 @@ class RandomFlashcardPresenterTest {
 
     private val randomFlashcardViewModel: RandomFlashcardContract.ViewModel = mock()
 
-    private val useCaseCallbackCaptor =
-            argumentCaptor<UseCase.UseCaseCallback<GetRandomFlashcard.ResponseValue>>()
-
-    private val requestCaptor = argumentCaptor<GetRandomFlashcard.RequestValues>()
 
     private val flashcardCaptor = argumentCaptor<Flashcard>()
 
@@ -61,7 +71,7 @@ class RandomFlashcardPresenterTest {
 
     @Test
     fun creation_setsPresenterOnView() {
-        presenter = createPresenter()
+        createPresenter()
         verify(randomFlashcardView).setPresenter(presenter)
     }
 
@@ -72,8 +82,8 @@ class RandomFlashcardPresenterTest {
 
         // GetRandomFlashcard use case is called
         verify(useCaseHandler)
-                .execute(eq(getRandomFlashcard), any(), useCaseCallbackCaptor.capture())
-        useCaseCallbackCaptor.firstValue.onSuccess(response1)
+                .execute(eq(getRandomFlashcard), any(), getRandomFlashcardUseCaseCallbackCaptor.capture())
+        getRandomFlashcardUseCaseCallbackCaptor.firstValue.onSuccess(response1)
         inOrder.verify(randomFlashcardView).setLoadingIndicator(false)
 
         verify(randomFlashcardViewModel).setFlashcard(FLASHCARD_1)
@@ -88,25 +98,25 @@ class RandomFlashcardPresenterTest {
 
         // GetRandomFlashcard use case is called
         useCaseHandlerInOrder.verify(useCaseHandler).execute(eq(getRandomFlashcard),
-                requestCaptor.capture(), useCaseCallbackCaptor.capture())
+                getRandomFlashcardRequestCaptor.capture(), getRandomFlashcardUseCaseCallbackCaptor.capture())
 
         // First time the presenter should send a request value with null for the flashcardId
-        assertNull(requestCaptor.firstValue.flashcardId)
+        assertNull(getRandomFlashcardRequestCaptor.firstValue.flashcardId)
 
         // Use case responds successful with a Flashcard
-        useCaseCallbackCaptor.firstValue.onSuccess(response1)
+        getRandomFlashcardUseCaseCallbackCaptor.firstValue.onSuccess(response1)
         inOrder.verify(randomFlashcardView).setLoadingIndicator(false)
 
         presenter.loadNewFlashcard()
         inOrder.verify(randomFlashcardView).setLoadingIndicator(true)
         useCaseHandlerInOrder.verify(useCaseHandler).execute(eq(getRandomFlashcard),
-                requestCaptor.capture(), useCaseCallbackCaptor.capture())
+                getRandomFlashcardRequestCaptor.capture(), getRandomFlashcardUseCaseCallbackCaptor.capture())
 
         // Second call to GetRandomFlashcard, presenter sends the flashcardId of the
         // previously attained Flashcard
-        assertEquals(FLASHCARD_1.id, requestCaptor.secondValue.flashcardId)
+        assertEquals(FLASHCARD_1.id, getRandomFlashcardRequestCaptor.secondValue.flashcardId)
 
-        useCaseCallbackCaptor.secondValue.onSuccess(response2)
+        getRandomFlashcardUseCaseCallbackCaptor.secondValue.onSuccess(response2)
         inOrder.verify(randomFlashcardView).setLoadingIndicator(false)
 
         // ViewModel should have been called twice
@@ -146,9 +156,50 @@ class RandomFlashcardPresenterTest {
     fun `on data not available shows failed to load flashcard in view`() {
         createAndStartPresenter()
         verify(useCaseHandler)
-                .execute(eq(getRandomFlashcard), any(), useCaseCallbackCaptor.capture())
-        useCaseCallbackCaptor.firstValue.onError()
+                .execute(eq(getRandomFlashcard), any(), getRandomFlashcardUseCaseCallbackCaptor.capture())
+        getRandomFlashcardUseCaseCallbackCaptor.firstValue.onError()
         verify(randomFlashcardView).showFailedToLoadFlashcard()
+    }
+
+    @Test
+    fun `on save flashcard, flashcard saved with new priority, success from use case, moves to next flashcard`() {
+        createStartAndGetFlashcard()
+
+        presenter.saveFlashcard(FlashcardPriority.URGENT)
+
+        verifyCorrectSaveAttempt()
+
+        // Success from use case
+        saveFlashcardUseCaseCallbackCaptor.firstValue.onSuccess(SaveFlashcard.ResponseValue())
+        verify(useCaseHandler, times(2)).execute(eq(getRandomFlashcard),
+                getRandomFlashcardRequestCaptor.capture(),
+                getRandomFlashcardUseCaseCallbackCaptor.capture())
+        assertEquals(FLASHCARD_1.id, getRandomFlashcardRequestCaptor.secondValue.flashcardId)
+    }
+
+    @Test
+    fun `on save flashcard, flashcard saved with new priority, failure from use case, moves to next flashcard`() {
+        createStartAndGetFlashcard()
+
+        presenter.saveFlashcard(FlashcardPriority.URGENT)
+
+        verifyCorrectSaveAttempt()
+
+        // Failure from use case
+        saveFlashcardUseCaseCallbackCaptor.firstValue.onError()
+        verify(useCaseHandler, times(2)).execute(eq(getRandomFlashcard),
+                getRandomFlashcardRequestCaptor.capture(),
+                getRandomFlashcardUseCaseCallbackCaptor.capture())
+        assertEquals(FLASHCARD_1.id, getRandomFlashcardRequestCaptor.secondValue.flashcardId)
+    }
+
+    @Test
+    fun `save attempt without having already retrieved a flashcard, does nothing`() {
+        createPresenter()
+
+        presenter.saveFlashcard(FlashcardPriority.URGENT)
+
+        verifyNoMoreInteractions(useCaseHandler)
     }
 
     @Test
@@ -176,17 +227,27 @@ class RandomFlashcardPresenterTest {
         whenever(randomFlashcardView.isActive()).thenReturn(false)
         createAndStartPresenter()
         verify(useCaseHandler)
-                .execute(eq(getRandomFlashcard), any(), useCaseCallbackCaptor.capture())
-        useCaseCallbackCaptor.firstValue.onError()
+                .execute(eq(getRandomFlashcard), any(), getRandomFlashcardUseCaseCallbackCaptor.capture())
+        getRandomFlashcardUseCaseCallbackCaptor.firstValue.onError()
         verify(randomFlashcardView, never()).setLoadingIndicator(any())
         verify(randomFlashcardView, never()).showFailedToLoadFlashcard()
+    }
+
+    private fun verifyCorrectSaveAttempt() {
+        verify(useCaseHandler).execute(eq(saveFlashcard), saveFlashcardRequestCaptor.capture(),
+                saveFlashcardUseCaseCallbackCaptor.capture())
+
+        // Saved flashcard should have same data as retrieved flashcard with new priority
+        val savedFlashcard = Flashcard(FLASHCARD_1.id, FLASHCARD_1.category, FLASHCARD_1.front,
+                FLASHCARD_1.back, FlashcardPriority.URGENT)
+        assertEquals(savedFlashcard, saveFlashcardRequestCaptor.firstValue.flashcard)
     }
 
     private fun createStartAndGetFlashcard() {
         createAndStartPresenter()
         verify(useCaseHandler)
-                .execute(eq(getRandomFlashcard), any(), useCaseCallbackCaptor.capture())
-        useCaseCallbackCaptor.firstValue.onSuccess(response1)
+                .execute(eq(getRandomFlashcard), any(), getRandomFlashcardUseCaseCallbackCaptor.capture())
+        getRandomFlashcardUseCaseCallbackCaptor.firstValue.onSuccess(response1)
     }
 
     private fun verifyLoadingIndicatorInOrderStart() : InOrder {
@@ -196,12 +257,12 @@ class RandomFlashcardPresenterTest {
     }
 
     private fun createAndStartPresenter() {
-        presenter = createPresenter()
+        createPresenter()
         presenter.start()
     }
 
-    private fun createPresenter(): RandomFlashcardPresenter {
-        return RandomFlashcardPresenter(useCaseHandler, randomFlashcardView,
-                randomFlashcardViewModel, getRandomFlashcard)
+    private fun createPresenter() {
+        presenter = RandomFlashcardPresenter(useCaseHandler, randomFlashcardView,
+                randomFlashcardViewModel, getRandomFlashcard, saveFlashcard)
     }
 }

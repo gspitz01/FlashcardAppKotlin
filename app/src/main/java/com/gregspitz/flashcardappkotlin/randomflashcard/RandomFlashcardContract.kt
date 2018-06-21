@@ -19,6 +19,7 @@ package com.gregspitz.flashcardappkotlin.randomflashcard
 import com.gregspitz.flashcardappkotlin.BasePresenter
 import com.gregspitz.flashcardappkotlin.BaseView
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardSide
 
 /**
@@ -40,6 +41,8 @@ interface RandomFlashcardContract {
         fun turnFlashcard()
 
         fun loadNewFlashcard()
+
+        fun saveFlashcard(priority: FlashcardPriority)
     }
 
     interface ViewModel {

@@ -18,7 +18,9 @@ package com.gregspitz.flashcardappkotlin.randomflashcard
 
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
+import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.SaveFlashcard
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardSide
 import com.gregspitz.flashcardappkotlin.randomflashcard.domain.usecase.GetRandomFlashcard
 
@@ -29,7 +31,8 @@ class RandomFlashcardPresenter(
         private val useCaseHandler: UseCaseHandler,
         private val view: RandomFlashcardContract.View,
         private val viewModel: RandomFlashcardContract.ViewModel,
-        private val getRandomFlashcard: GetRandomFlashcard
+        private val getRandomFlashcard: GetRandomFlashcard,
+        private val saveFlashcard: SaveFlashcard
 ) : RandomFlashcardContract.Presenter {
 
     private var flashcard: Flashcard? = null
@@ -77,5 +80,22 @@ class RandomFlashcardPresenter(
                         }
                     }
                 })
+    }
+
+    override fun saveFlashcard(priority: FlashcardPriority) {
+        flashcard?.let {
+            val newFlashcard = Flashcard(it.id, it.category, it.front, it.back, priority)
+            useCaseHandler.execute(saveFlashcard, SaveFlashcard.RequestValues(newFlashcard),
+                    object: UseCase.UseCaseCallback<SaveFlashcard.ResponseValue> {
+                        override fun onSuccess(response: SaveFlashcard.ResponseValue) {
+                            loadNewFlashcard()
+                        }
+
+                        override fun onError() {
+                            // TODO: put log statement here
+                            loadNewFlashcard()
+                        }
+                    })
+        }
     }
 }

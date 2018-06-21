@@ -8,6 +8,7 @@ import android.view.*
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
+import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.SaveFlashcard
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardSide
 import com.gregspitz.flashcardappkotlin.randomflashcard.domain.usecase.GetRandomFlashcard
@@ -22,6 +23,8 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
     // Dagger Dependency Injection
     @Inject
     lateinit var getRandomFlashcard: GetRandomFlashcard
+    @Inject
+    lateinit var saveFlashcard: SaveFlashcard
     @Inject
     lateinit var useCaseHandler: UseCaseHandler
 
@@ -85,7 +88,8 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
         viewModel.flashcardSide.observe(this, flashcardSideObserver)
 
         // Create the presenter
-        RandomFlashcardPresenter(useCaseHandler, this, viewModel, getRandomFlashcard)
+        RandomFlashcardPresenter(useCaseHandler, this, viewModel, getRandomFlashcard,
+                saveFlashcard)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
