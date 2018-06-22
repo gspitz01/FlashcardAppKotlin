@@ -9,9 +9,17 @@ to keep the user learning.
     <img src="screenshots/FlashcardList.jpg"
          alt="Flashcard list"
          style="margin: 0.5em;" />
+     <img src="screenshots/NavDrawer.jpg"
+          alt="Navigation drawer"
+          style="margin: 0.5em;" />
+</div>
+<div style="display: inline-block;">
     <img src="screenshots/DownloadCategoriesList.jpg"
-         alt="Download flashcards from Firebase"
-         style="margin: 0.5em;" />
+             alt="Download flashcards from Firebase"
+             style="margin: 0.5em;" />
+    <img src="screenshots/DownloadCategoriesListSelected.jpg"
+             alt="Download flashcards from Firebase"
+             style="margin: 0.5em;" />
 </div>
 <div style="display: inline-block;">
     <img src="screenshots/FlashcardFront.jpg"
@@ -27,11 +35,6 @@ to keep the user learning.
          style="margin: 0.5em;" />
     <img src="screenshots/EditFlashcard.jpg"
          alt="Edit a flashcard"
-         style="margin: 0.5em;" />
-</div>
-<div style="display: inline-block;">
-    <img src="screenshots/NavDrawer.jpg"
-         alt="Navigation drawer"
          style="margin: 0.5em;" />
 </div>
 
