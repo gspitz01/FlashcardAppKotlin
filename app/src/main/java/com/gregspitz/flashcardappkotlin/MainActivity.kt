@@ -7,6 +7,10 @@ import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
+import android.view.View
+import android.widget.Button
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -18,6 +22,8 @@ import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardFragmen
 import com.gregspitz.flashcardappkotlin.flashcarddownload.FlashcardDownloadFragment
 import com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListFragment
 import com.gregspitz.flashcardappkotlin.randomflashcard.RandomFlashcardFragment
+import com.squareup.picasso.Picasso
+import jp.wasabeef.picasso.transformations.CropCircleTransformation
 import kotlinx.android.synthetic.main.activity_main.*
 
 private const val RC_SIGN_IN = 1
@@ -36,7 +42,12 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
             AddEditFlashcardFragment.newInstance(AddEditFlashcardFragment.newFlashcardId)
     private val randomFlashcardFragment = RandomFlashcardFragment.newInstance()
     private lateinit var flashcardListFragment: FlashcardListFragment
-    private lateinit var flashcardDownloadFragment: FlashcardDownloadFragment
+    private var flashcardDownloadFragment: FlashcardDownloadFragment? = null
+
+    // Specially initialize the nav header views
+    private lateinit var navHeaderText: TextView
+    private lateinit var userProfileImage: ImageView
+    private lateinit var signOutButton: Button
 
     private lateinit var googleSignInClient: GoogleSignInClient
     private var googleSignInAccount: GoogleSignInAccount? = null
@@ -84,6 +95,15 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
             }
         }
 
+        // Force nav header to instantiate
+        val navHeader = navDrawer.getHeaderView(0)
+        navHeaderText = navHeader.findViewById(R.id.navHeaderText)
+        userProfileImage = navHeader.findViewById(R.id.userProfileImg)
+        signOutButton = navHeader.findViewById(R.id.signOutButton)
+        signOutButton.setOnClickListener {
+            signOut()
+        }
+
         // Google Sign-In
         val googleSignInOptions = GoogleSignInOptions
                 .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -95,6 +115,9 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
     override fun onStart() {
         super.onStart()
         googleSignInAccount = GoogleSignIn.getLastSignedInAccount(this)
+        if (googleSignInAccount != null) {
+            updateNavViewForSignedIn()
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -109,7 +132,8 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
     private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>?) {
         try {
             googleSignInAccount = completedTask?.getResult(ApiException::class.java)
-            // Successful sign in, show FlashcardDownload
+            // Successful sign in, update nav view and show FlashcardDownload
+            updateNavViewForSignedIn()
             showFlashcardDownload()
         } catch (ex: ApiException) {
             // Failed sign in, show AddEditFlashcard
@@ -130,7 +154,7 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
 
     private fun setFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
-                .add(R.id.contentFrame, fragment, "Main Content")
+                .add(R.id.contentFrame, fragment)
                 .commit()
     }
 
@@ -177,7 +201,7 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
                     .create().show()
         } else {
             flashcardDownloadFragment = FlashcardDownloadFragment.newInstance()
-            replaceFragment(flashcardDownloadFragment)
+            replaceFragment(flashcardDownloadFragment!!)
         }
     }
 
@@ -193,5 +217,44 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
      */
     private fun signIn() {
         startActivityForResult(googleSignInClient.signInIntent, RC_SIGN_IN)
+    }
+
+    private fun signOut() {
+        googleSignInClient.signOut()
+                .addOnCompleteListener(this) {
+                    googleSignInAccount = null
+                    updateNavViewForSignedOut()
+                }
+    }
+
+    private fun updateNavViewForSignedIn() {
+        googleSignInAccount?.let {
+            it.displayName?.let {
+                navHeaderText.text = it
+            }
+            it.photoUrl?.let {
+                userProfileImage.visibility = View.VISIBLE
+                Picasso.get().load(it)
+                        .resize(resources.getDimensionPixelSize(R.dimen.user_profile_img_nav_width),
+                                resources.getDimensionPixelSize(R.dimen.user_profile_img_nav_height))
+                        .transform(CropCircleTransformation())
+                        .into(userProfileImage)
+            }
+        }
+        signOutButton.visibility = View.VISIBLE
+    }
+
+    private fun updateNavViewForSignedOut() {
+        navHeaderText.text = getString(R.string.app_name)
+        userProfileImage.setImageBitmap(null)
+        userProfileImage.setImageDrawable(null)
+        userProfileImage.visibility = View.GONE
+        signOutButton.visibility = View.GONE
+
+        // If current fragment is FlashcardDownload, move to AddEditFlashcardFragment
+        if (supportFragmentManager.findFragmentById(R.id.contentFrame)
+                        is FlashcardDownloadFragment) {
+            showAddEditFlashcard(AddEditFlashcardFragment.newFlashcardId)
+        }
     }
 }

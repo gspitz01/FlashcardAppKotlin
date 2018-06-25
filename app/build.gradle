@@ -98,7 +98,8 @@ dependencies {
     implementation "com.google.android.gms:play-services-auth:$rootProject.playServicesAuthVersion"
     implementation "com.google.firebase:firebase-database:$rootProject.firebaseDatabaseVersion"
     implementation "com.android.support:support-v4:$rootProject.supportLibraryVersion"
-    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    implementation "com.squareup.picasso:picasso:$rootProject.picassoVersion"
+    implementation "jp.wasabeef:picasso-transformations:$rootProject.picassoTransformationsVersion"
     kapt "android.arch.persistence.room:compiler:$rootProject.archRoomVersion"
 
     // Flexible Adapter

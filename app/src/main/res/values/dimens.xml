@@ -5,4 +5,6 @@
     <dimen name="random_flashcard_view_padding">16dp</dimen>
     <dimen name="add_flashcard_fab_margin">16dp</dimen>
     <dimen name="category_holder_text_size">18sp</dimen>
+    <dimen name="user_profile_img_nav_width">175px</dimen>
+    <dimen name="user_profile_img_nav_height">175px</dimen>
 </resources>

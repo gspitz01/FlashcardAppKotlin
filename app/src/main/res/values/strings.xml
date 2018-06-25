@@ -41,4 +41,6 @@
     <string name="flashcard_priority_high_button_text">Poorly</string>
     <string name="flashcard_priority_question_text">How well do you feel you knew this card?
     </string>
+    <string name="user_profile_image_content_description">User Profile Image</string>
+    <string name="sign_out_button_text">Sign Out</string>
 </resources>
