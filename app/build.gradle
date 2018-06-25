@@ -5,7 +5,19 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'jacoco-android'
 apply plugin: 'com.google.gms.google-services'
 
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
 android {
+    signingConfigs {
+        config {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
     compileSdkVersion rootProject.ext.compileSdkVersion
     defaultConfig {
         applicationId "com.gregspitz.flashcardappkotlin"
@@ -25,14 +37,13 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
         debug {
             testCoverageEnabled true
         }
     }
-
     flavorDimensions "default"
-
     // If you need to add more flavors, consider using flavor dimensions.
     productFlavors {
         mock {
@@ -43,7 +54,6 @@ android {
             dimension "default"
         }
     }
-
     // Remove mockRelease as it's not needed.
     android.variantFilter { variant ->
         if (variant.buildType.name == 'release'
@@ -51,7 +61,6 @@ android {
             variant.setIgnore(true)
         }
     }
-
     testOptions {
         execution 'ANDROID_TEST_ORCHESTRATOR'
         unitTests {
@@ -74,7 +83,7 @@ tasks.withType(Test) {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     implementation "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
@@ -82,20 +91,18 @@ dependencies {
     implementation "com.android.support.constraint:constraint-layout:$rootProject.constraintLayoutVersion"
     implementation "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
     implementation "com.android.support:cardview-v7:$rootProject.supportLibraryVersion"
-
     implementation "android.arch.lifecycle:extensions:$rootProject.archLifecycleVersion"
     implementation "android.arch.persistence.room:runtime:$rootProject.archRoomVersion"
     implementation "com.android.support:support-v4:$rootProject.supportLibraryVersion"
-
     implementation "com.google.firebase:firebase-auth:$rootProject.firebaseAuthVersion"
     implementation "com.google.android.gms:play-services-auth:$rootProject.playServicesAuthVersion"
-
     implementation "com.google.firebase:firebase-database:$rootProject.firebaseDatabaseVersion"
     implementation "com.android.support:support-v4:$rootProject.supportLibraryVersion"
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     kapt "android.arch.persistence.room:compiler:$rootProject.archRoomVersion"
 
     // Flexible Adapter
+
     // https://github.com/davideas/FlexibleAdapter
     implementation "eu.davidea:flexible-adapter:$rootProject.flexibleAdapterVersion"
     implementation "eu.davidea:flexible-adapter-ui:$rootProject.flexibleAdapterUiVersion"
@@ -107,14 +114,11 @@ dependencies {
     implementation "com.google.dagger:dagger-android-support:$rootProject.daggerVersion"
     kapt "com.google.dagger:dagger-android-processor:$rootProject.daggerVersion"
     kapt "com.google.dagger:dagger-compiler:$rootProject.kaptDaggerCompilerVersion"
-
     testImplementation "junit:junit:$rootProject.junitVersion"
     testImplementation "com.nhaarman:mockito-kotlin:$rootProject.mockitoKotlinVersion"
-
     androidTestImplementation "com.android.support.test:runner:$rootProject.supportTestRunnerVersion"
     androidTestImplementation "com.android.support.test.espresso:espresso-core:$rootProject.espressoVersion"
     androidTestImplementation "com.android.support.test.espresso:espresso-contrib:$rootProject.espressoVersion"
     androidTestImplementation "android.arch.persistence.room:testing:$rootProject.archRoomVersion"
-
     androidTestUtil "com.android.support.test:orchestrator:$rootProject.supportTestRunnerVersion"
 }
