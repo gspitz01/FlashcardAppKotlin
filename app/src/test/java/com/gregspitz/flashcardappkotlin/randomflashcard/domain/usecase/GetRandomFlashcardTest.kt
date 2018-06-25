@@ -37,8 +37,10 @@ import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
 import com.gregspitz.flashcardappkotlin.randomflashcard.domain.model.FlashcardPriorityProbabilityDistribution
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.times
 import com.nhaarman.mockito_kotlin.verify
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Before
 import org.junit.Test
 
@@ -84,18 +86,18 @@ class GetRandomFlashcardTest {
             FlashcardPriorityProbabilityDistribution(0.2, 0.2,
                     0.2, 0.2, 0.2)
 
-    private lateinit var getRandomFlashcards: GetRandomFlashcard
+    private lateinit var getRandomFlashcard: GetRandomFlashcard
 
     @Before
     fun setup() {
-        getRandomFlashcards = GetRandomFlashcard(flashcardRepository, probabilityDistributionEven)
+        getRandomFlashcard = GetRandomFlashcard(flashcardRepository, probabilityDistributionEven)
     }
 
     @Test
     fun `when only one flashcard and null previous flashcard, gets flashcard and calls success on callback`() {
         // Request value represents the previous Flashcard
         // In this null case, there was no previous Flashcard
-        useCaseHandler.execute(getRandomFlashcards, requestValuesNull, callback)
+        useCaseHandler.execute(getRandomFlashcard, requestValuesNull, callback)
         verify(flashcardRepository).getFlashcards(repositoryCallbackCaptor.capture())
         repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(SINGLE_FLASHCARD_LIST)
         verify(callback).onSuccess(responseCaptor.capture())
@@ -106,7 +108,7 @@ class GetRandomFlashcardTest {
     fun `when only one flashcard and same previous flashcard, gets flashcard and calls success on callback`() {
         // This test is to make sure it doesn't run into an infinite loop of trying to find
         // a different Flashcard from the previous one when there is only one to be had.
-        useCaseHandler.execute(getRandomFlashcards, requestValuesFlashcard1, callback)
+        useCaseHandler.execute(getRandomFlashcard, requestValuesFlashcard1, callback)
         verify(flashcardRepository).getFlashcards(repositoryCallbackCaptor.capture())
         repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(SINGLE_FLASHCARD_LIST)
         verify(callback).onSuccess(responseCaptor.capture())
@@ -115,7 +117,7 @@ class GetRandomFlashcardTest {
 
     @Test
     fun `when all flashcards have same id, gets first flashcard in list and calls success on callback`() {
-        useCaseHandler.execute(getRandomFlashcards, requestValuesFlashcard1, callback)
+        useCaseHandler.execute(getRandomFlashcard, requestValuesFlashcard1, callback)
         verify(flashcardRepository).getFlashcards(repositoryCallbackCaptor.capture())
         repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(FLASHCARD_LIST_SAME_IDS)
         verify(callback).onSuccess(responseCaptor.capture())
@@ -124,7 +126,7 @@ class GetRandomFlashcardTest {
 
     @Test
     fun `gets flashcard different from previous and calls success on callback`() {
-        useCaseHandler.execute(getRandomFlashcards, requestValuesFlashcard1, callback)
+        useCaseHandler.execute(getRandomFlashcard, requestValuesFlashcard1, callback)
         verify(flashcardRepository).getFlashcards(repositoryCallbackCaptor.capture())
         repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(FLASHCARD_LIST)
         verify(callback).onSuccess(responseCaptor.capture())
@@ -133,7 +135,7 @@ class GetRandomFlashcardTest {
 
     @Test
     fun `when data not available, calls failure on callback`() {
-        useCaseHandler.execute(getRandomFlashcards, requestValuesNull, callback)
+        useCaseHandler.execute(getRandomFlashcard, requestValuesNull, callback)
         verify(flashcardRepository).getFlashcards(repositoryCallbackCaptor.capture())
         repositoryCallbackCaptor.firstValue.onDataNotAvailable()
         verify(callback).onError()
@@ -141,7 +143,7 @@ class GetRandomFlashcardTest {
 
     @Test
     fun `when no flashcards from repository, calls failure on callback`() {
-        useCaseHandler.execute(getRandomFlashcards, requestValuesNull, callback)
+        useCaseHandler.execute(getRandomFlashcard, requestValuesNull, callback)
         verify(flashcardRepository).getFlashcards(repositoryCallbackCaptor.capture())
         // Repository replies with empty list
         repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(listOf())
@@ -150,7 +152,7 @@ class GetRandomFlashcardTest {
 
     @Test
     fun `one of each priority, only new distribution, null previous id, provides flashcard with new priority`() {
-        getRandomFlashcards =
+        getRandomFlashcard =
                 GetRandomFlashcard(flashcardRepository, probabilityDistributionOnlyNew)
         executeWithRepositoryResponseOfOneOfEachPriorityAndCaptureCallbackResponse(requestValuesNull)
         assertEquals(FLASHCARD_WITH_PRIORITY_NEW, responseCaptor.firstValue.flashcard)
@@ -158,7 +160,7 @@ class GetRandomFlashcardTest {
 
     @Test
     fun `one of each priority, only new distribution, new priority previous id, provides flashcard with new priority`() {
-        getRandomFlashcards =
+        getRandomFlashcard =
                 GetRandomFlashcard(flashcardRepository, probabilityDistributionOnlyNew)
         val requestValues =
                 GetRandomFlashcard.RequestValues(FLASHCARD_WITH_PRIORITY_NEW.id)
@@ -168,7 +170,7 @@ class GetRandomFlashcardTest {
 
     @Test
     fun `one of each priority, only urgent distribution, null previous id, provides flashcard with urgent priority`() {
-        getRandomFlashcards =
+        getRandomFlashcard =
                 GetRandomFlashcard(flashcardRepository, probabilityDistributionOnlyUrgent)
         executeWithRepositoryResponseOfOneOfEachPriorityAndCaptureCallbackResponse(requestValuesNull)
         assertEquals(FLASHCARD_WITH_PRIORITY_URGENT, responseCaptor.firstValue.flashcard)
@@ -176,7 +178,7 @@ class GetRandomFlashcardTest {
 
     @Test
     fun `one of each priority, only urgent distribution, urgent priority previous id, provides flashcard with urgent priority`() {
-        getRandomFlashcards =
+        getRandomFlashcard =
                 GetRandomFlashcard(flashcardRepository, probabilityDistributionOnlyUrgent)
         val requestValues =
                 GetRandomFlashcard.RequestValues(FLASHCARD_WITH_PRIORITY_URGENT.id)
@@ -186,7 +188,7 @@ class GetRandomFlashcardTest {
 
     @Test
     fun `one of each priority, only high distribution, null previous id, provides flashcard with high priority`() {
-        getRandomFlashcards =
+        getRandomFlashcard =
                 GetRandomFlashcard(flashcardRepository, probabilityDistributionOnlyHigh)
         executeWithRepositoryResponseOfOneOfEachPriorityAndCaptureCallbackResponse(requestValuesNull)
         assertEquals(FLASHCARD_WITH_PRIORITY_HIGH, responseCaptor.firstValue.flashcard)
@@ -194,7 +196,7 @@ class GetRandomFlashcardTest {
 
     @Test
     fun `one of each priority, only high distribution, high priority previous id, provides flashcard with high priority`() {
-        getRandomFlashcards =
+        getRandomFlashcard =
                 GetRandomFlashcard(flashcardRepository, probabilityDistributionOnlyHigh)
         val requestValues =
                 GetRandomFlashcard.RequestValues(FLASHCARD_WITH_PRIORITY_HIGH.id)
@@ -204,7 +206,7 @@ class GetRandomFlashcardTest {
 
     @Test
     fun `one of each priority, only medium distribution, null previous id, provides flashcard with medium priority`() {
-        getRandomFlashcards =
+        getRandomFlashcard =
                 GetRandomFlashcard(flashcardRepository, probabilityDistributionOnlyMedium)
         executeWithRepositoryResponseOfOneOfEachPriorityAndCaptureCallbackResponse(requestValuesNull)
         assertEquals(FLASHCARD_WITH_PRIORITY_MEDIUM, responseCaptor.firstValue.flashcard)
@@ -212,7 +214,7 @@ class GetRandomFlashcardTest {
 
     @Test
     fun `one of each priority, only high distribution, medium priority previous id, provides flashcard with high priority`() {
-        getRandomFlashcards =
+        getRandomFlashcard =
                 GetRandomFlashcard(flashcardRepository, probabilityDistributionOnlyMedium)
         val requestValues =
                 GetRandomFlashcard.RequestValues(FLASHCARD_WITH_PRIORITY_MEDIUM.id)
@@ -222,7 +224,7 @@ class GetRandomFlashcardTest {
 
     @Test
     fun `one of each priority, only low distribution, null previous id, provides flashcard with low priority`() {
-        getRandomFlashcards =
+        getRandomFlashcard =
                 GetRandomFlashcard(flashcardRepository, probabilityDistributionOnlyLow)
         executeWithRepositoryResponseOfOneOfEachPriorityAndCaptureCallbackResponse(requestValuesNull)
         assertEquals(FLASHCARD_WITH_PRIORITY_LOW, responseCaptor.firstValue.flashcard)
@@ -230,7 +232,7 @@ class GetRandomFlashcardTest {
 
     @Test
     fun `one of each priority, only high distribution, low priority previous id, provides flashcard with high priority`() {
-        getRandomFlashcards =
+        getRandomFlashcard =
                 GetRandomFlashcard(flashcardRepository, probabilityDistributionOnlyLow)
         val requestValues =
                 GetRandomFlashcard.RequestValues(FLASHCARD_WITH_PRIORITY_LOW.id)
@@ -428,10 +430,27 @@ class GetRandomFlashcardTest {
                 probabilityDistributionOnlyUrgent, FLASHCARD_WITH_PRIORITY_URGENT)
     }
 
+    @Test
+    fun `all new priority except one, won't repeat that one`() {
+        val flashcards = listOf(FLASHCARD_1, FLASHCARD_2, FLASHCARD_WITH_PRIORITY_NEW,
+                FLASHCARD_WITH_PRIORITY_URGENT)
+        val request =
+                GetRandomFlashcard.RequestValues(FLASHCARD_WITH_PRIORITY_URGENT.id)
+        // Run several times to avoid accidental success from probability
+        for (num in 0..10) {
+            useCaseHandler.execute(getRandomFlashcard, request, callback)
+            verify(flashcardRepository, times(num + 1))
+                    .getFlashcards(repositoryCallbackCaptor.capture())
+            repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(flashcards)
+            verify(callback, times(num + 1)).onSuccess(responseCaptor.capture())
+            assertNotEquals(FLASHCARD_WITH_PRIORITY_URGENT, responseCaptor.allValues[num].flashcard)
+        }
+    }
+
     private fun executeWithRepositoryResponseOfOneOfEachPriorityAndCaptureCallbackResponse(
             requestValues: GetRandomFlashcard.RequestValues,
             flashcardList: List<Flashcard> = FLASHCARD_LIST_ONE_OF_EACH_PRIORITY) {
-        useCaseHandler.execute(getRandomFlashcards, requestValues, callback)
+        useCaseHandler.execute(getRandomFlashcard, requestValues, callback)
         verify(flashcardRepository).getFlashcards(repositoryCallbackCaptor.capture())
         repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(flashcardList)
         verify(callback).onSuccess(responseCaptor.capture())
@@ -446,7 +465,7 @@ class GetRandomFlashcardTest {
             priorityDistribution: FlashcardPriorityProbabilityDistribution,
             flashcardToAssert: Flashcard) {
 
-        getRandomFlashcards =
+        getRandomFlashcard =
                 GetRandomFlashcard(flashcardRepository, priorityDistribution)
         val flashcardsWithoutHighPriority =
                 filterBasedOnPriority(prioritiesToRemove)

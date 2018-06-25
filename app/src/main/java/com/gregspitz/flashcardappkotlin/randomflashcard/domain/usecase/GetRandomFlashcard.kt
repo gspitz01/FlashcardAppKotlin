@@ -55,20 +55,20 @@ class GetRandomFlashcard @Inject constructor(
         override fun onFlashcardsLoaded(flashcards: List<Flashcard>) {
             when {
                 flashcards.size > 1 -> {
-                    // For now assume at least one of each priority
-                    // Pick a priority based on distribution
-                    val priority = choosePriority(flashcards)
-                    // Then pick randomly from within that priority group
-                    val flashcardsOfPriority =
-                            flashcards.filter { it.priority == priority }
 
-                    // If more than one Flashcard of that priority, choose randomly between them
-                    // while avoiding the previously retrieved Flashcard
                     var flashcard: Flashcard?
                     // Keep track of number attempts just in case (see below)
                     var attempts = 0
                     var broke = false
                     do {
+                        // Pick a priority based on distribution
+                        val priority = choosePriority(flashcards)
+                        // Then pick randomly from within that priority group
+                        val flashcardsOfPriority =
+                                flashcards.filter { it.priority == priority }
+
+                        // If more than one Flashcard of that priority, choose randomly between them
+                        // while avoiding the previously retrieved Flashcard
                         val index = random.nextInt(flashcardsOfPriority.size)
                         flashcard = flashcardsOfPriority[index]
                         attempts++
@@ -80,9 +80,8 @@ class GetRandomFlashcard @Inject constructor(
                         }
                     } while (flashcard == null || flashcard.id == flashcardId)
                     if (broke) {
-                        // Either all the Flashcards of the chosen priority have the same id
-                        // or there is only one Flashcard of the chosen priority
-                        useCaseCallback.onSuccess(ResponseValue(flashcardsOfPriority[0]))
+                        // Too many attempts, just choose the first flashcard
+                        useCaseCallback.onSuccess(ResponseValue(flashcards[0]))
                     } else {
                         // Can be sure that flashcard isn't actually null here
                         useCaseCallback.onSuccess(ResponseValue(flashcard!!))
