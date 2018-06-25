@@ -1,4 +1,3 @@
-[![Build Status](https://travis-ci.org/gspitz01/FlashcardAppKotlin.svg?branch=master)](https://travis-ci.org/gspitz01/FlashcardAppKotlin)
 # Flashcard App Kotlin
 A flashcard app using Kotlin on Android
 Users can add and edit flashcards, as well as download flashcards from a
@@ -50,3 +49,4 @@ Technologies used:
 - Flexible Adapter https://github.com/davideas/FlexibleAdapter
 - Firebase Realtime Database
 - Google Sign-In
+- Picasso
