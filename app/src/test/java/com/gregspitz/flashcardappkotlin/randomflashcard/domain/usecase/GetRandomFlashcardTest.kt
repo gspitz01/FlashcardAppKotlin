@@ -177,30 +177,10 @@ class GetRandomFlashcardTest {
     }
 
     @Test
-    fun `one of each priority, only urgent distribution, urgent priority previous id, provides flashcard with urgent priority`() {
-        getRandomFlashcard =
-                GetRandomFlashcard(flashcardRepository, probabilityDistributionOnlyUrgent)
-        val requestValues =
-                GetRandomFlashcard.RequestValues(FLASHCARD_WITH_PRIORITY_URGENT.id)
-        executeWithRepositoryResponseOfOneOfEachPriorityAndCaptureCallbackResponse(requestValues)
-        assertEquals(FLASHCARD_WITH_PRIORITY_URGENT, responseCaptor.firstValue.flashcard)
-    }
-
-    @Test
     fun `one of each priority, only high distribution, null previous id, provides flashcard with high priority`() {
         getRandomFlashcard =
                 GetRandomFlashcard(flashcardRepository, probabilityDistributionOnlyHigh)
         executeWithRepositoryResponseOfOneOfEachPriorityAndCaptureCallbackResponse(requestValuesNull)
-        assertEquals(FLASHCARD_WITH_PRIORITY_HIGH, responseCaptor.firstValue.flashcard)
-    }
-
-    @Test
-    fun `one of each priority, only high distribution, high priority previous id, provides flashcard with high priority`() {
-        getRandomFlashcard =
-                GetRandomFlashcard(flashcardRepository, probabilityDistributionOnlyHigh)
-        val requestValues =
-                GetRandomFlashcard.RequestValues(FLASHCARD_WITH_PRIORITY_HIGH.id)
-        executeWithRepositoryResponseOfOneOfEachPriorityAndCaptureCallbackResponse(requestValues)
         assertEquals(FLASHCARD_WITH_PRIORITY_HIGH, responseCaptor.firstValue.flashcard)
     }
 
@@ -213,30 +193,10 @@ class GetRandomFlashcardTest {
     }
 
     @Test
-    fun `one of each priority, only high distribution, medium priority previous id, provides flashcard with high priority`() {
-        getRandomFlashcard =
-                GetRandomFlashcard(flashcardRepository, probabilityDistributionOnlyMedium)
-        val requestValues =
-                GetRandomFlashcard.RequestValues(FLASHCARD_WITH_PRIORITY_MEDIUM.id)
-        executeWithRepositoryResponseOfOneOfEachPriorityAndCaptureCallbackResponse(requestValues)
-        assertEquals(FLASHCARD_WITH_PRIORITY_MEDIUM, responseCaptor.firstValue.flashcard)
-    }
-
-    @Test
     fun `one of each priority, only low distribution, null previous id, provides flashcard with low priority`() {
         getRandomFlashcard =
                 GetRandomFlashcard(flashcardRepository, probabilityDistributionOnlyLow)
         executeWithRepositoryResponseOfOneOfEachPriorityAndCaptureCallbackResponse(requestValuesNull)
-        assertEquals(FLASHCARD_WITH_PRIORITY_LOW, responseCaptor.firstValue.flashcard)
-    }
-
-    @Test
-    fun `one of each priority, only high distribution, low priority previous id, provides flashcard with high priority`() {
-        getRandomFlashcard =
-                GetRandomFlashcard(flashcardRepository, probabilityDistributionOnlyLow)
-        val requestValues =
-                GetRandomFlashcard.RequestValues(FLASHCARD_WITH_PRIORITY_LOW.id)
-        executeWithRepositoryResponseOfOneOfEachPriorityAndCaptureCallbackResponse(requestValues)
         assertEquals(FLASHCARD_WITH_PRIORITY_LOW, responseCaptor.firstValue.flashcard)
     }
 
