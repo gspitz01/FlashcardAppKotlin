@@ -16,6 +16,7 @@
 
 package com.gregspitz.flashcardappkotlin.data.source
 
+import com.gregspitz.flashcardappkotlin.data.model.Category
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 
 /**
@@ -51,6 +52,19 @@ class FakeFlashcardLocalDataSource : FlashcardDataSource {
         } else {
             callback.onFlashcardLoaded(flashcard)
         }
+    }
+
+    override fun getCategories(callback: FlashcardDataSource.GetCategoriesCallback) {
+        if (failure) {
+            callback.onDataNotAvailable()
+        }
+
+        val categories = database.values.map {
+            it.category
+        }.distinct().map {
+            Category(it)
+        }
+        callback.onCategoriesLoaded(categories)
     }
 
     override fun saveFlashcard(flashcard: Flashcard, callback: FlashcardDataSource.SaveFlashcardCallback) {

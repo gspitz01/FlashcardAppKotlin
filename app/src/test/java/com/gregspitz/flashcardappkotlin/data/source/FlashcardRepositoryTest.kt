@@ -72,6 +72,13 @@ class FlashcardRepositoryTest {
     }
 
     @Test
+    fun `on get categories, call get categories on local data source`() {
+        val getCategoriesCallback: FlashcardDataSource.GetCategoriesCallback = mock()
+        flashcardRepository.getCategories(getCategoriesCallback)
+        verify(spyLocalDataSource).getCategories(any())
+    }
+
+    @Test
     fun `on save flashcard, calls save flashcard on local data source and sets cache dirty`() {
         // Call getFlashcards to make sure cache is not dirty
         getLocalFlashcardsWithArgumentCaptor()

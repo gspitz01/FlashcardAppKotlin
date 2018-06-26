@@ -16,6 +16,7 @@
 
 package com.gregspitz.flashcardappkotlin.data.source.local
 
+import com.gregspitz.flashcardappkotlin.TestData.CATEGORY_LIST
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_LIST
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
@@ -53,6 +54,14 @@ class FlashcardLocalDataSourceTest {
         val getFlashcardCallback: FlashcardDataSource.GetFlashcardCallback = mock()
         flashcardLocalDataSource.getFlashcard(FLASHCARD_1.id, getFlashcardCallback)
         verify(getFlashcardCallback).onDataNotAvailable()
+    }
+
+    @Test
+    fun `on get categories with available categories, gets from dao and passes to callback`() {
+        whenever(mockFlashcardDao.getCategories()).thenReturn(CATEGORY_LIST)
+        val getCategoriesCallback: FlashcardDataSource.GetCategoriesCallback = mock()
+        flashcardLocalDataSource.getCategories(getCategoriesCallback)
+        verify(getCategoriesCallback).onCategoriesLoaded(eq(CATEGORY_LIST))
     }
 
     @Test

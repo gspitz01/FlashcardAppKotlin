@@ -18,12 +18,15 @@ package com.gregspitz.flashcardappkotlin.data.source.local
 
 import android.arch.persistence.room.Database
 import android.arch.persistence.room.RoomDatabase
+import android.arch.persistence.room.TypeConverters
+import com.gregspitz.flashcardappkotlin.data.model.CategoryTypeConverter
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 
 /**
  * Room database for Flashcards
  */
 @Database(entities = [(Flashcard::class)], version = 1)
+@TypeConverters(CategoryTypeConverter::class)
 abstract class FlashcardDatabase : RoomDatabase() {
 
     abstract fun flashcardDao(): FlashcardDao

@@ -16,6 +16,7 @@
 
 package com.gregspitz.flashcardappkotlin.data.source
 
+import com.gregspitz.flashcardappkotlin.data.model.Category
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 
 /**
@@ -40,6 +41,15 @@ interface FlashcardDataSource {
     }
 
     fun getFlashcard(flashcardId: String, callback: GetFlashcardCallback)
+
+    interface GetCategoriesCallback {
+
+        fun onCategoriesLoaded(categories: List<Category>)
+
+        fun onDataNotAvailable()
+    }
+
+    fun getCategories(callback: GetCategoriesCallback)
 
     interface SaveFlashcardCallback {
 

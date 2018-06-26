@@ -8,6 +8,7 @@ object TestData {
     val CATEGORY_1 = Category("Data Structure: Behavioral")
     val CATEGORY_2 = Category("Data Structure: Whatever")
     val CATEGORY_3 = Category("Different Category")
+    val CATEGORY_LIST = listOf(CATEGORY_1, CATEGORY_2, CATEGORY_3)
     val FLASHCARD_1 =
             Flashcard("0", CATEGORY_1.name, "Front", "Back", FlashcardPriority.NEW)
     val FLASHCARD_2 =

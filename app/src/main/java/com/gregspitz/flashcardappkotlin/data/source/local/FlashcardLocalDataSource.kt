@@ -46,6 +46,11 @@ class FlashcardLocalDataSource(private val flashcardDao: FlashcardDao) : Flashca
         }
     }
 
+
+    override fun getCategories(callback: FlashcardDataSource.GetCategoriesCallback) {
+        callback.onCategoriesLoaded(flashcardDao.getCategories())
+    }
+
     /**
      * Save a Flashcard to the dao
      * Currently no mechanism for failed save as inserts will always replace any conflicting content

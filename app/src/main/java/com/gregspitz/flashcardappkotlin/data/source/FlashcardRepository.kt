@@ -63,6 +63,14 @@ open class FlashcardRepository(private val localDataSource: FlashcardDataSource)
     }
 
     /**
+     * Get all available categories
+     * @param callback to be called on either success or failure
+     */
+    override fun getCategories(callback: FlashcardDataSource.GetCategoriesCallback) {
+        localDataSource.getCategories(callback)
+    }
+
+    /**
      * Save a Flashcard to the local data source
      * Sets the cache dirty so it will be updated on next call to getFlashcards
      * @param flashcard the Flashcard to be saved
