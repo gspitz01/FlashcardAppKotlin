@@ -17,6 +17,7 @@
 package com.gregspitz.flashcardappkotlin.di
 
 import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardFragment
+import com.gregspitz.flashcardappkotlin.categorylist.CategoryListFragment
 import com.gregspitz.flashcardappkotlin.data.source.RepoComponent
 import com.gregspitz.flashcardappkotlin.flashcarddownload.FlashcardDownloadFragment
 import com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListFragment
@@ -37,4 +38,6 @@ interface UseCaseComponent {
     fun inject(randomFlashcardFragment: RandomFlashcardFragment)
 
     fun inject(flashcardDownloadFragment: FlashcardDownloadFragment)
+
+    fun inject(categoryListFragment: CategoryListFragment)
 }

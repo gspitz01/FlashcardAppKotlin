@@ -22,6 +22,7 @@ import com.gregspitz.flashcardappkotlin.UseCaseThreadPoolScheduler
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.DeleteFlashcard
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.GetFlashcard
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.SaveFlashcard
+import com.gregspitz.flashcardappkotlin.categorylist.domain.usecase.GetCategories
 import com.gregspitz.flashcardappkotlin.data.service.FlashcardDownloadService
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
 import com.gregspitz.flashcardappkotlin.flashcarddownload.domain.usecase.DownloadFlashcards
@@ -57,6 +58,11 @@ class UseCaseModule {
     @Provides
     fun provideGetFlashcards(flashcardRepository: FlashcardRepository) : GetFlashcards {
         return GetFlashcards(flashcardRepository)
+    }
+
+    @Provides
+    fun provideGetCategories(flashcardRepository: FlashcardRepository) : GetCategories {
+        return GetCategories(flashcardRepository)
     }
 
     @Provides

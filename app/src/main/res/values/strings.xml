@@ -43,4 +43,6 @@
     </string>
     <string name="user_profile_image_content_description">User Profile Image</string>
     <string name="sign_out_button_text">Sign Out</string>
+    <string name="no_categories_to_show_text">No categories to show</string>
+    <string name="failed_to_load_categories_text">Failed to load categories</string>
 </resources>

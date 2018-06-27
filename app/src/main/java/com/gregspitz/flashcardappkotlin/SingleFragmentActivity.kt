@@ -28,7 +28,7 @@ class SingleFragmentActivity : AppCompatActivity(), MainFragmentRouter {
                 .commit()
     }
 
-    fun replaceFragment(fragment: Fragment) {
+    private fun replaceFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
                 .replace(R.id.contentFrame, fragment)
                 .commit()
@@ -36,6 +36,11 @@ class SingleFragmentActivity : AppCompatActivity(), MainFragmentRouter {
 
     override fun showFlashcardList(flashcardId: String) {
         replaceFragment(FlashcardListFragment.newInstance(flashcardId))
+    }
+
+    override fun showCategoryFlashcardList(categoryName: String) {
+        replaceFragment(FlashcardListFragment
+                .newInstance(FlashcardListFragment.noParticularFlashcardExtra, categoryName))
     }
 
     override fun showAddEditFlashcard(flashcardId: String) {

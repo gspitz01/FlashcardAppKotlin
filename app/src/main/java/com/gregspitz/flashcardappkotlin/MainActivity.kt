@@ -143,7 +143,7 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return when(item?.itemId) {
+        return when (item?.itemId) {
             android.R.id.home -> {
                 drawerLayout.openDrawer(GravityCompat.START)
                 true
@@ -181,6 +181,15 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
     override fun showFlashcardList(flashcardId: String) {
         flashcardListFragment = FlashcardListFragment.newInstance(flashcardId)
         replaceFragment(flashcardListFragment)
+    }
+
+    /**
+     * Change view to FlashcardListFragment for a particular Category
+     * @param categoryName the name of the Category
+     */
+    override fun showCategoryFlashcardList(categoryName: String) {
+        flashcardListFragment = FlashcardListFragment
+                .newInstance(FlashcardListFragment.noParticularFlashcardExtra, categoryName)
     }
 
     /**
