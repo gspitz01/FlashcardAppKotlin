@@ -31,29 +31,49 @@ class GetFlashcards @Inject constructor(private val flashcardRepository: Flashca
     : UseCase<GetFlashcards.RequestValues, GetFlashcards.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues) {
-        flashcardRepository.getFlashcards(object: FlashcardDataSource.GetFlashcardsCallback {
-            override fun onFlashcardsLoaded(flashcards: List<Flashcard>) {
-                // TODO: sort the list of Flashcards by category before translation here
-                // Turn the list of Flashcards into a list of FlashcardListItems with
-                // Category headers
-                val listWithCategories = mutableListOf<FlashcardListItem>()
-                for (flashcard in flashcards) {
-                    if (!listWithCategories.contains(Category(flashcard.category))) {
-                        listWithCategories.add(Category(flashcard.category))
-                    }
-                    listWithCategories.add(flashcard)
+        if (requestValues.categoryName == null) {
+            flashcardRepository.getFlashcards(object: FlashcardDataSource.GetFlashcardsCallback {
+                override fun onFlashcardsLoaded(flashcards: List<Flashcard>) {
+                    // TODO: sort the list of Flashcards by category before translation here
+                    // Turn the list of Flashcards into a list of FlashcardListItems with
+                    // Category headers
+                    getUseCaseCallback()
+                            .onSuccess(ResponseValue(createListWithCategories(flashcards)))
                 }
-                getUseCaseCallback().onSuccess(ResponseValue(listWithCategories))
-            }
 
-            override fun onDataNotAvailable() {
-                getUseCaseCallback().onError()
-            }
+                override fun onDataNotAvailable() {
+                    getUseCaseCallback().onError()
+                }
 
-        })
+            })
+        } else {
+            flashcardRepository.getFlashcardsByCategoryName(requestValues.categoryName,
+                    object: FlashcardDataSource.GetFlashcardsCallback {
+                        override fun onFlashcardsLoaded(flashcards: List<Flashcard>) {
+                            // TODO: see note above
+                            getUseCaseCallback()
+                                    .onSuccess(ResponseValue(createListWithCategories(flashcards)))
+                        }
+
+                        override fun onDataNotAvailable() {
+                            getUseCaseCallback().onError()
+                        }
+                    })
+        }
     }
 
-    class RequestValues : UseCase.RequestValues
+    fun createListWithCategories(flashcards: List<Flashcard>): List<FlashcardListItem> {
+        val listWithCategories = mutableListOf<FlashcardListItem>()
+        for (flashcard in flashcards) {
+            if (!listWithCategories.contains(Category(flashcard.category))) {
+                listWithCategories.add(Category(flashcard.category))
+            }
+            listWithCategories.add(flashcard)
+        }
+        return listWithCategories
+    }
+
+    class RequestValues(val categoryName: String? = null) : UseCase.RequestValues
 
     class ResponseValue(val flashcards: List<FlashcardListItem>) : UseCase.ResponseValue
 }

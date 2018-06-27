@@ -17,6 +17,7 @@
 package com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase
 
 import com.gregspitz.flashcardappkotlin.TestData
+import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_LIST_WITH_CATEGORIES
 import com.gregspitz.flashcardappkotlin.TestUseCaseScheduler
 import com.gregspitz.flashcardappkotlin.UseCase
@@ -24,6 +25,7 @@ import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
 import com.nhaarman.mockito_kotlin.argumentCaptor
+import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import org.junit.Assert.assertEquals
@@ -35,7 +37,9 @@ import org.junit.Test
  */
 class GetFlashcardsTest {
 
-    private val values = GetFlashcards.RequestValues()
+    private val noCategoryRequest = GetFlashcards.RequestValues()
+    private val categoryRequest =
+            GetFlashcards.RequestValues(FLASHCARD_1.category)
 
     private val flashcardRepository: FlashcardRepository = mock()
 
@@ -53,20 +57,46 @@ class GetFlashcardsTest {
     @Before
     fun setup() {
         getFlashcards = GetFlashcards(flashcardRepository)
-        useCaseHandler.execute(getFlashcards, values, callback)
-        verify(flashcardRepository).getFlashcards(repositoryCallbackCaptor.capture())
     }
 
     @Test
-    fun `gets flashcards from repository and on success calls success on callback`() {
+    fun `gets flashcards without category from repository and on success calls success on callback`() {
+        executeUseCaseWithoutCategory()
         repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(TestData.FLASHCARD_LIST)
         verify(callback).onSuccess(responseCaptor.capture())
         assertEquals(FLASHCARD_LIST_WITH_CATEGORIES, responseCaptor.firstValue.flashcards)
     }
 
     @Test
-    fun `gets flashcards from repository and on failure calls fail on callback`() {
+    fun `gets flashcards without category from repository and on failure calls error on callback`() {
+        executeUseCaseWithoutCategory()
         repositoryCallbackCaptor.firstValue.onDataNotAvailable()
         verify(callback).onError()
+    }
+
+    @Test
+    fun `gets flashcards with category from repository and on success calls success on callback`() {
+        executeUseCaseWithCategory()
+        repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(TestData.FLASHCARD_LIST)
+        verify(callback).onSuccess(responseCaptor.capture())
+        assertEquals(FLASHCARD_LIST_WITH_CATEGORIES, responseCaptor.firstValue.flashcards)
+    }
+
+    @Test
+    fun `gets flashcards with category from repository and on failure calls error on callback`() {
+        executeUseCaseWithCategory()
+        repositoryCallbackCaptor.firstValue.onDataNotAvailable()
+        verify(callback).onError()
+    }
+
+    private fun executeUseCaseWithoutCategory() {
+        useCaseHandler.execute(getFlashcards, noCategoryRequest, callback)
+        verify(flashcardRepository).getFlashcards(repositoryCallbackCaptor.capture())
+    }
+
+    private fun executeUseCaseWithCategory() {
+        useCaseHandler.execute(getFlashcards, categoryRequest, callback)
+        verify(flashcardRepository).getFlashcardsByCategoryName(eq(categoryRequest.categoryName!!),
+                repositoryCallbackCaptor.capture())
     }
 }
