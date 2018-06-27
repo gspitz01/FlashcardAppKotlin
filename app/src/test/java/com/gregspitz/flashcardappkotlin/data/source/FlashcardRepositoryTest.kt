@@ -16,8 +16,10 @@
 
 package com.gregspitz.flashcardappkotlin.data.source
 
+import com.gregspitz.flashcardappkotlin.TestData.CATEGORY_1
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_LIST
+import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_LIST_OF_CATEGORY_1
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
 import com.gregspitz.flashcardappkotlin.data.source.local.FlashcardDao
@@ -60,6 +62,27 @@ class FlashcardRepositoryTest {
         // Second call will get from cache
         flashcardRepository.getFlashcards(getFlashcardsCallback)
         verify(getFlashcardsCallback, times(2)).onFlashcardsLoaded(FLASHCARD_LIST)
+        verifyNoMoreInteractions(spyLocalDataSource)
+    }
+
+    @Test
+    fun `on get flashcards by category name without prior call to get flashcards, gets flashcards from local data source`() {
+        flashcardRepository.getFlashcardsByCategoryName(CATEGORY_1.name, getFlashcardsCallback)
+        verify(spyLocalDataSource).getFlashcardsByCategoryName(eq(CATEGORY_1.name),
+                getFlashcardsArgumentCaptor.capture())
+        getFlashcardsArgumentCaptor.firstValue.onFlashcardsLoaded(FLASHCARD_LIST_OF_CATEGORY_1)
+    }
+
+    @Test
+    fun `on get flashcards by category name with prior call to get flashcards, gets flashcards from cache`() {
+        // First call get flashcards, goes to local data source
+        flashcardRepository.getFlashcards(getFlashcardsCallback)
+        verify(spyLocalDataSource).getFlashcards(getFlashcardsArgumentCaptor.capture())
+        getFlashcardsArgumentCaptor.firstValue.onFlashcardsLoaded(FLASHCARD_LIST)
+
+        // Now call get by category name, gets from cache
+        flashcardRepository.getFlashcardsByCategoryName(CATEGORY_1.name, getFlashcardsCallback)
+        verify(getFlashcardsCallback).onFlashcardsLoaded(FLASHCARD_LIST_OF_CATEGORY_1)
         verifyNoMoreInteractions(spyLocalDataSource)
     }
 

@@ -33,6 +33,15 @@ class FlashcardLocalDataSource(private val flashcardDao: FlashcardDao) : Flashca
     }
 
     /**
+     * Get all Flashcards with a certain Category name
+     * @param categoryName the name of the Category
+     * @param callback to be called on success or failure
+     */
+    override fun getFlashcardsByCategoryName(categoryName: String, callback: FlashcardDataSource.GetFlashcardsCallback) {
+        callback.onFlashcardsLoaded(flashcardDao.getFlashcardsByCategoryName(categoryName))
+    }
+
+    /**
      * Get a single Flashcard from a dao based on the Flashcard id
      * @param flashcardId the id of the Flashcard to be found
      * @param callback to be called on success or failure

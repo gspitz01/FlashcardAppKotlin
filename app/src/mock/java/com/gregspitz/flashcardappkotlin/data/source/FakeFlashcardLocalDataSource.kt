@@ -37,7 +37,17 @@ class FakeFlashcardLocalDataSource : FlashcardDataSource {
         }
 
         callback.onFlashcardsLoaded(database.values.toList())
+    }
 
+    override fun getFlashcardsByCategoryName(categoryName: String, callback: FlashcardDataSource.GetFlashcardsCallback) {
+        if (failure) {
+            callback.onDataNotAvailable()
+            return
+        }
+
+        callback.onFlashcardsLoaded(database.values.filter {
+            it.category == categoryName
+        })
     }
 
     override fun getFlashcard(flashcardId: String, callback: FlashcardDataSource.GetFlashcardCallback) {

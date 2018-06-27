@@ -33,6 +33,8 @@ interface FlashcardDataSource {
 
     fun getFlashcards(callback: GetFlashcardsCallback)
 
+    fun getFlashcardsByCategoryName(categoryName: String, callback: GetFlashcardsCallback)
+
     interface GetFlashcardCallback {
 
         fun onFlashcardLoaded(flashcard: Flashcard)

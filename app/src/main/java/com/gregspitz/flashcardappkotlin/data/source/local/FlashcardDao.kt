@@ -32,6 +32,9 @@ interface FlashcardDao {
     @Query("SELECT * from flashcard")
     fun getFlashcards() : List<Flashcard>
 
+    @Query("SELECT * from flashcard where category = :categoryName")
+    fun getFlashcardsByCategoryName(categoryName: String): List<Flashcard>
+
     @Query("SELECT * from flashcard where id = :flashcardId")
     fun getFlashcard(flashcardId: String): Flashcard?
 

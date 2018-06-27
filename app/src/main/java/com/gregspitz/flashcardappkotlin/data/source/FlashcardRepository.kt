@@ -46,6 +46,22 @@ open class FlashcardRepository(private val localDataSource: FlashcardDataSource)
     }
 
     /**
+     * Get all the Flashcards with a certain Category name
+     * @param categoryName the name of the Category
+     * @param callback to be called with either success or failure
+     */
+    override fun getFlashcardsByCategoryName(categoryName: String, callback: FlashcardDataSource.GetFlashcardsCallback) {
+        // Try to get from the cache first
+        if (!cacheDirty) {
+            callback.onFlashcardsLoaded(cache.values.filter {
+                it.category == categoryName
+            })
+        } else {
+            localDataSource.getFlashcardsByCategoryName(categoryName, callback)
+        }
+    }
+
+    /**
      * Get a single Flashcard either from the cache or the local data source
      * @param flashcardId the id of the Flashcard to be found
      * @param callback to be called with either success or failure
