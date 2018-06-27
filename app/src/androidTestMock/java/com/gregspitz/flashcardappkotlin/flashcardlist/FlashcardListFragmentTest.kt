@@ -24,23 +24,19 @@ import android.support.test.espresso.ViewInteraction
 import android.support.test.espresso.action.ViewActions.*
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.RecyclerViewActions
-import android.support.test.espresso.contrib.RecyclerViewActions.scrollToPosition
-import android.support.test.espresso.matcher.BoundedMatcher
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.filters.MediumTest
 import android.support.test.runner.AndroidJUnit4
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.RecyclerView
-import android.view.View
 import com.gregspitz.flashcardappkotlin.BaseSingleFragmentTest
 import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_2
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.R.id.detailPager
+import com.gregspitz.flashcardappkotlin.TestUtils.recyclerViewScrollToAndVerifyPosition
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
-import org.hamcrest.Description
-import org.hamcrest.Matcher
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.not
 import org.junit.Test
@@ -70,10 +66,14 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
     fun flashcardRecyclerView_showsFlashcardFronts() {
         addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity()
-        scrollToAndVerifyPosition(0, FLASHCARD_1.category)
-        scrollToAndVerifyPosition(1, FLASHCARD_1.front)
-        scrollToAndVerifyPosition(2, FLASHCARD_2.category)
-        scrollToAndVerifyPosition(3, FLASHCARD_2.front)
+        recyclerViewScrollToAndVerifyPosition(R.id.flashcardRecyclerView, 0,
+                FLASHCARD_1.category)
+        recyclerViewScrollToAndVerifyPosition(R.id.flashcardRecyclerView, 1,
+                FLASHCARD_1.front)
+        recyclerViewScrollToAndVerifyPosition(R.id.flashcardRecyclerView, 2,
+                FLASHCARD_2.category)
+        recyclerViewScrollToAndVerifyPosition(R.id.flashcardRecyclerView, 3,
+                FLASHCARD_2.front)
         onView(withId(R.id.flashcardListMessages)).check(matches(not(isDisplayed())))
     }
 
@@ -245,34 +245,9 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
         IdlingRegistry.getInstance().unregister(idlingResource)
     }
 
-    private fun scrollToAndVerifyPosition(position: Int, text: String) {
-        onView(withId(R.id.flashcardRecyclerView))
-                .perform(scrollToPosition<RecyclerView.ViewHolder>(position))
-                .check(matches(hasFlashcardTextForPosition(position, text)))
-    }
-
     private fun launchActivity(flashcardId: String =
                                          FlashcardListFragment.noParticularFlashcardExtra) {
         launchActivity(FlashcardListFragment.newInstance(flashcardId))
     }
-
-    private fun hasFlashcardTextForPosition(position: Int, text: String)
-            : Matcher<in View>? =
-            object : BoundedMatcher<View, RecyclerView>(RecyclerView::class.java) {
-                override fun describeTo(description: Description?) {
-                    description?.appendText("Item has flashcard category at position $position")
-                }
-
-                override fun matchesSafely(item: RecyclerView?): Boolean {
-                    if (item == null) {
-                        return false
-                    }
-
-                    val holder = item.findViewHolderForAdapterPosition(position)
-                    return holder != null &&
-                            withChild(withText(text)).matches(holder.itemView)
-                }
-
-            }
 
 }
