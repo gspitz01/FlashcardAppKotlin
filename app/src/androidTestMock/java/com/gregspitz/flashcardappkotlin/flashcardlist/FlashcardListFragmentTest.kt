@@ -193,8 +193,8 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
     fun orientationChangeAndThenClickEditFlashcardInDetailView_showsEditFlashcardView() {
         addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity()
-        testRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-        testRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
         clickDetailViewEditButton()
         checkForAddEditFlashcardFragment(FLASHCARD_1.front, FLASHCARD_1.back)
     }
