@@ -16,7 +16,6 @@
 
 package com.gregspitz.flashcardappkotlin.randomflashcard
 
-import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.click
@@ -24,23 +23,19 @@ import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.matcher.BoundedMatcher
 import android.support.test.espresso.matcher.ViewMatchers.withId
 import android.support.test.espresso.matcher.ViewMatchers.withText
-import android.support.test.rule.ActivityTestRule
+import android.support.test.filters.MediumTest
 import android.support.test.runner.AndroidJUnit4
 import android.view.View
 import android.widget.TextView
-import com.gregspitz.flashcardappkotlin.FlashcardApplication
+import com.gregspitz.flashcardappkotlin.BaseSingleFragmentTest
 import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_2
 import com.gregspitz.flashcardappkotlin.R
-import com.gregspitz.flashcardappkotlin.SingleFragmentActivity
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
-import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -48,21 +43,11 @@ import org.junit.runner.RunWith
  * Tests for the implementation of {@link RandomFlashcardFragment}
  */
 @RunWith(AndroidJUnit4::class)
-class RandomFlashcardFragmentTest {
+@MediumTest
+class RandomFlashcardFragmentTest : BaseSingleFragmentTest() {
 
     private var firstText = ""
     private var firstCategory = ""
-
-    private val dataSource = FlashcardApplication.repoComponent.exposeRepository()
-
-    @Rule @JvmField
-    val testRule = ActivityTestRule<SingleFragmentActivity>(
-            SingleFragmentActivity::class.java, true, false)
-
-    @Before
-    fun setup() {
-        dataSource.deleteAllFlashcards()
-    }
 
     @Test
     fun atStart_showsFrontOfOneFlashcardAndClickTurnsFlashcard() {
@@ -201,16 +186,6 @@ class RandomFlashcardFragmentTest {
         }
     }
 
-    private fun addFlashcardsToDataSource(vararg flashcards: Flashcard) {
-        for (flashcard in flashcards) {
-            dataSource.saveFlashcard(flashcard, object : FlashcardDataSource.SaveFlashcardCallback {
-                override fun onSaveSuccessful() { /* ignore */}
-
-                override fun onSaveFailed() { /* ignore */ }
-            })
-        }
-    }
-
     private fun verifyPriorityButtonClickSavesWithThatPriority(buttonId: Int,
                                                                priority: FlashcardPriority) {
         addFlashcardsToDataSource(FLASHCARD_1)
@@ -222,20 +197,11 @@ class RandomFlashcardFragmentTest {
     }
 
     private fun assertFlashcardSavedWithPriority(priority: FlashcardPriority) {
-        var savedFlashcard: Flashcard? = null
-        dataSource.getFlashcard(FLASHCARD_1.id, object: FlashcardDataSource.GetFlashcardCallback {
-            override fun onFlashcardLoaded(flashcard: Flashcard) {
-                savedFlashcard = flashcard
-            }
-
-            override fun onDataNotAvailable() { /* ignore */ }
-        })
-
+        val savedFlashcard = getFlashcardFromRepoById(FLASHCARD_1.id)
         assertEquals(priority, savedFlashcard!!.priority)
     }
 
     private fun launchActivity() {
-        testRule.launchActivity(Intent())
-        testRule.activity.setFragment(RandomFlashcardFragment.newInstance())
+        launchActivity(RandomFlashcardFragment.newInstance())
     }
 }

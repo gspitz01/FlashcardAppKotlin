@@ -16,7 +16,6 @@
 
 package com.gregspitz.flashcardappkotlin.flashcardlist
 
-import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.IdlingRegistry
@@ -28,26 +27,22 @@ import android.support.test.espresso.contrib.RecyclerViewActions
 import android.support.test.espresso.contrib.RecyclerViewActions.scrollToPosition
 import android.support.test.espresso.matcher.BoundedMatcher
 import android.support.test.espresso.matcher.ViewMatchers.*
-import android.support.test.rule.ActivityTestRule
+import android.support.test.filters.MediumTest
 import android.support.test.runner.AndroidJUnit4
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.RecyclerView
 import android.view.View
-import com.gregspitz.flashcardappkotlin.FlashcardApplication
+import com.gregspitz.flashcardappkotlin.BaseSingleFragmentTest
 import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_2
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.R.id.detailPager
-import com.gregspitz.flashcardappkotlin.SingleFragmentActivity
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
-import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.not
-import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -55,7 +50,8 @@ import org.junit.runner.RunWith
  * Tests for the implementation of {@link FlashcardListFragment}
  */
 @RunWith(AndroidJUnit4::class)
-class FlashcardListFragmentTest {
+@MediumTest
+class FlashcardListFragmentTest : BaseSingleFragmentTest() {
 
     private val flashcard3 = Flashcard("2", "Category2", "Front2", "Back2",
             FlashcardPriority.NEW)
@@ -69,19 +65,6 @@ class FlashcardListFragmentTest {
             FlashcardPriority.NEW)
     private val flashcard8 = Flashcard("7", "Category7", "Front7", "Back7",
             FlashcardPriority.NEW)
-
-    private val dataSource = FlashcardApplication.repoComponent.exposeRepository()
-    private val localDataSource =
-            FlashcardApplication.repoComponent.exposeLocalDataSource()
-
-    @Rule @JvmField
-    val testRule = ActivityTestRule<SingleFragmentActivity>(
-            SingleFragmentActivity::class.java, true, false)
-
-    @Before
-    fun setup() {
-        dataSource.deleteAllFlashcards()
-    }
 
     @Test
     fun flashcardRecyclerView_showsFlashcardFronts() {
@@ -262,27 +245,15 @@ class FlashcardListFragmentTest {
         IdlingRegistry.getInstance().unregister(idlingResource)
     }
 
-    private fun addFlashcardsToDataSource(vararg flashcards: Flashcard) {
-        for (flashcard in flashcards) {
-            dataSource.saveFlashcard(flashcard, object: FlashcardDataSource.SaveFlashcardCallback {
-                override fun onSaveSuccessful() { /* ignore */ }
-
-                override fun onSaveFailed() { /* ignore */ }
-            })
-        }
-    }
-
-
-    private fun launchActivity(flashcardId: String =
-                                       FlashcardListFragment.noParticularFlashcardExtra) {
-        testRule.launchActivity(Intent())
-        testRule.activity.setFragment(FlashcardListFragment.newInstance(flashcardId))
-    }
-
     private fun scrollToAndVerifyPosition(position: Int, text: String) {
         onView(withId(R.id.flashcardRecyclerView))
                 .perform(scrollToPosition<RecyclerView.ViewHolder>(position))
                 .check(matches(hasFlashcardTextForPosition(position, text)))
+    }
+
+    private fun launchActivity(flashcardId: String =
+                                         FlashcardListFragment.noParticularFlashcardExtra) {
+        launchActivity(FlashcardListFragment.newInstance(flashcardId))
     }
 
     private fun hasFlashcardTextForPosition(position: Int, text: String)

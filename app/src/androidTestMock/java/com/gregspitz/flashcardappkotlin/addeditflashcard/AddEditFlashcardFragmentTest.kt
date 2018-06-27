@@ -16,30 +16,24 @@
 
 package com.gregspitz.flashcardappkotlin.addeditflashcard
 
-import android.content.Intent
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.action.ViewActions.replaceText
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.matcher.RootMatchers.isDialog
-import android.support.test.espresso.matcher.RootMatchers.withDecorView
 import android.support.test.espresso.matcher.ViewMatchers.*
-import android.support.test.rule.ActivityTestRule
+import android.support.test.filters.MediumTest
 import android.support.test.runner.AndroidJUnit4
-import com.gregspitz.flashcardappkotlin.FlashcardApplication
+import com.gregspitz.flashcardappkotlin.BaseSingleFragmentTest
 import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.R
-import com.gregspitz.flashcardappkotlin.SingleFragmentActivity
-import com.gregspitz.flashcardappkotlin.TestUtils
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import org.hamcrest.Matchers
-import org.hamcrest.Matchers.not
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -47,21 +41,12 @@ import org.junit.runner.RunWith
  * Tests for the implementation of {@link AddEditFlashcardFragment}
  */
 @RunWith(AndroidJUnit4::class)
-class AddEditFlashcardFragmentTest {
-
-    private val dataSource = FlashcardApplication.repoComponent.exposeRepository()
-    private val localDataSource =
-            FlashcardApplication.repoComponent.exposeLocalDataSource()
-
-    @Rule
-    @JvmField
-    val testRule = ActivityTestRule<SingleFragmentActivity>(SingleFragmentActivity::class.java,
-            true, false)
+@MediumTest
+class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
 
     @Before
-    fun setup() {
-        dataSource.deleteAllFlashcards()
-        saveFlashcardsToRepo(FLASHCARD_1)
+    fun setupTests() {
+        addFlashcardsToDataSource(FLASHCARD_1)
     }
 
     @After
@@ -76,7 +61,7 @@ class AddEditFlashcardFragmentTest {
 
     @Test
     fun startWithFlashcardId_showsFlashcardInfo() {
-        launchActivityWithFlashcardId(FLASHCARD_1.id)
+        launchActivity(FLASHCARD_1.id)
         onView(withId(R.id.flashcardEditCategory)).check(matches(withText(FLASHCARD_1.category)))
         onView(withId(R.id.flashcardEditFront)).check(matches(withText(FLASHCARD_1.front)))
         onView(withId(R.id.flashcardEditBack)).check(matches(withText(FLASHCARD_1.back)))
@@ -84,7 +69,7 @@ class AddEditFlashcardFragmentTest {
 
     @Test
     fun startWithNewFlashcardIntent_showsBlankFields() {
-        launchActivityWithFlashcardId(AddEditFlashcardFragment.newFlashcardId)
+        launchActivity(AddEditFlashcardFragment.newFlashcardId)
         onView(withId(R.id.flashcardEditCategory)).check(matches(withText("")))
         onView(withId(R.id.flashcardEditFront)).check(matches(withText("")))
         onView(withId(R.id.flashcardEditBack)).check(matches(withText("")))
@@ -92,13 +77,13 @@ class AddEditFlashcardFragmentTest {
 
     @Test
     fun startWithBadFlashcardId_showsFailedToLoad() {
-        launchActivityWithFlashcardId("Bad ID")
+        launchActivity("Bad ID")
         onView(withId(R.id.failedToLoadFlashcard)).check(matches(isDisplayed()))
     }
 
     @Test
     fun saveFlashcardButtonClick_savesChangesToExistingFlashcard() {
-        launchActivityWithFlashcardId(FLASHCARD_1.id)
+        launchActivity(FLASHCARD_1.id)
 
         val newCategory = "Category1"
         val newFront = "New Front"
@@ -109,25 +94,25 @@ class AddEditFlashcardFragmentTest {
         clickSaveFlashcardButton()
 
         // Successful save shows save success toast
-        TestUtils.checkForToast(testRule, R.string.save_successful_toast_text)
+        checkForToast(R.string.save_successful_toast_text)
 
         val savedFlashcard = getFlashcardFromRepoById(FLASHCARD_1.id)
-        assertEquals(newCategory, savedFlashcard.category)
-        assertEquals(newFront, savedFlashcard.front)
-        assertEquals(newBack, savedFlashcard.back)
+        assertEquals(newCategory, savedFlashcard?.category)
+        assertEquals(newFront, savedFlashcard?.front)
+        assertEquals(newBack, savedFlashcard?.back)
     }
 
     @Test
     fun saveFailed_showsSaveFailedToast() {
         localDataSource.setFailure(true)
-        launchActivityWithFlashcardId(FLASHCARD_1.id)
+        launchActivity(FLASHCARD_1.id)
         clickSaveFlashcardButton()
-        TestUtils.checkForToast(testRule, R.string.save_failed_toast_text)
+        checkForToast(R.string.save_failed_toast_text)
     }
 
     @Test
     fun deleteSuccess_deletesFlashcardAndShowsFlashcardListView() {
-        launchActivityWithFlashcardId(FLASHCARD_1.id)
+        launchActivity(FLASHCARD_1.id)
 
         clickDeleteFlashcardButton()
 
@@ -141,19 +126,19 @@ class AddEditFlashcardFragmentTest {
     @Test
     fun deleteFailure_showsDeleteFailedToast() {
         localDataSource.setDeleteFailure(true)
-        launchActivityWithFlashcardId(FLASHCARD_1.id)
+        launchActivity(FLASHCARD_1.id)
 
         clickDeleteFlashcardButton()
 
         // Alert dialog for confirmation
         clickOnDeleteDialog(android.R.string.yes)
 
-        TestUtils.checkForToast(testRule, R.string.delete_failed_toast_text)
+        checkForToast(R.string.delete_failed_toast_text)
     }
 
     @Test
     fun clickNoOnDeleteDialog_returnsToEditView() {
-        launchActivityWithFlashcardId(FLASHCARD_1.id)
+        launchActivity(FLASHCARD_1.id)
         clickDeleteFlashcardButton()
         clickOnDeleteDialog(android.R.string.no)
         onView(withId(R.id.flashcardEditCategory)).check(matches(isDisplayed()))
@@ -161,43 +146,16 @@ class AddEditFlashcardFragmentTest {
 
     @Test
     fun showListButtonClickIntentWithId_showsFlashcardListViewWithThatFlashcardInDetailView() {
-        launchActivityWithFlashcardId(FLASHCARD_1.id)
+        launchActivity(FLASHCARD_1.id)
         clickShowListButton()
         checkDetailViewMatchesFlashcard(FLASHCARD_1)
     }
 
     @Test
     fun showListButtonClickNewFlashcard_showsFlashcardListViewWithNoParticularFlashcard() {
-        launchActivityWithFlashcardId(AddEditFlashcardFragment.newFlashcardId)
+        launchActivity(AddEditFlashcardFragment.newFlashcardId)
         clickShowListButton()
         onView(withId(R.id.detailPager)).check(matches(isDisplayed()))
-    }
-
-    private fun saveFlashcardsToRepo(vararg flashcards: Flashcard) {
-        for (flashcard in flashcards) {
-            dataSource.saveFlashcard(flashcard, object : FlashcardDataSource.SaveFlashcardCallback {
-                override fun onSaveSuccessful() { /* ignore */
-                }
-
-                override fun onSaveFailed() { /* ignore */
-                }
-            })
-        }
-    }
-
-    private fun getFlashcardFromRepoById(id: String): Flashcard {
-        val savedFlashcards = mutableListOf<Flashcard>()
-        dataSource.getFlashcard(id, object : FlashcardDataSource.GetFlashcardCallback {
-            override fun onFlashcardLoaded(flashcard: Flashcard) {
-                savedFlashcards.add(flashcard)
-            }
-
-            override fun onDataNotAvailable() {
-
-            }
-
-        })
-        return savedFlashcards[0]
     }
 
     private fun verifyFlashcardNoLongerInRepo(flashcard: Flashcard): Boolean {
@@ -225,9 +183,8 @@ class AddEditFlashcardFragmentTest {
     }
 
 
-    private fun launchActivityWithFlashcardId(flashcardId: String) {
-        testRule.launchActivity(Intent())
-        testRule.activity.setFragment(AddEditFlashcardFragment.newInstance(flashcardId))
+    private fun launchActivity(flashcardId: String) {
+        launchActivity(AddEditFlashcardFragment.newInstance(flashcardId))
     }
 
     private fun clickSaveFlashcardButton() {

@@ -1,6 +1,5 @@
 package com.gregspitz.flashcardappkotlin.flashcarddownload
 
-import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.click
@@ -9,15 +8,15 @@ import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.RecyclerViewActions
 import android.support.test.espresso.matcher.BoundedMatcher
 import android.support.test.espresso.matcher.ViewMatchers.*
-import android.support.test.rule.ActivityTestRule
+import android.support.test.filters.MediumTest
+import android.support.test.runner.AndroidJUnit4
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import com.gregspitz.flashcardappkotlin.BaseSingleFragmentTest
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.MockTestData.CATEGORY_1
 import com.gregspitz.flashcardappkotlin.MockTestData.CATEGORY_2
 import com.gregspitz.flashcardappkotlin.R
-import com.gregspitz.flashcardappkotlin.SingleFragmentActivity
-import com.gregspitz.flashcardappkotlin.TestUtils
 import com.gregspitz.flashcardappkotlin.data.model.Category
 import com.gregspitz.flashcardappkotlin.data.service.model.DownloadCategory
 import com.gregspitz.flashcardappkotlin.data.source.FakeFlashcardDownloadService
@@ -27,10 +26,12 @@ import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.junit.Assert.assertEquals
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 
-class FlashcardDownloadFragmentTest {
+@RunWith(AndroidJUnit4::class)
+@MediumTest
+class FlashcardDownloadFragmentTest : BaseSingleFragmentTest() {
 
     private val downloadCategories = listOf(DownloadCategory(CATEGORY_1.name, 3),
             DownloadCategory(CATEGORY_2.name, 4))
@@ -38,13 +39,8 @@ class FlashcardDownloadFragmentTest {
     private val downloadService =
             FlashcardApplication.repoComponent.exposeFlashcardDownloadService() as FakeFlashcardDownloadService
 
-    @Rule
-    @JvmField
-    val activityRule = ActivityTestRule<SingleFragmentActivity>(SingleFragmentActivity::class.java,
-            true, false)
-
     @Before
-    fun setup() {
+    fun setup_test() {
         downloadService.deleteAll()
     }
 
@@ -79,10 +75,10 @@ class FlashcardDownloadFragmentTest {
     fun onRotation_maintainsSelection() {
         addCategoriesToDownloadService(downloadCategories)
         launchActivity()
-        activityRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
         scrollToAndClickPosition(0)
         verifyDownloadFlashcardButtonDisplayedAndEnabled()
-        activityRule.activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
         verifyDownloadFlashcardButtonDisplayedAndEnabled()
     }
 
@@ -93,7 +89,7 @@ class FlashcardDownloadFragmentTest {
         scrollToAndClickPosition(1)
         clickDownloadFlashcardButton()
         assertEquals(downloadCategories[1], downloadService.attemptedDownloadCategory)
-        TestUtils.checkForToast(activityRule, R.string.download_flashcards_successful)
+        checkForToast(R.string.download_flashcards_successful)
     }
 
     @Test
@@ -104,12 +100,11 @@ class FlashcardDownloadFragmentTest {
         scrollToAndClickPosition(1)
         clickDownloadFlashcardButton()
         assertEquals(downloadCategories[1], downloadService.attemptedDownloadCategory)
-        TestUtils.checkForToast(activityRule, R.string.download_flashcards_failed)
+        checkForToast(R.string.download_flashcards_failed)
     }
 
     private fun launchActivity() {
-        activityRule.launchActivity(Intent())
-        activityRule.activity.setFragment(FlashcardDownloadFragment.newInstance())
+        launchActivity(FlashcardDownloadFragment.newInstance())
     }
 
     private fun addCategoriesToDownloadService(downloadCategories: List<DownloadCategory>) {
