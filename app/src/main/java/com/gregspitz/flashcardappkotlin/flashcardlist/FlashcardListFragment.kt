@@ -22,6 +22,7 @@ import kotlinx.android.synthetic.main.fragment_flashcard_list.*
 import javax.inject.Inject
 
 private const val FLASHCARD_ID = "flashcard_id"
+private const val CATEGORY_NAME = "category_name"
 
 /**
  * Fragment for listing all Flashcards with a RecyclerView
@@ -46,14 +47,19 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
     // Active onResume; inactive onPause
     private var active = false
     private var flashcardId: String? = null
+    private var categoryName: String? = null
 
     companion object {
         // Represents that no particular Flashcard was asked to be shown in the detail view
         const val noParticularFlashcardExtra = "-1"
 
-        fun newInstance(flashcardId: String) = FlashcardListFragment().apply {
+        fun newInstance(flashcardId: String, categoryName: String? = null)
+                = FlashcardListFragment().apply {
             arguments = Bundle().apply {
                 putString(FLASHCARD_ID, flashcardId)
+                if (categoryName != null) {
+                    putString(CATEGORY_NAME, categoryName)
+                }
             }
         }
     }
@@ -62,6 +68,7 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
         super.onCreate(savedInstanceState)
         arguments?.let {
             flashcardId = it.getString(FLASHCARD_ID)
+            categoryName = it.getString(CATEGORY_NAME)
         }
         FlashcardApplication.useCaseComponent.inject(this)
         viewModel = ViewModelProviders.of(this).get(FlashcardListViewModel::class.java)
@@ -243,6 +250,10 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
 
     override fun isActive(): Boolean {
         return active
+    }
+
+    override fun getCategoryName(): String? {
+        return categoryName
     }
 
     /**

@@ -17,6 +17,7 @@ object MockTestData {
             Flashcard("0", CATEGORY_3.name, "Other front", "Taken aback",
                     FlashcardPriority.NEW)
     val SINGLE_FLASHCARD_LIST = listOf(FLASHCARD_1)
+    val FLASHCARD_LIST_OF_CATEGORY_1 = listOf(FLASHCARD_1)
     val FLASHCARD_LIST = listOf(FLASHCARD_1, FLASHCARD_2)
     val FLASHCARD_LIST_SAME_IDS = listOf(FLASHCARD_1, FLASHCARD_SAME_ID_AS_FLASHCARD_1)
     val FLASHCARD_LIST_WITH_CATEGORIES = listOf(CATEGORY_1, FLASHCARD_1, CATEGORY_2, FLASHCARD_2)
