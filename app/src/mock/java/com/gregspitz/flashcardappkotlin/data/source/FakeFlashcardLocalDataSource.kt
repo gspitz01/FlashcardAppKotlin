@@ -57,6 +57,7 @@ class FakeFlashcardLocalDataSource : FlashcardDataSource {
     override fun getCategories(callback: FlashcardDataSource.GetCategoriesCallback) {
         if (failure) {
             callback.onDataNotAvailable()
+            return
         }
 
         val categories = database.values.map {
