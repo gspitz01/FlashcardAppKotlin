@@ -8,6 +8,12 @@
         android:id="@+id/navList"
         android:title="@string/nav_list_title"
         android:icon="@drawable/ic_list_black_24dp"/>
+
+    <item
+        android:id="@+id/navCategoryList"
+        android:title="@string/nav_category_list_title"
+        android:icon="@drawable/ic_list_black_24dp"/>
+
     <item
         android:id="@+id/newFlashcard"
         android:title="@string/nav_new_flashcard_title"

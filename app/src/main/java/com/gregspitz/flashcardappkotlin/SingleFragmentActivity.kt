@@ -5,6 +5,7 @@ import android.support.annotation.RestrictTo
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardFragment
+import com.gregspitz.flashcardappkotlin.categorylist.CategoryListFragment
 import com.gregspitz.flashcardappkotlin.flashcarddownload.FlashcardDownloadFragment
 import com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListFragment
 import com.gregspitz.flashcardappkotlin.randomflashcard.RandomFlashcardFragment
@@ -53,5 +54,9 @@ class SingleFragmentActivity : AppCompatActivity(), MainFragmentRouter {
 
     override fun showFlashcardDownload() {
         replaceFragment(FlashcardDownloadFragment.newInstance())
+    }
+
+    override fun showCategoryList() {
+        replaceFragment(CategoryListFragment.newInstance())
     }
 }

@@ -13,7 +13,7 @@
     <string name="save_successful_toast_text">Save Successful</string>
     <string name="save_failed_toast_text">Save Failed!</string>
     <string name="nav_game_title">Play Game</string>
-    <string name="nav_list_title">Flashcard List</string>
+    <string name="nav_list_title">All Flashcards</string>
     <string name="nav_new_flashcard_title">New Flashcard</string>
     <string name="flashcard_category_hint_text">Category</string>
     <string name="delete_flashcard_button_text">Delete</string>
@@ -45,4 +45,5 @@
     <string name="sign_out_button_text">Sign Out</string>
     <string name="no_categories_to_show_text">No categories to show</string>
     <string name="failed_to_load_categories_text">Failed to load categories</string>
+    <string name="nav_category_list_title">Categories</string>
 </resources>

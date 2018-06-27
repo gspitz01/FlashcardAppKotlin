@@ -9,6 +9,8 @@ interface MainFragmentRouter {
 
     fun showCategoryFlashcardList(categoryName: String)
 
+    fun showCategoryList()
+
     fun showAddEditFlashcard(flashcardId: String)
 
     fun showRandomFlashcard()

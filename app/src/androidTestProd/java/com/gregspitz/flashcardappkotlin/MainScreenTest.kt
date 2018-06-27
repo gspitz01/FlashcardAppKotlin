@@ -21,15 +21,18 @@ import android.support.test.espresso.Espresso
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.Espresso.pressBack
 import android.support.test.espresso.action.ViewActions.*
+import android.support.test.espresso.assertion.ViewAssertions.doesNotExist
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.NavigationViewActions.navigateTo
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
+import android.support.v7.widget.RecyclerView
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_2
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.allOf
 import org.junit.Before
 import org.junit.Rule
@@ -58,14 +61,20 @@ class MainScreenTest {
 
     @Test
     fun navigateThroughWholeAppExceptDownloadView() {
-        // App starts with game view
+        // App starts with add/edit view
+        verifyAddEditViewVisible()
+
+        navigateToGameViewViaNavDrawer()
         verifyGameViewVisible()
 
-        navigateToListViaNavDrawer()
-        verifyListViewVisible()
+        navigateToFlashcardListViaNavDrawer()
+        verifyFlashcardListViewVisible()
 
         navigateToAddEditViaNavDrawer()
         verifyAddEditViewVisible()
+
+        navigateToCategoryListViaNavDrawer()
+        verifyCategoryListViewVisible()
     }
 
     @Test
@@ -75,7 +84,7 @@ class MainScreenTest {
         // Save the flashcard
         saveFlashcard(FLASHCARD_1)
         // Move away from edit view
-        navigateToListViaNavDrawer()
+        navigateToFlashcardListViaNavDrawer()
         // Move back to edit view of that flashcard
         clickOnEditButtonInListView()
 
@@ -108,7 +117,7 @@ class MainScreenTest {
         saveFlashcard(FLASHCARD_1)
         saveFlashcard(FLASHCARD_2)
 
-        navigateToListViaNavDrawer()
+        navigateToFlashcardListViaNavDrawer()
 
         // Click first for focus
         onView(withId(R.id.detailPager)).perform(click())
@@ -127,6 +136,26 @@ class MainScreenTest {
     }
 
     @Test
+    fun clickCategoryInCategoryList_showsFlashcardListWithJustFlashcardsFromThatCategory() {
+        // Save flashcards
+        saveFlashcard(FLASHCARD_1)
+        saveFlashcard(FLASHCARD_2)
+
+        navigateToCategoryListViaNavDrawer()
+        verifyCategoryListViewVisible()
+
+        onView(withText(FLASHCARD_1.category)).perform(click())
+
+        verifyFlashcardListViewVisible()
+        onView(allOf(isDescendantOfA(withClassName(`is`(RecyclerView::class.java.name))),
+                withText(FLASHCARD_1.front))).check(matches(isDisplayed()))
+        onView(allOf(isDescendantOfA(withClassName(`is`(RecyclerView::class.java.name))),
+                withText(FLASHCARD_1.category))).check(matches(isDisplayed()))
+        onView(withText(FLASHCARD_2.category)).check(doesNotExist())
+        onView(withText(FLASHCARD_2.front)).check(doesNotExist())
+    }
+
+    @Test
     fun backFunction_worksProperly() {
         // Save flashcard data
         saveFlashcard(FLASHCARD_1)
@@ -137,8 +166,8 @@ class MainScreenTest {
         verifyGameViewVisible()
 
         // Move to List view
-        navigateToListViaNavDrawer()
-        verifyListViewVisible()
+        navigateToFlashcardListViaNavDrawer()
+        verifyFlashcardListViewVisible()
 
         // Press back
         pressBack()
@@ -146,8 +175,8 @@ class MainScreenTest {
         verifyGameViewVisible()
 
         // Move to List view
-        navigateToListViaNavDrawer()
-        verifyListViewVisible()
+        navigateToFlashcardListViaNavDrawer()
+        verifyFlashcardListViewVisible()
 
         // Move to Add/Edit view
         clickOnEditButtonInListView()
@@ -157,7 +186,7 @@ class MainScreenTest {
         Espresso.closeSoftKeyboard()
         pressBack()
         // Should be back at List view
-        verifyListViewVisible()
+        verifyFlashcardListViewVisible()
 
         pressBack()
         // Should be back at game view
@@ -189,7 +218,7 @@ class MainScreenTest {
         onView(withId(R.id.nextFlashcardButton)).check(matches(isDisplayed()))
     }
 
-    private fun verifyListViewVisible() {
+    private fun verifyFlashcardListViewVisible() {
         onView(withId(R.id.flashcardRecyclerView)).check(matches(isDisplayed()))
     }
 
@@ -197,13 +226,22 @@ class MainScreenTest {
         onView(withId(R.id.flashcardEditCategory)).check(matches(isDisplayed()))
     }
 
+    private fun verifyCategoryListViewVisible() {
+        onView(withId(R.id.categoryRecyclerView)).check(matches(isDisplayed()))
+    }
+
     private fun clickOnEditButtonInListView() {
         onView(withId(R.id.editFlashcardButton)).perform(click())
     }
 
-    private fun navigateToListViaNavDrawer() {
+    private fun navigateToFlashcardListViaNavDrawer() {
         onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(click())
         onView(withId(R.id.navDrawer)).perform(navigateTo(R.id.navList))
+    }
+
+    private fun navigateToCategoryListViaNavDrawer() {
+        onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(click())
+        onView(withId(R.id.navDrawer)).perform(navigateTo(R.id.navCategoryList))
     }
 
     private fun navigateToAddEditViaNavDrawer() {

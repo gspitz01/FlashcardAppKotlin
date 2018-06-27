@@ -19,6 +19,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardFragment
+import com.gregspitz.flashcardappkotlin.categorylist.CategoryListFragment
 import com.gregspitz.flashcardappkotlin.flashcarddownload.FlashcardDownloadFragment
 import com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListFragment
 import com.gregspitz.flashcardappkotlin.randomflashcard.RandomFlashcardFragment
@@ -42,6 +43,7 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
             AddEditFlashcardFragment.newInstance(AddEditFlashcardFragment.newFlashcardId)
     private val randomFlashcardFragment = RandomFlashcardFragment.newInstance()
     private lateinit var flashcardListFragment: FlashcardListFragment
+    private lateinit var categoryListFragment: CategoryListFragment
     private var flashcardDownloadFragment: FlashcardDownloadFragment? = null
 
     // Specially initialize the nav header views
@@ -78,6 +80,11 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
                 }
                 R.id.navList -> {
                     showFlashcardList(FlashcardListFragment.noParticularFlashcardExtra)
+                    drawerLayout.closeDrawers()
+                    return@setNavigationItemSelectedListener true
+                }
+                R.id.navCategoryList -> {
+                    showCategoryList()
                     drawerLayout.closeDrawers()
                     return@setNavigationItemSelectedListener true
                 }
@@ -190,6 +197,15 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
     override fun showCategoryFlashcardList(categoryName: String) {
         flashcardListFragment = FlashcardListFragment
                 .newInstance(FlashcardListFragment.noParticularFlashcardExtra, categoryName)
+        replaceFragment(flashcardListFragment)
+    }
+
+    /**
+     * Change view to CategoryListFragment
+     */
+    override fun showCategoryList() {
+        categoryListFragment = CategoryListFragment.newInstance()
+        replaceFragment(categoryListFragment)
     }
 
     /**
