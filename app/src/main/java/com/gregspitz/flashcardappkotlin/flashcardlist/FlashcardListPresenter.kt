@@ -43,7 +43,7 @@ class FlashcardListPresenter(private val useCaseHandler: UseCaseHandler,
 
     override fun loadFlashcards() {
         view.setLoadingIndicator(true)
-        useCaseHandler.execute(getFlashcards, GetFlashcards.RequestValues(),
+        useCaseHandler.execute(getFlashcards, GetFlashcards.RequestValues(view.getCategoryName()),
                 object: UseCase.UseCaseCallback<GetFlashcards.ResponseValue> {
                     override fun onSuccess(response: GetFlashcards.ResponseValue) {
                         if (view.isActive()) {

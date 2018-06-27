@@ -42,6 +42,8 @@ interface FlashcardListContract {
 
         fun showEditFlashcard(flashcardId: String)
 
+        fun getCategoryName(): String?
+
         fun isActive(): Boolean
     }
 

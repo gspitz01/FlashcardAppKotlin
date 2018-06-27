@@ -16,11 +16,15 @@
 
 package com.gregspitz.flashcardappkotlin.flashcardlist
 
+import com.gregspitz.flashcardappkotlin.TestData.CATEGORY_1
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_LIST
+import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_LIST_OF_CATEGORY_1
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase.GetFlashcards
 import com.nhaarman.mockito_kotlin.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 
@@ -30,10 +34,15 @@ import org.junit.Test
 class FlashcardListPresenterTest {
 
     private val getFlashcards: GetFlashcards = mock()
+    private val getFlashcardsRequestCaptor =
+            argumentCaptor<GetFlashcards.RequestValues>()
 
     private val useCaseHandler: UseCaseHandler = mock()
 
     private val flashcardListView : FlashcardListContract.View = mock()
+
+    // InOrder for verifying setLoadingIndicator on view
+    private val inOrder = inOrder(flashcardListView)
 
     private val flashcardListViewModel: FlashcardListContract.ViewModel = mock()
 
@@ -45,6 +54,7 @@ class FlashcardListPresenterTest {
     @Before
     fun setup() {
         whenever(flashcardListView.isActive()).thenReturn(true)
+        whenever(flashcardListView.getCategoryName()).thenReturn(null)
     }
 
     @Test
@@ -54,15 +64,33 @@ class FlashcardListPresenterTest {
     }
 
     @Test
-    fun `startup shows flashcard list in view`() {
+    fun `startup without category shows flashcard list in view`() {
         createAndStartPresenter()
-        val inOrder = inOrder(flashcardListView)
-        inOrder.verify(flashcardListView).setLoadingIndicator(true)
-        verify(useCaseHandler).execute(eq(getFlashcards), any(), useCaseCallbackCaptor.capture())
+        verifySetLoadingIndicator(true)
+        verify(flashcardListView).getCategoryName()
+        verify(useCaseHandler).execute(eq(getFlashcards), getFlashcardsRequestCaptor.capture(),
+                useCaseCallbackCaptor.capture())
+        assertNull(getFlashcardsRequestCaptor.firstValue.categoryName)
         val response = GetFlashcards.ResponseValue(FLASHCARD_LIST)
         useCaseCallbackCaptor.firstValue.onSuccess(response)
-        inOrder.verify(flashcardListView).setLoadingIndicator(false)
+        verifySetLoadingIndicator(false)
         verify(flashcardListViewModel).setFlashcards(FLASHCARD_LIST)
+    }
+
+    @Test
+    fun `startup with category shows flashcard list of that category in view`() {
+        whenever(flashcardListView.getCategoryName()).thenReturn(CATEGORY_1.name)
+        createAndStartPresenter()
+        verifySetLoadingIndicator(true)
+        verify(flashcardListView).getCategoryName()
+        verify(useCaseHandler).execute(eq(getFlashcards), getFlashcardsRequestCaptor.capture(),
+                useCaseCallbackCaptor.capture())
+        assertEquals(CATEGORY_1.name, getFlashcardsRequestCaptor.firstValue.categoryName)
+        val response =
+                GetFlashcards.ResponseValue(FLASHCARD_LIST_OF_CATEGORY_1)
+        useCaseCallbackCaptor.firstValue.onSuccess(response)
+        verifySetLoadingIndicator(false)
+        verify(flashcardListViewModel).setFlashcards(FLASHCARD_LIST_OF_CATEGORY_1)
     }
 
     @Test
@@ -95,5 +123,9 @@ class FlashcardListPresenterTest {
     private fun createPresenter(): FlashcardListPresenter {
         return FlashcardListPresenter(useCaseHandler, flashcardListView, flashcardListViewModel,
                 getFlashcards)
+    }
+
+    fun verifySetLoadingIndicator(active: Boolean) {
+        inOrder.verify(flashcardListView).setLoadingIndicator(active)
     }
 }
