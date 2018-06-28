@@ -16,9 +16,11 @@
 
 package com.gregspitz.flashcardappkotlin.randomflashcard.domain.usecase
 
+import com.gregspitz.flashcardappkotlin.TestData.CATEGORY_1
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_2
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_LIST
+import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_LIST_OF_CATEGORY_1
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_LIST_ONE_OF_EACH_PRIORITY
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_LIST_SAME_IDS
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_WITH_PRIORITY_HIGH
@@ -35,10 +37,7 @@ import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
 import com.gregspitz.flashcardappkotlin.randomflashcard.domain.model.FlashcardPriorityProbabilityDistribution
-import com.nhaarman.mockito_kotlin.argumentCaptor
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.times
-import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Before
@@ -52,9 +51,13 @@ class GetRandomFlashcardTest {
     // Request values represents the id of the previous Flashcard
     // Null means there was no previous Flashcard
     private val requestValuesNull =
-            GetRandomFlashcard.RequestValues(null)
+            GetRandomFlashcard.RequestValues()
     private val requestValuesFlashcard1 =
             GetRandomFlashcard.RequestValues(FLASHCARD_1.id)
+    private val requestValuesCategory =
+            GetRandomFlashcard.RequestValues(categoryName = CATEGORY_1.name)
+    private val requestValuesCategoryAndPrevious =
+            GetRandomFlashcard.RequestValues(FLASHCARD_1.id, CATEGORY_1.name)
 
     private val flashcardRepository: FlashcardRepository = mock()
 
@@ -65,7 +68,8 @@ class GetRandomFlashcardTest {
 
     private val callback: UseCase.UseCaseCallback<GetRandomFlashcard.ResponseValue> = mock()
 
-    private val responseCaptor = argumentCaptor<GetRandomFlashcard.ResponseValue>()
+    private val responseCaptor =
+            argumentCaptor<GetRandomFlashcard.ResponseValue>()
 
     private val probabilityDistributionOnlyNew =
             FlashcardPriorityProbabilityDistribution(1.0, 0.0,
@@ -148,6 +152,31 @@ class GetRandomFlashcardTest {
         // Repository replies with empty list
         repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(listOf())
         verify(callback).onError()
+    }
+
+    @Test
+    fun `get with category, null previous id, gets flashcard from that category`() {
+        useCaseHandler.execute(getRandomFlashcard, requestValuesCategory, callback)
+        verify(flashcardRepository).getFlashcardsByCategoryName(
+                eq(requestValuesCategory.categoryName!!), repositoryCallbackCaptor.capture())
+        repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(FLASHCARD_LIST_OF_CATEGORY_1)
+        verify(callback).onSuccess(responseCaptor.capture())
+        assertEquals(requestValuesCategory.categoryName,
+                responseCaptor.firstValue.flashcard.category)
+    }
+
+    @Test
+    fun `get with category and previous id, returns not previous id flashcard`() {
+        useCaseHandler.execute(getRandomFlashcard, requestValuesCategoryAndPrevious, callback)
+        verify(flashcardRepository).getFlashcardsByCategoryName(
+                eq(requestValuesCategoryAndPrevious.categoryName!!),
+                repositoryCallbackCaptor.capture())
+        val notPreviousCard = Flashcard("Some id", CATEGORY_1.name, "An afront", "Backy",
+                FlashcardPriority.NEW)
+        val listOfCategoryOne = listOf(FLASHCARD_1, notPreviousCard)
+        repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(listOfCategoryOne)
+        verify(callback).onSuccess(responseCaptor.capture())
+        assertEquals(notPreviousCard, responseCaptor.firstValue.flashcard)
     }
 
     @Test

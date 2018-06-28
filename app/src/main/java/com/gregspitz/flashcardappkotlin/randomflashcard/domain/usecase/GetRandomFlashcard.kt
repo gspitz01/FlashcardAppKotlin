@@ -34,11 +34,17 @@ class GetRandomFlashcard @Inject constructor(
     : UseCase<GetRandomFlashcard.RequestValues, GetRandomFlashcard.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues) {
-        flashcardRepository.getFlashcards(RandomFlashcardRepoGet(
-                requestValues.flashcardId, getUseCaseCallback()))
+        if (requestValues.categoryName == null) {
+            flashcardRepository.getFlashcards(RandomFlashcardRepoGet(
+                    requestValues.flashcardId, getUseCaseCallback()))
+        } else {
+            flashcardRepository.getFlashcardsByCategoryName(requestValues.categoryName,
+                    RandomFlashcardRepoGet(requestValues.flashcardId, getUseCaseCallback()))
+        }
     }
 
-    class RequestValues(val flashcardId: String?) : UseCase.RequestValues
+    class RequestValues(val flashcardId: String? = null, val categoryName: String? = null)
+        : UseCase.RequestValues
 
     class ResponseValue(val flashcard: Flashcard) : UseCase.ResponseValue
 
