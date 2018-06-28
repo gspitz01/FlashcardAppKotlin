@@ -19,6 +19,7 @@ package com.gregspitz.flashcardappkotlin.flashcardlist
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
+import android.support.v4.view.PagerAdapter
 
 /**
  * PagerAdapter for FlashcardDetailFragments
@@ -34,6 +35,7 @@ class FlashcardDetailPagerAdapter(fragmentManager: FragmentManager,
         return fragments.size
     }
 
+
 //    override fun restoreState(state: Parcelable?, loader: ClassLoader?) {
 //        // Do nothing to avoid NPE
 //        // this solution comes from this stackoverflow response
@@ -43,5 +45,15 @@ class FlashcardDetailPagerAdapter(fragmentManager: FragmentManager,
     fun setFragments(fragments: List<Fragment>) {
         this.fragments = fragments
         notifyDataSetChanged()
+    }
+
+    /**
+     * As suggested here:
+     * https://stackoverflow.com/questions/7263291/viewpager-pageradapter-not-updating-the-view
+     * this is to make sure the ViewPager actually destroys view as needed.
+     * If efficiency becomes a problem, change based on other suggestion in that reply
+     */
+    override fun getItemPosition(`object`: Any): Int {
+        return PagerAdapter.POSITION_NONE
     }
 }

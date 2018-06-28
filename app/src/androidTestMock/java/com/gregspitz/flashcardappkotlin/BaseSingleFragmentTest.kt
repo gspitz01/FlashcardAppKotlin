@@ -78,7 +78,7 @@ open class BaseSingleFragmentTest {
                 .perform(ViewActions.click())
     }
 
-    protected fun verifyFlashcardNoLongerInRepo(flashcard: Flashcard): Boolean {
+    protected fun verifyFlashcardNotInRepo(flashcard: Flashcard): Boolean {
         var returnValue = false
         dataSource.getFlashcard(flashcard.id, object : FlashcardDataSource.GetFlashcardCallback {
             override fun onDataNotAvailable() {
@@ -87,6 +87,21 @@ open class BaseSingleFragmentTest {
 
             override fun onFlashcardLoaded(flashcard: Flashcard) {
                 // Ignore
+            }
+        })
+
+        return returnValue
+    }
+
+    protected fun verifyFlashcardInInRepo(flashcard: Flashcard): Boolean {
+        var returnValue = false
+        dataSource.getFlashcard(flashcard.id, object : FlashcardDataSource.GetFlashcardCallback {
+            override fun onDataNotAvailable() {
+
+            }
+
+            override fun onFlashcardLoaded(flashcard: Flashcard) {
+                returnValue = true
             }
         })
 

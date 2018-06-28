@@ -18,6 +18,7 @@ package com.gregspitz.flashcardappkotlin.flashcardlist
 
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
+import com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase.DeleteFlashcards
 import com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase.GetFlashcards
 
 /**
@@ -26,7 +27,8 @@ import com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase.GetFlashcar
 class FlashcardListPresenter(private val useCaseHandler: UseCaseHandler,
                              private val view: FlashcardListContract.View,
                              private val viewModel: FlashcardListContract.ViewModel,
-                             private val getFlashcards: GetFlashcards)
+                             private val getFlashcards: GetFlashcards,
+                             private val deleteFlashcards: DeleteFlashcards)
     : FlashcardListContract.Presenter {
 
     init {
@@ -38,21 +40,24 @@ class FlashcardListPresenter(private val useCaseHandler: UseCaseHandler,
     }
 
     override fun addFlashcard() {
-        view.showAddFlashcard()
+        if (view.isActive()) {
+            view.showAddFlashcard()
+        }
     }
 
     override fun loadFlashcards() {
-        view.setLoadingIndicator(true)
+        if (view.isActive()) {
+            view.setLoadingIndicator(true)
+        }
         useCaseHandler.execute(getFlashcards, GetFlashcards.RequestValues(view.getCategoryName()),
                 object: UseCase.UseCaseCallback<GetFlashcards.ResponseValue> {
                     override fun onSuccess(response: GetFlashcards.ResponseValue) {
                         if (view.isActive()) {
                             view.setLoadingIndicator(false)
-                            if (response.flashcards.isNotEmpty()) {
-                                viewModel.setFlashcards(response.flashcards)
-                            } else {
+                            if (response.flashcards.isEmpty()) {
                                 view.showNoFlashcardsToLoad()
                             }
+                            viewModel.setFlashcards(response.flashcards)
                         }
                     }
 
@@ -67,10 +72,50 @@ class FlashcardListPresenter(private val useCaseHandler: UseCaseHandler,
     }
 
     override fun onFlashcardClick(recyclerPosition: Int) {
-        view.showFlashcardDetailsUi(recyclerPosition)
+        if (view.isActive()) {
+            view.showFlashcardDetailsUi(recyclerPosition)
+        }
     }
 
     override fun onCategoryClick(recyclerPosition: Int) {
-        view.showCategoryFlashcardList(recyclerPosition)
+        if (view.isActive()) {
+            view.showCategoryFlashcardList(recyclerPosition)
+        }
+    }
+
+    override fun deleteAllFlashcards() {
+        useCaseHandler.execute(deleteFlashcards, DeleteFlashcards.RequestValues(),
+                object: UseCase.UseCaseCallback<DeleteFlashcards.ResponseValue> {
+                    override fun onSuccess(response: DeleteFlashcards.ResponseValue) {
+                        if (view.isActive()) {
+                            view.showDeleteSuccess()
+                            view.showAddFlashcard()
+                        }
+                    }
+
+                    override fun onError() {
+                        if (view.isActive()) {
+                            view.showDeleteFailed()
+                        }
+                    }
+                })
+    }
+
+    override fun deleteFlashcardsFromCategory(categoryName: String) {
+        useCaseHandler.execute(deleteFlashcards, DeleteFlashcards.RequestValues(categoryName),
+                object: UseCase.UseCaseCallback<DeleteFlashcards.ResponseValue> {
+                    override fun onSuccess(response: DeleteFlashcards.ResponseValue) {
+                        if (view.isActive()) {
+                            view.showDeleteSuccess()
+                            view.showCategoryList()
+                        }
+                    }
+
+                    override fun onError() {
+                        if (view.isActive()) {
+                            view.showDeleteFailed()
+                        }
+                    }
+                })
     }
 }

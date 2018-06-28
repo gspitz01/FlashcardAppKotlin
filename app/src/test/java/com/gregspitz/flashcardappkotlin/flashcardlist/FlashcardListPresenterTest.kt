@@ -17,10 +17,12 @@
 package com.gregspitz.flashcardappkotlin.flashcardlist
 
 import com.gregspitz.flashcardappkotlin.TestData.CATEGORY_1
+import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_LIST
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_LIST_OF_CATEGORY_1
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
+import com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase.DeleteFlashcards
 import com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase.GetFlashcards
 import com.nhaarman.mockito_kotlin.*
 import org.junit.Assert.assertEquals
@@ -37,6 +39,10 @@ class FlashcardListPresenterTest {
     private val getFlashcardsRequestCaptor =
             argumentCaptor<GetFlashcards.RequestValues>()
 
+    private val deleteFlashcards: DeleteFlashcards = mock()
+    private val deleteFlashcardsRequestCaptor =
+            argumentCaptor<DeleteFlashcards.RequestValues>()
+
     private val useCaseHandler: UseCaseHandler = mock()
 
     private val flashcardListView : FlashcardListContract.View = mock()
@@ -46,8 +52,10 @@ class FlashcardListPresenterTest {
 
     private val flashcardListViewModel: FlashcardListContract.ViewModel = mock()
 
-    private val useCaseCallbackCaptor =
+    private val getUseCaseCallbackCaptor =
             argumentCaptor<UseCase.UseCaseCallback<GetFlashcards.ResponseValue>>()
+    private val deleteUseCaseCallbackCaptor =
+            argumentCaptor<UseCase.UseCaseCallback<DeleteFlashcards.ResponseValue>>()
 
     private lateinit var flashcardListPresenter: FlashcardListPresenter
 
@@ -69,10 +77,10 @@ class FlashcardListPresenterTest {
         verifySetLoadingIndicator(true)
         verify(flashcardListView).getCategoryName()
         verify(useCaseHandler).execute(eq(getFlashcards), getFlashcardsRequestCaptor.capture(),
-                useCaseCallbackCaptor.capture())
+                getUseCaseCallbackCaptor.capture())
         assertNull(getFlashcardsRequestCaptor.firstValue.categoryName)
         val response = GetFlashcards.ResponseValue(FLASHCARD_LIST)
-        useCaseCallbackCaptor.firstValue.onSuccess(response)
+        getUseCaseCallbackCaptor.firstValue.onSuccess(response)
         verifySetLoadingIndicator(false)
         verify(flashcardListViewModel).setFlashcards(FLASHCARD_LIST)
     }
@@ -84,11 +92,11 @@ class FlashcardListPresenterTest {
         verifySetLoadingIndicator(true)
         verify(flashcardListView).getCategoryName()
         verify(useCaseHandler).execute(eq(getFlashcards), getFlashcardsRequestCaptor.capture(),
-                useCaseCallbackCaptor.capture())
+                getUseCaseCallbackCaptor.capture())
         assertEquals(CATEGORY_1.name, getFlashcardsRequestCaptor.firstValue.categoryName)
         val response =
                 GetFlashcards.ResponseValue(FLASHCARD_LIST_OF_CATEGORY_1)
-        useCaseCallbackCaptor.firstValue.onSuccess(response)
+        getUseCaseCallbackCaptor.firstValue.onSuccess(response)
         verifySetLoadingIndicator(false)
         verify(flashcardListViewModel).setFlashcards(FLASHCARD_LIST_OF_CATEGORY_1)
     }
@@ -96,8 +104,8 @@ class FlashcardListPresenterTest {
     @Test
     fun `when error from use case, shows failed to load in view`() {
         createAndStartPresenter()
-        verify(useCaseHandler).execute(eq(getFlashcards), any(), useCaseCallbackCaptor.capture())
-        useCaseCallbackCaptor.firstValue.onError()
+        verify(useCaseHandler).execute(eq(getFlashcards), any(), getUseCaseCallbackCaptor.capture())
+        getUseCaseCallbackCaptor.firstValue.onError()
         verify(flashcardListView).showFailedToLoadFlashcards()
     }
 
@@ -122,6 +130,58 @@ class FlashcardListPresenterTest {
         verify(flashcardListView).showCategoryFlashcardList(0)
     }
 
+    @Test
+    fun `on delete all flashcards, deletes all flashcards, shows success on view, shows add flashcard view`() {
+        createAndStartPresenter()
+        flashcardListPresenter.deleteAllFlashcards()
+
+        captureDeleteUseCaseExecution()
+        assertNull(deleteFlashcardsRequestCaptor.firstValue.categoryName)
+        val response = DeleteFlashcards.ResponseValue()
+        deleteUseCaseCallbackCaptor.firstValue.onSuccess(response)
+
+        verify(flashcardListView).showDeleteSuccess()
+        verify(flashcardListView).showAddFlashcard()
+    }
+
+    @Test
+    fun `on delete all flashcards, failure from use case, calls delete failed on view`() {
+        createAndStartPresenter()
+        flashcardListPresenter.deleteAllFlashcards()
+
+        captureDeleteUseCaseExecution()
+        assertNull(deleteFlashcardsRequestCaptor.firstValue.categoryName)
+        deleteUseCaseCallbackCaptor.firstValue.onError()
+
+        verify(flashcardListView).showDeleteFailed()
+    }
+
+    @Test
+    fun `on delete by category, deletes by category on use case, shows success on view, shows category list view`() {
+        createAndStartPresenter()
+        flashcardListPresenter.deleteFlashcardsFromCategory(FLASHCARD_1.category)
+
+        captureDeleteUseCaseExecution()
+        assertEquals(FLASHCARD_1.category, deleteFlashcardsRequestCaptor.firstValue.categoryName)
+        val response = DeleteFlashcards.ResponseValue()
+        deleteUseCaseCallbackCaptor.firstValue.onSuccess(response)
+
+        verify(flashcardListView).showDeleteSuccess()
+        verify(flashcardListView).showCategoryList()
+    }
+
+    @Test
+    fun `on delete by category, failure from use case, calls delete failed on view`() {
+        createAndStartPresenter()
+        flashcardListPresenter.deleteFlashcardsFromCategory(FLASHCARD_1.category)
+
+        captureDeleteUseCaseExecution()
+        assertEquals(FLASHCARD_1.category, deleteFlashcardsRequestCaptor.firstValue.categoryName)
+        deleteUseCaseCallbackCaptor.firstValue.onError()
+
+        verify(flashcardListView).showDeleteFailed()
+    }
+
     private fun createAndStartPresenter() {
         flashcardListPresenter = createPresenter()
         flashcardListPresenter.start()
@@ -129,10 +189,15 @@ class FlashcardListPresenterTest {
 
     private fun createPresenter(): FlashcardListPresenter {
         return FlashcardListPresenter(useCaseHandler, flashcardListView, flashcardListViewModel,
-                getFlashcards)
+                getFlashcards, deleteFlashcards)
     }
 
     private fun verifySetLoadingIndicator(active: Boolean) {
         inOrder.verify(flashcardListView).setLoadingIndicator(active)
+    }
+
+    private fun captureDeleteUseCaseExecution() {
+        verify(useCaseHandler).execute(eq(deleteFlashcards), deleteFlashcardsRequestCaptor.capture(),
+                deleteUseCaseCallbackCaptor.capture())
     }
 }

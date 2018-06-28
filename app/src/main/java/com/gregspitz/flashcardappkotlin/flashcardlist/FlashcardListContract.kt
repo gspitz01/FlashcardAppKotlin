@@ -42,7 +42,13 @@ interface FlashcardListContract {
 
         fun showCategoryFlashcardList(recyclerPosition: Int)
 
+        fun showCategoryList()
+
         fun showEditFlashcard(flashcardId: String)
+
+        fun showDeleteSuccess()
+
+        fun showDeleteFailed()
 
         fun getCategoryName(): String?
 
@@ -58,6 +64,10 @@ interface FlashcardListContract {
         fun onFlashcardClick(recyclerPosition: Int)
 
         fun onCategoryClick(recyclerPosition: Int)
+
+        fun deleteAllFlashcards()
+
+        fun deleteFlashcardsFromCategory(categoryName: String)
     }
 
     interface ViewModel {

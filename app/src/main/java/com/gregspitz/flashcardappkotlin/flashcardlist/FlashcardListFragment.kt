@@ -1,15 +1,15 @@
 package com.gregspitz.flashcardappkotlin.flashcardlist
 
 
+import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.LinearLayoutManager
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.Toast
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.MainFragmentRouter
 import com.gregspitz.flashcardappkotlin.R
@@ -18,6 +18,7 @@ import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardFragmen
 import com.gregspitz.flashcardappkotlin.data.model.Category
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardListItem
+import com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase.DeleteFlashcards
 import com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase.GetFlashcards
 import kotlinx.android.synthetic.main.fragment_flashcard_list.*
 import javax.inject.Inject
@@ -32,6 +33,7 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
 
     // Dagger Dependency Injection
     @Inject lateinit var getFlashcards: GetFlashcards
+    @Inject lateinit var deleteFlashcards: DeleteFlashcards
     @Inject lateinit var useCaseHandler: UseCaseHandler
 
     private lateinit var presenter: FlashcardListContract.Presenter
@@ -77,8 +79,46 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+        setHasOptionsMenu(true)
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_flashcard_list, container, false)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater?.inflate(R.menu.flashcard_list_fragment_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return when(item?.itemId) {
+            R.id.deleteFlashcardsButton -> {
+                if (categoryName == null) {
+                    AlertDialog.Builder(activity)
+                            .setTitle(R.string.confirm_delete_multiple_title_text)
+                            .setMessage(R.string.confirm_delete_all_flashcards_text)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton(android.R.string.yes) { _, _ ->
+                                presenter.deleteAllFlashcards()
+                            }
+                            .setNegativeButton(android.R.string.no, null)
+                            .show()
+                } else {
+                    AlertDialog.Builder(activity)
+                            .setTitle(R.string.confirm_delete_multiple_title_text)
+                            .setMessage(activity?.getString(
+                                    R.string.confirm_delete_flashcards_from_category_text,
+                                    categoryName))
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton(android.R.string.yes) { _, _ ->
+                                presenter.deleteFlashcardsFromCategory(categoryName!!)
+                            }
+                            .setNegativeButton(android.R.string.no, null)
+                            .show()
+                }
+                return true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -120,7 +160,9 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
         // Observe on the ViewModel
         val flashcardsObserver = Observer<List<FlashcardListItem>> {
             if (it != null) {
-                flashcardListMessages.visibility = View.GONE
+                if (it.isNotEmpty()) {
+                    flashcardListMessages.visibility = View.GONE
+                }
                 recyclerAdapter.updateFlashcards(it)
                 initPagerAdapter(it)
                 moveToDetailsFromArgument(it)
@@ -130,7 +172,7 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
         viewModel.flashcards.observe(this, flashcardsObserver)
 
         // Create the presenter
-        FlashcardListPresenter(useCaseHandler, this, viewModel, getFlashcards)
+        FlashcardListPresenter(useCaseHandler, this, viewModel, getFlashcards, deleteFlashcards)
     }
 
 
@@ -213,6 +255,7 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
      * Show message if Flashcards failed to load
      */
     override fun showFailedToLoadFlashcards() {
+        flashcardListMessages.visibility = View.VISIBLE
         flashcardListMessages.setText(R.string.failed_to_load_flashcard_text)
     }
 
@@ -220,6 +263,7 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
      * Show message if there are no Flashcards to show
      */
     override fun showNoFlashcardsToLoad() {
+        flashcardListMessages.visibility = View.VISIBLE
         flashcardListMessages.setText(R.string.no_flashcards_to_show_text)
     }
 
@@ -255,11 +299,32 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
     }
 
     /**
+     * Show the list of Categories
+     */
+    override fun showCategoryList() {
+        (activity as MainFragmentRouter).showCategoryList()
+    }
+
+    /**
      * Tell router (containing Activity) to move to the edit Flashcard view
      * @param flashcardId id of the Flashcard to be edited
      */
     override fun showEditFlashcard(flashcardId: String) {
         (activity as MainFragmentRouter).showAddEditFlashcard(flashcardId)
+    }
+
+    /**
+     * Show that a deletion was successful
+     */
+    override fun showDeleteSuccess() {
+        Toast.makeText(activity, R.string.delete_succeeded_toast_text, Toast.LENGTH_LONG).show()
+    }
+
+    /**
+     * Show that a deletion failed
+     */
+    override fun showDeleteFailed() {
+        Toast.makeText(activity, R.string.delete_failed_toast_text, Toast.LENGTH_LONG).show()
     }
 
     override fun isActive(): Boolean {

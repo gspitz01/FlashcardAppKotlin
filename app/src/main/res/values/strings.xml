@@ -46,4 +46,13 @@
     <string name="no_categories_to_show_text">No categories to show</string>
     <string name="failed_to_load_categories_text">Failed to load categories</string>
     <string name="nav_category_list_title">Categories</string>
+    <string name="delete_flashcards_button_title">Delete flashcards</string>
+    <string name="delete_succeeded_toast_text">Delete Succeeded!</string>
+    <string name="confirm_delete_multiple_title_text">Delete multiple flashcards?</string>
+    <string name="confirm_delete_all_flashcards_text">Are you sure you want to delete all
+        flashcards?
+    </string>
+    <string name="confirm_delete_flashcards_from_category_text">Are you sure you want to delete all
+        flashcards from %s?
+    </string>
 </resources>

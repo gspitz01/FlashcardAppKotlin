@@ -20,7 +20,6 @@ import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.action.ViewActions.replaceText
 import android.support.test.espresso.assertion.ViewAssertions.matches
-import android.support.test.espresso.matcher.RootMatchers.isDialog
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.filters.MediumTest
 import android.support.test.runner.AndroidJUnit4
@@ -28,7 +27,6 @@ import com.gregspitz.flashcardappkotlin.BaseSingleFragmentTest
 import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
-import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import org.hamcrest.Matchers
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -119,7 +117,7 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
         // Alert dialog for confirmation
         clickOnDeleteDialog(android.R.string.yes)
 
-        assertTrue(verifyFlashcardNoLongerInRepo(FLASHCARD_1))
+        assertTrue(verifyFlashcardNotInRepo(FLASHCARD_1))
         onView(withId(R.id.detailPager)).check(matches(isDisplayed()))
     }
 

@@ -41,6 +41,7 @@ import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.not
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -194,6 +195,112 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
     }
 
     @Test
+    fun clickDeleteWithAllFlashcardsShown_yesOnConfirm_deletesAllFlashcards_showsDeleteSuccessToast_changesToAddFlashcardView() {
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
+        launchActivity()
+
+        clickDeleteButton()
+        // Click yes on confirmation dialog
+        clickOnDeleteDialog(android.R.string.yes)
+
+        assertTrue(verifyFlashcardNotInRepo(FLASHCARD_1))
+        assertTrue(verifyFlashcardNotInRepo(FLASHCARD_2))
+        checkForToast(R.string.delete_succeeded_toast_text)
+        // Check for add flashcard view
+        onView(withId(R.id.flashcardEditCategory)).check(matches(isDisplayed()))
+        onView(withId(R.id.flashcardEditFront)).check(matches(isDisplayed()))
+        onView(withId(R.id.flashcardEditBack)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun clickDeleteWithAllFlashcardsShown_noOnConfirm_doesNothing() {
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
+        launchActivity()
+
+        clickDeleteButton()
+        // Click no on confirmation dialog
+        clickOnDeleteDialog(android.R.string.no)
+
+        assertTrue(verifyFlashcardInInRepo(FLASHCARD_1))
+        assertTrue(verifyFlashcardInInRepo(FLASHCARD_2))
+        verifyRecyclerViewShownAndNotShown(listOf(FLASHCARD_1.category,
+                FLASHCARD_1.front, FLASHCARD_2.category, FLASHCARD_2.front), listOf())
+    }
+
+    @Test
+    fun clickDeleteWithAllFlashcardsShown_yesOnConfirm_failureFromDataSource_showsDeleteFailedToast() {
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
+        localDataSource.setDeleteFailure(true)
+        launchActivity()
+
+        clickDeleteButton()
+        clickOnDeleteDialog(android.R.string.yes)
+
+        checkForToast(R.string.delete_failed_toast_text)
+        verifyRecyclerViewShownAndNotShown(listOf(FLASHCARD_1.category,
+                FLASHCARD_1.front, FLASHCARD_2.category, FLASHCARD_2.front), listOf())
+        onView(withText(R.string.no_flashcards_to_show_text)).check(doesNotExist())
+    }
+
+    @Test
+    fun launchWithCategory_clickDelete_yesOnConfirm_deletesThatCategory_showsDeleteSuccessToast_changesViewToCategoryList() {
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
+        launchActivity(categoryName = FLASHCARD_1.category)
+
+        // Only showing FLASHCARD_1
+        verifyRecyclerViewShownAndNotShown(listOf(FLASHCARD_1.category, FLASHCARD_1.front),
+                listOf(FLASHCARD_2.category, FLASHCARD_2.front))
+
+        clickDeleteButton()
+        clickOnDeleteDialog(android.R.string.yes)
+
+        assertTrue(verifyFlashcardNotInRepo(FLASHCARD_1))
+        assertTrue(verifyFlashcardInInRepo(FLASHCARD_2))
+        checkForToast(R.string.delete_succeeded_toast_text)
+
+        // Moves to category list view
+        onView(withId(R.id.categoryRecyclerView)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun launchWithCategory_clickDelete_noOnConfirm_doesNothing() {
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
+        launchActivity(categoryName = FLASHCARD_1.category)
+
+        // Only showing FLASHCARD_1
+        verifyRecyclerViewShownAndNotShown(listOf(FLASHCARD_1.category, FLASHCARD_1.front),
+                listOf(FLASHCARD_2.category, FLASHCARD_2.front))
+
+        clickDeleteButton()
+        clickOnDeleteDialog(android.R.string.no)
+
+        assertTrue(verifyFlashcardInInRepo(FLASHCARD_1))
+        assertTrue(verifyFlashcardInInRepo(FLASHCARD_2))
+        verifyRecyclerViewShownAndNotShown(listOf(FLASHCARD_1.category, FLASHCARD_1.front),
+                listOf(FLASHCARD_2.category, FLASHCARD_2.front))
+    }
+
+    @Test
+    fun launchWithCategory_clickDelete_yesOnConfirm_failureFromRepo_showsDeleteFailedToast() {
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
+        localDataSource.setDeleteFailure(true)
+        launchActivity(categoryName = FLASHCARD_1.category)
+
+        // Only showing FLASHCARD_1
+        verifyRecyclerViewShownAndNotShown(listOf(FLASHCARD_1.category, FLASHCARD_1.front),
+                listOf(FLASHCARD_2.category, FLASHCARD_2.front))
+
+        clickDeleteButton()
+        clickOnDeleteDialog(android.R.string.yes)
+
+        assertTrue(verifyFlashcardInInRepo(FLASHCARD_1))
+        assertTrue(verifyFlashcardInInRepo(FLASHCARD_2))
+        checkForToast(R.string.delete_failed_toast_text)
+        verifyRecyclerViewShownAndNotShown(listOf(FLASHCARD_1.category, FLASHCARD_1.front),
+                listOf(FLASHCARD_2.category, FLASHCARD_2.front))
+    }
+
+    @Test
     fun orientationChangeAndThenClickEditFlashcardInDetailView_showsEditFlashcardView() {
         addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity()
@@ -237,6 +344,10 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
 
     private fun clickDetailViewEditButton() {
         onView(withId(R.id.editFlashcardButton)).perform(click())
+    }
+
+    private fun clickDeleteButton() {
+        onView(withId(R.id.deleteFlashcardsButton)).perform(click())
     }
 
     private fun clickRecyclerViewHolderWithText(text: String) {
