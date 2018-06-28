@@ -28,6 +28,7 @@ import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
 import com.gregspitz.flashcardappkotlin.flashcarddownload.domain.usecase.DownloadFlashcards
 import com.gregspitz.flashcardappkotlin.flashcarddownload.domain.usecase.GetDownloadCategories
 import com.gregspitz.flashcardappkotlin.flashcarddownload.domain.usecase.SaveFlashcards
+import com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase.DeleteFlashcards
 import com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase.GetFlashcards
 import com.gregspitz.flashcardappkotlin.randomflashcard.domain.model.FlashcardPriorityProbabilityDistribution
 import com.gregspitz.flashcardappkotlin.randomflashcard.domain.usecase.GetRandomFlashcard
@@ -78,6 +79,11 @@ class UseCaseModule {
     @Provides
     fun provideDeleteFlashcard(flashcardRepository: FlashcardRepository): DeleteFlashcard {
         return DeleteFlashcard(flashcardRepository)
+    }
+
+    @Provides
+    fun provideDeleteFlashcards(flashcardRepository: FlashcardRepository): DeleteFlashcards {
+        return DeleteFlashcards(flashcardRepository)
     }
 
     @Provides
