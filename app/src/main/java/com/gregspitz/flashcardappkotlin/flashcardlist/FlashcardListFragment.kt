@@ -15,6 +15,7 @@ import com.gregspitz.flashcardappkotlin.MainFragmentRouter
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardFragment
+import com.gregspitz.flashcardappkotlin.data.model.Category
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardListItem
 import com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase.GetFlashcards
@@ -237,6 +238,19 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
     override fun showFlashcardDetailsUi(recyclerPosition: Int) {
         recyclerPositionToPagerPositionMap[recyclerPosition]?.let {
             detailPager.currentItem = it
+        }
+    }
+
+    /**
+     * Show the list of only Flashcards with a certain Category name
+     * @param recyclerPosition the position in the recyclerAdapter of the category
+     */
+    override fun showCategoryFlashcardList(recyclerPosition: Int) {
+        viewModel.flashcards.value?.let {
+            if (it[recyclerPosition] is Category) {
+                (activity as MainFragmentRouter)
+                        .showCategoryFlashcardList((it[recyclerPosition] as Category).name)
+            }
         }
     }
 

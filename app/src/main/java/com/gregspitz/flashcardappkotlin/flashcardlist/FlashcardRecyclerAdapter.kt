@@ -102,6 +102,9 @@ class FlashcardRecyclerAdapter(private var flashcards: List<FlashcardListItem>)
     inner class CategoryHolder(itemView: View) : Holder(itemView) {
         fun setCategory(category: Category) {
             itemView.categoryName.text = category.name
+            itemView.setOnClickListener {
+                presenter.onCategoryClick(adapterPosition)
+            }
         }
     }
 

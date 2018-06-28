@@ -32,7 +32,6 @@ import android.support.v4.view.ViewPager
 import android.support.v7.widget.RecyclerView
 import com.gregspitz.flashcardappkotlin.BaseSingleFragmentTest
 import com.gregspitz.flashcardappkotlin.MockTestData.CATEGORY_1
-import com.gregspitz.flashcardappkotlin.MockTestData.CATEGORY_2
 import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_2
 import com.gregspitz.flashcardappkotlin.R
@@ -69,14 +68,9 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
     fun flashcardRecyclerView_showsFlashcardFronts() {
         addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity()
-        recyclerViewScrollToAndVerifyPosition(R.id.flashcardRecyclerView, 0,
-                FLASHCARD_1.category)
-        recyclerViewScrollToAndVerifyPosition(R.id.flashcardRecyclerView, 1,
-                FLASHCARD_1.front)
-        recyclerViewScrollToAndVerifyPosition(R.id.flashcardRecyclerView, 2,
-                FLASHCARD_2.category)
-        recyclerViewScrollToAndVerifyPosition(R.id.flashcardRecyclerView, 3,
-                FLASHCARD_2.front)
+        verifyRecyclerViewShownAndNotShown(listOf(FLASHCARD_1.category, FLASHCARD_1.front,
+                FLASHCARD_2.category, FLASHCARD_2.front),
+                listOf())
         onView(withId(R.id.flashcardListMessages)).check(matches(not(isDisplayed())))
     }
 
@@ -84,13 +78,21 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
     fun launchWithCategoryName_showsOnlyThatCategory() {
         addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity(categoryName = CATEGORY_1.name)
-        recyclerViewScrollToAndVerifyPosition(R.id.flashcardRecyclerView, 0,
-                FLASHCARD_1.category)
-        recyclerViewScrollToAndVerifyPosition(R.id.flashcardRecyclerView, 1,
-                FLASHCARD_1.front)
-        onView(withText(FLASHCARD_2.category)).check(doesNotExist())
-        onView(withText(FLASHCARD_2.front)).check(doesNotExist())
+        verifyRecyclerViewShownAndNotShown(listOf(FLASHCARD_1.category, FLASHCARD_1.front),
+                listOf(FLASHCARD_2.category, FLASHCARD_2.front))
         onView(withId(R.id.flashcardListMessages)).check(matches(not(isDisplayed())))
+    }
+
+    @Test
+    fun launchWithCategoryNameAndOrientationChange_stillShowsOnlyThatCategory() {
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
+        launchActivity(categoryName = CATEGORY_1.name)
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+        verifyRecyclerViewShownAndNotShown(listOf(FLASHCARD_1.category, FLASHCARD_1.front),
+                listOf(FLASHCARD_2.category, FLASHCARD_2.front))
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+        verifyRecyclerViewShownAndNotShown(listOf(FLASHCARD_1.category, FLASHCARD_1.front),
+                listOf(FLASHCARD_2.category, FLASHCARD_2.front))
     }
 
     @Test
@@ -133,16 +135,18 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
                 flashcard6, flashcard7, flashcard8)
         launchActivity()
         val viewPagerIdlingResource = registerViewPagerIdlingResource()
-        onView(withId(R.id.flashcardRecyclerView))
-                .perform(RecyclerViewActions
-                        .scrollTo<RecyclerView.ViewHolder>(hasDescendant(
-                                withText(flashcard8.front))))
-                .perform(RecyclerViewActions
-                        .actionOnItem<RecyclerView.ViewHolder>(
-                                hasDescendant(withText(flashcard8.front)),
-                                click()))
+        clickRecyclerViewHolderWithText(flashcard8.front)
         checkDetailViewMatchesFlashcard(flashcard8)
         unregisterViewPagerIdlingResource(viewPagerIdlingResource)
+    }
+
+    @Test
+    fun clickCategory_showsListOfFlashcardsOfOnlyThatCategory() {
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
+        launchActivity()
+        clickRecyclerViewHolderWithText(FLASHCARD_2.category)
+        verifyRecyclerViewShownAndNotShown(listOf(FLASHCARD_2.category, FLASHCARD_2.front),
+                listOf(FLASHCARD_1.category, FLASHCARD_1.front))
     }
 
     @Test
@@ -235,6 +239,28 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
         onView(withId(R.id.editFlashcardButton)).perform(click())
     }
 
+    private fun clickRecyclerViewHolderWithText(text: String) {
+        onView(withId(R.id.flashcardRecyclerView))
+                .perform(RecyclerViewActions
+                        .scrollTo<RecyclerView.ViewHolder>(hasDescendant(
+                                withText(text))))
+                .perform(RecyclerViewActions
+                        .actionOnItem<RecyclerView.ViewHolder>(
+                                hasDescendant(withText(text)),
+                                click()))
+    }
+
+    private fun verifyRecyclerViewShownAndNotShown(shownTexts: List<String>,
+                                                   notShownTexts: List<String>) {
+        for ((index, text) in shownTexts.withIndex()) {
+            recyclerViewScrollToAndVerifyPosition(R.id.flashcardRecyclerView, index,
+                    text)
+        }
+        for (text in notShownTexts) {
+            onView(withText(text)).check(doesNotExist())
+        }
+    }
+
     private fun checkDetailViewMatchesFlashcard(flashcard: Flashcard) {
         onView(allOf(withId(R.id.flashcardCategory), isDescendantOfA(withId(R.id.detailPager)),
                 isCompletelyDisplayed()))
@@ -247,7 +273,7 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
                 .check(matches(withText(flashcard.back)))
     }
 
-    private fun registerViewPagerIdlingResource() : IdlingResource {
+    private fun registerViewPagerIdlingResource(): IdlingResource {
         // Force Espresso to wait until fragment is loaded.
         onView(withId(R.id.flashcardRecyclerView)).check(matches(isDisplayed()))
         val detailPager = testRule.activity.supportFragmentManager
@@ -262,9 +288,8 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
     }
 
     private fun launchActivity(flashcardId: String =
-                                         FlashcardListFragment.noParticularFlashcardExtra,
+                                       FlashcardListFragment.noParticularFlashcardExtra,
                                categoryName: String? = null) {
         launchActivity(FlashcardListFragment.newInstance(flashcardId, categoryName))
     }
-
 }

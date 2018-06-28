@@ -115,6 +115,13 @@ class FlashcardListPresenterTest {
         verify(flashcardListView).showFlashcardDetailsUi(0)
     }
 
+    @Test
+    fun `on category click shows list of flashcards for that category`() {
+        createAndStartPresenter()
+        flashcardListPresenter.onCategoryClick(0)
+        verify(flashcardListView).showCategoryFlashcardList(0)
+    }
+
     private fun createAndStartPresenter() {
         flashcardListPresenter = createPresenter()
         flashcardListPresenter.start()
@@ -125,7 +132,7 @@ class FlashcardListPresenterTest {
                 getFlashcards)
     }
 
-    fun verifySetLoadingIndicator(active: Boolean) {
+    private fun verifySetLoadingIndicator(active: Boolean) {
         inOrder.verify(flashcardListView).setLoadingIndicator(active)
     }
 }

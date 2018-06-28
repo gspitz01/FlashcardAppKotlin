@@ -40,6 +40,8 @@ interface FlashcardListContract {
 
         fun showFlashcardDetailsUi(recyclerPosition: Int)
 
+        fun showCategoryFlashcardList(recyclerPosition: Int)
+
         fun showEditFlashcard(flashcardId: String)
 
         fun getCategoryName(): String?
@@ -54,6 +56,8 @@ interface FlashcardListContract {
         fun loadFlashcards()
 
         fun onFlashcardClick(recyclerPosition: Int)
+
+        fun onCategoryClick(recyclerPosition: Int)
     }
 
     interface ViewModel {
