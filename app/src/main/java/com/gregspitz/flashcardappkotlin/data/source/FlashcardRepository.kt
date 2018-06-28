@@ -26,7 +26,7 @@ open class FlashcardRepository(private val localDataSource: FlashcardDataSource)
     : FlashcardDataSource {
 
     // The cache
-    private val cache = mutableMapOf<String, Flashcard>()
+    private var cache = mutableMapOf<String, Flashcard>()
 
     // Tells repo to go straight to local source for call to getFlashcards(), updates cache
     private var cacheDirty = true
@@ -120,10 +120,22 @@ open class FlashcardRepository(private val localDataSource: FlashcardDataSource)
     /**
      * Delete all the Flashcards from the local data source and the cache
      */
-    override fun deleteAllFlashcards() {
-        localDataSource.deleteAllFlashcards()
+    override fun deleteAllFlashcards(callback: FlashcardDataSource.DeleteAllFlashcardsCallback) {
+        localDataSource.deleteAllFlashcards(callback)
         cache.clear()
         cacheDirty = true
+    }
+
+    /**
+     * Delete all Flashcards with a certain Category name
+     */
+    override fun deleteFlashcardsByCategoryName(
+            categoryName: String,
+            callback: FlashcardDataSource.DeleteFlashcardsByCategoryNameCallback) {
+        localDataSource.deleteFlashcardsByCategoryName(categoryName, callback)
+        cache = cache.filter {
+            it.value.category != categoryName
+        }.toMutableMap()
     }
 
     /**

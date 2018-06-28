@@ -7,6 +7,7 @@ import android.support.test.espresso.contrib.DrawerActions
 import android.support.test.espresso.contrib.NavigationViewActions.navigateTo
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.rule.ActivityTestRule
+import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import org.hamcrest.CoreMatchers.not
 import org.junit.Before
 import org.junit.Rule
@@ -19,7 +20,13 @@ class MainScreenTest {
 
     @Before
     fun setup() {
-        FlashcardApplication.repoComponent.exposeRepository().deleteAllFlashcards()
+        FlashcardApplication.repoComponent.exposeRepository().deleteAllFlashcards(
+                object: FlashcardDataSource.DeleteAllFlashcardsCallback {
+                    override fun onDeleteSuccessful() { /* ignore */ }
+
+                    override fun onDeleteFailed() { /* ignore */ }
+                }
+        )
     }
 
     @Test

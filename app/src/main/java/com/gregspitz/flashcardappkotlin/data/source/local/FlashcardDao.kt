@@ -51,5 +51,8 @@ interface FlashcardDao {
     fun deleteFlashcard(flashcardId: String)
 
     @Query("DELETE from flashcard")
-    fun deleteFlashcards()
+    fun deleteAllFlashcards()
+
+    @Query("DELETE from flashcard where category = :categoryName")
+    fun deleteFlashcardsByCategoryName(categoryName: String)
 }

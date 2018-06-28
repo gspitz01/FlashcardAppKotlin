@@ -158,21 +158,6 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
         onView(withId(R.id.detailPager)).check(matches(isDisplayed()))
     }
 
-    private fun verifyFlashcardNoLongerInRepo(flashcard: Flashcard): Boolean {
-        var returnValue = false
-        dataSource.getFlashcard(flashcard.id, object : FlashcardDataSource.GetFlashcardCallback {
-            override fun onDataNotAvailable() {
-                returnValue = true
-            }
-
-            override fun onFlashcardLoaded(flashcard: Flashcard) {
-                // Ignore
-            }
-        })
-
-        return returnValue
-    }
-
     private fun checkDetailViewMatchesFlashcard(flashcard: Flashcard) {
         onView(Matchers.allOf(withId(R.id.flashcardFront), isDescendantOfA(withId(R.id.detailPager)),
                 isCompletelyDisplayed()))
@@ -193,13 +178,6 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
 
     private fun clickDeleteFlashcardButton() {
         onView(withId(R.id.deleteFlashcardButton)).perform(click())
-    }
-
-    private fun clickOnDeleteDialog(responseStringId: Int) {
-        onView(withText(responseStringId))
-                .inRoot(isDialog())
-                .check(matches(isDisplayed()))
-                .perform(click())
     }
 
     private fun clickShowListButton() {

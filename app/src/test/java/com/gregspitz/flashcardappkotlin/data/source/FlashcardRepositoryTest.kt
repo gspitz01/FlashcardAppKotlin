@@ -155,12 +155,31 @@ class FlashcardRepositoryTest {
         // Call getFlashcards once to make sure cache is not dirty
         getLocalFlashcardsWithArgumentCaptor()
 
-        flashcardRepository.deleteAllFlashcards()
-        verify(spyLocalDataSource).deleteAllFlashcards()
+        val callback: FlashcardDataSource.DeleteAllFlashcardsCallback = mock()
+        flashcardRepository.deleteAllFlashcards(callback)
+        verify(spyLocalDataSource).deleteAllFlashcards(any())
+
+        verify(callback).onDeleteSuccessful()
 
         // Prove cache is dirty again by showing repository calls local data source again
         flashcardRepository.getFlashcards(getFlashcardsCallback)
         verify(spyLocalDataSource, times(2)).getFlashcards(any())
+    }
+
+    @Test
+    fun `on delete flashcards by category name, calls delete by category name on local data source and deletes from cache`() {
+        // Call getFlashcards to make sure cache is not dirty
+        getLocalFlashcardsWithArgumentCaptor()
+
+        val callback: FlashcardDataSource.DeleteFlashcardsByCategoryNameCallback = mock()
+        flashcardRepository.deleteFlashcardsByCategoryName(FLASHCARD_1.category, callback)
+        verify(spyLocalDataSource).deleteFlashcardsByCategoryName(eq(FLASHCARD_1.category), any())
+        verify(callback).onDeleteSuccessful()
+
+        // To prove FLASHCARD_1 no longer in cache, show that a getFlashcard call goes to local source
+        val getCallback: FlashcardDataSource.GetFlashcardCallback = mock()
+        flashcardRepository.getFlashcard(FLASHCARD_1.id, getCallback)
+        verify(spyLocalDataSource).getFlashcard(eq(FLASHCARD_1.id), any())
     }
 
     @Test

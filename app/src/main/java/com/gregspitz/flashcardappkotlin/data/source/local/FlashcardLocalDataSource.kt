@@ -88,8 +88,19 @@ class FlashcardLocalDataSource(private val flashcardDao: FlashcardDao) : Flashca
     /**
      * Delete all the Flashcards from the dao
      */
-    override fun deleteAllFlashcards() {
-        flashcardDao.deleteFlashcards()
+    override fun deleteAllFlashcards(callback: FlashcardDataSource.DeleteAllFlashcardsCallback) {
+        flashcardDao.deleteAllFlashcards()
+        callback.onDeleteSuccessful()
+    }
+
+    /**
+     * Delete all Flashcards with a certain Category name from the dao
+     */
+    override fun deleteFlashcardsByCategoryName(
+            categoryName: String,
+            callback: FlashcardDataSource.DeleteFlashcardsByCategoryNameCallback) {
+        flashcardDao.deleteFlashcardsByCategoryName(categoryName)
+        callback.onDeleteSuccessful()
     }
 
     override fun refreshFlashcards() {

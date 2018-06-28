@@ -1,6 +1,11 @@
 package com.gregspitz.flashcardappkotlin
 
 import android.content.Intent
+import android.support.test.espresso.Espresso
+import android.support.test.espresso.action.ViewActions
+import android.support.test.espresso.assertion.ViewAssertions
+import android.support.test.espresso.matcher.RootMatchers
+import android.support.test.espresso.matcher.ViewMatchers
 import android.support.test.rule.ActivityTestRule
 import android.support.v4.app.Fragment
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
@@ -21,7 +26,11 @@ open class BaseSingleFragmentTest {
 
     @Before
     fun setup() {
-        dataSource.deleteAllFlashcards()
+        dataSource.deleteAllFlashcards(object: FlashcardDataSource.DeleteAllFlashcardsCallback {
+            override fun onDeleteSuccessful() { /* ignore */ }
+
+            override fun onDeleteFailed() { /* ignore */ }
+        })
     }
 
     protected fun launchActivity(fragment: Fragment) {
@@ -60,5 +69,27 @@ open class BaseSingleFragmentTest {
 
     protected fun checkForToast(text: Int) {
         TestUtils.checkForToast(testRule, text)
+    }
+
+    protected fun clickOnDeleteDialog(responseStringId: Int) {
+        Espresso.onView(ViewMatchers.withText(responseStringId))
+                .inRoot(RootMatchers.isDialog())
+                .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
+                .perform(ViewActions.click())
+    }
+
+    protected fun verifyFlashcardNoLongerInRepo(flashcard: Flashcard): Boolean {
+        var returnValue = false
+        dataSource.getFlashcard(flashcard.id, object : FlashcardDataSource.GetFlashcardCallback {
+            override fun onDataNotAvailable() {
+                returnValue = true
+            }
+
+            override fun onFlashcardLoaded(flashcard: Flashcard) {
+                // Ignore
+            }
+        })
+
+        return returnValue
     }
 }

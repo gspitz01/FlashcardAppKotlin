@@ -80,7 +80,24 @@ interface FlashcardDataSource {
 
     fun deleteFlashcard(flashcardId: String, callback: DeleteFlashcardCallback)
 
-    fun deleteAllFlashcards()
+    interface DeleteAllFlashcardsCallback {
+
+        fun onDeleteSuccessful()
+
+        fun onDeleteFailed()
+    }
+
+    fun deleteAllFlashcards(callback: DeleteAllFlashcardsCallback)
+
+    interface DeleteFlashcardsByCategoryNameCallback {
+
+        fun onDeleteSuccessful()
+
+        fun onDeleteFailed()
+    }
+
+    fun deleteFlashcardsByCategoryName(categoryName: String,
+                                       callback: DeleteFlashcardsByCategoryNameCallback)
 
     fun refreshFlashcards()
 }

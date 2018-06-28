@@ -100,8 +100,19 @@ class FlashcardLocalDataSourceTest {
 
     @Test
     fun `on delete all flashcards, deletes all flashcards from dao`() {
-        flashcardLocalDataSource.deleteAllFlashcards()
-        verify(mockFlashcardDao).deleteFlashcards()
+        val deleteAllFlashcardsCallback: FlashcardDataSource.DeleteAllFlashcardsCallback = mock()
+        flashcardLocalDataSource.deleteAllFlashcards(deleteAllFlashcardsCallback)
+        verify(mockFlashcardDao).deleteAllFlashcards()
+        verify(deleteAllFlashcardsCallback).onDeleteSuccessful()
+    }
+
+    @Test
+    fun `on delete flashcards by category name, deletes flashcards by category name on dao`() {
+        val deleteByCategory: FlashcardDataSource.DeleteFlashcardsByCategoryNameCallback = mock()
+        flashcardLocalDataSource.deleteFlashcardsByCategoryName(FLASHCARD_1.category,
+                deleteByCategory)
+        verify(mockFlashcardDao).deleteFlashcardsByCategoryName(FLASHCARD_1.category)
+        verify(deleteByCategory).onDeleteSuccessful()
     }
 
     @Test
