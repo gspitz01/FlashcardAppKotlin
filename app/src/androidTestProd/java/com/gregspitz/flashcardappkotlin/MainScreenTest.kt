@@ -32,6 +32,7 @@ import android.support.v7.widget.RecyclerView
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_2
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.allOf
 import org.junit.Before
@@ -56,7 +57,11 @@ class MainScreenTest {
 
     @Before
     fun setup() {
-        database.deleteAllFlashcards()
+        database.deleteAllFlashcards(object: FlashcardDataSource.DeleteAllFlashcardsCallback {
+            override fun onDeleteSuccessful() { /* ignore */ }
+
+            override fun onDeleteFailed() { /* ignore */ }
+        })
     }
 
     @Test
