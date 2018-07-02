@@ -48,8 +48,8 @@ class SingleFragmentActivity : AppCompatActivity(), MainFragmentRouter {
         replaceFragment(AddEditFlashcardFragment.newInstance(flashcardId))
     }
 
-    override fun showRandomFlashcard() {
-        replaceFragment(RandomFlashcardFragment.newInstance())
+    override fun showRandomFlashcard(categoryName: String?) {
+        replaceFragment(RandomFlashcardFragment.newInstance(categoryName))
     }
 
     override fun showFlashcardDownload() {

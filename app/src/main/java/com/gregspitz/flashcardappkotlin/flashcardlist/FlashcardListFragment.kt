@@ -32,9 +32,12 @@ private const val CATEGORY_NAME = "category_name"
 class FlashcardListFragment : Fragment(), FlashcardListContract.View {
 
     // Dagger Dependency Injection
-    @Inject lateinit var getFlashcards: GetFlashcards
-    @Inject lateinit var deleteFlashcards: DeleteFlashcards
-    @Inject lateinit var useCaseHandler: UseCaseHandler
+    @Inject
+    lateinit var getFlashcards: GetFlashcards
+    @Inject
+    lateinit var deleteFlashcards: DeleteFlashcards
+    @Inject
+    lateinit var useCaseHandler: UseCaseHandler
 
     private lateinit var presenter: FlashcardListContract.Presenter
     private lateinit var viewModel: FlashcardListViewModel
@@ -56,8 +59,7 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
         // Represents that no particular Flashcard was asked to be shown in the detail view
         const val noParticularFlashcardExtra = "-1"
 
-        fun newInstance(flashcardId: String, categoryName: String? = null)
-                = FlashcardListFragment().apply {
+        fun newInstance(flashcardId: String, categoryName: String? = null) = FlashcardListFragment().apply {
             arguments = Bundle().apply {
                 putString(FLASHCARD_ID, flashcardId)
                 if (categoryName != null) {
@@ -90,7 +92,7 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return when(item?.itemId) {
+        return when (item?.itemId) {
             R.id.deleteFlashcardsButton -> {
                 if (categoryName == null) {
                     AlertDialog.Builder(activity)
@@ -115,6 +117,10 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
                             .setNegativeButton(android.R.string.no, null)
                             .show()
                 }
+                return true
+            }
+            R.id.playButton -> {
+                (activity as MainFragmentRouter).showRandomFlashcard(categoryName)
                 return true
             }
             else -> super.onOptionsItemSelected(item)

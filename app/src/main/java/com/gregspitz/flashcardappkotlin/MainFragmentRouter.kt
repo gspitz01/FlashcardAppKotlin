@@ -13,7 +13,7 @@ interface MainFragmentRouter {
 
     fun showAddEditFlashcard(flashcardId: String)
 
-    fun showRandomFlashcard()
+    fun showRandomFlashcard(categoryName: String?)
 
     fun showFlashcardDownload()
 }

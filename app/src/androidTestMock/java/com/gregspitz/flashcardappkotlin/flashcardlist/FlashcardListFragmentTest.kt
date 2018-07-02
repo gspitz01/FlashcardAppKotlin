@@ -195,6 +195,28 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
     }
 
     @Test
+    fun clickPlayWithAllFlashcardsShown_changesViewToRandomFlashcardWithAllCategories() {
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
+        launchActivity()
+
+        clickPlayButton()
+
+        onView(withId(R.id.categorySpinner))
+                .check(matches(withSpinnerText(R.string.all_flashcards_spinner_text)))
+    }
+
+    @Test
+    fun launchWithCategory_clickPlay_changesViewToRandomFlashcardWithThatCategory() {
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
+        launchActivity(categoryName = FLASHCARD_2.category)
+
+        clickPlayButton()
+
+        onView(withId(R.id.categorySpinner))
+                .check(matches(withSpinnerText(FLASHCARD_2.category)))
+    }
+
+    @Test
     fun clickDeleteWithAllFlashcardsShown_yesOnConfirm_deletesAllFlashcards_showsDeleteSuccessToast_changesToAddFlashcardView() {
         addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity()
@@ -348,6 +370,10 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
 
     private fun clickDeleteButton() {
         onView(withId(R.id.deleteFlashcardsButton)).perform(click())
+    }
+
+    private fun clickPlayButton() {
+        onView(withId(R.id.playButton)).perform(click())
     }
 
     private fun clickRecyclerViewHolderWithText(text: String) {

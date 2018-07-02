@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
     // Start with a AddEditFlashcardFragment
     private var addEditFlashcardFragment =
             AddEditFlashcardFragment.newInstance(AddEditFlashcardFragment.newFlashcardId)
-    private val randomFlashcardFragment = RandomFlashcardFragment.newInstance()
+    private lateinit var randomFlashcardFragment: RandomFlashcardFragment
     private lateinit var flashcardListFragment: FlashcardListFragment
     private lateinit var categoryListFragment: CategoryListFragment
     private var flashcardDownloadFragment: FlashcardDownloadFragment? = null
@@ -74,7 +74,7 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
         navDrawer.setNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.navGame -> {
-                    showRandomFlashcard()
+                    showRandomFlashcard(null)
                     drawerLayout.closeDrawers()
                     return@setNavigationItemSelectedListener true
                 }
@@ -233,7 +233,8 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
     /**
      * Change view to RandomFlashcardFragment (a.k.a. the game)
      */
-    override fun showRandomFlashcard() {
+    override fun showRandomFlashcard(categoryName: String?) {
+        randomFlashcardFragment = RandomFlashcardFragment.newInstance(categoryName)
         replaceFragment(randomFlashcardFragment)
     }
 

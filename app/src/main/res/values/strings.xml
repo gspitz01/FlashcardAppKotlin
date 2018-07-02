@@ -56,4 +56,5 @@
         flashcards from %s?
     </string>
     <string name="all_flashcards_spinner_text">All</string>
+    <string name="play_button_title">Play</string>
 </resources>
