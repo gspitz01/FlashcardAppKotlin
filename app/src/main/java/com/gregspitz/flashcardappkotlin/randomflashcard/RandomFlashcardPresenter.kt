@@ -19,6 +19,7 @@ package com.gregspitz.flashcardappkotlin.randomflashcard
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.SaveFlashcard
+import com.gregspitz.flashcardappkotlin.categorylist.domain.usecase.GetCategories
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardSide
@@ -32,6 +33,7 @@ class RandomFlashcardPresenter(
         private val view: RandomFlashcardContract.View,
         private val viewModel: RandomFlashcardContract.ViewModel,
         private val getRandomFlashcard: GetRandomFlashcard,
+        private val getCategories: GetCategories,
         private val saveFlashcard: SaveFlashcard
 ) : RandomFlashcardContract.Presenter {
 
@@ -43,6 +45,7 @@ class RandomFlashcardPresenter(
 
     override fun start() {
         loadNewFlashcard()
+        loadCategories()
     }
 
     override fun turnFlashcard() {
@@ -60,9 +63,9 @@ class RandomFlashcardPresenter(
         }
 
         val flashcardId = flashcard?.id
-        useCaseHandler.execute(
-                getRandomFlashcard, GetRandomFlashcard.RequestValues(flashcardId),
-                object: UseCase.UseCaseCallback<GetRandomFlashcard.ResponseValue> {
+        useCaseHandler.execute(getRandomFlashcard,
+                GetRandomFlashcard.RequestValues(flashcardId, view.getCategoryName()),
+                object : UseCase.UseCaseCallback<GetRandomFlashcard.ResponseValue> {
                     override fun onSuccess(response: GetRandomFlashcard.ResponseValue) {
                         flashcard = response.flashcard
                         if (view.isActive()) {
@@ -86,7 +89,7 @@ class RandomFlashcardPresenter(
         flashcard?.let {
             val newFlashcard = Flashcard(it.id, it.category, it.front, it.back, priority)
             useCaseHandler.execute(saveFlashcard, SaveFlashcard.RequestValues(newFlashcard),
-                    object: UseCase.UseCaseCallback<SaveFlashcard.ResponseValue> {
+                    object : UseCase.UseCaseCallback<SaveFlashcard.ResponseValue> {
                         override fun onSuccess(response: SaveFlashcard.ResponseValue) {
                             loadNewFlashcard()
                         }
@@ -97,5 +100,20 @@ class RandomFlashcardPresenter(
                         }
                     })
         }
+    }
+
+    private fun loadCategories() {
+        useCaseHandler.execute(getCategories, GetCategories.RequestValues(),
+                object : UseCase.UseCaseCallback<GetCategories.ResponseValue> {
+                    override fun onSuccess(response: GetCategories.ResponseValue) {
+                        viewModel.setSpinnerCategories(response.categories)
+                    }
+
+                    override fun onError() {
+                        if (view.isActive()) {
+                            view.showFailedToLoadCategories()
+                        }
+                    }
+                })
     }
 }

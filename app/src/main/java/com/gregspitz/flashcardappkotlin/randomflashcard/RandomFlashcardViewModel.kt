@@ -18,6 +18,7 @@ package com.gregspitz.flashcardappkotlin.randomflashcard
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import com.gregspitz.flashcardappkotlin.data.model.Category
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardSide
 
@@ -29,6 +30,8 @@ class RandomFlashcardViewModel : ViewModel(), RandomFlashcardContract.ViewModel 
     val randomFlashcard: MutableLiveData<Flashcard> = MutableLiveData()
 
     val flashcardSide: MutableLiveData<FlashcardSide> = MutableLiveData()
+
+    val spinnerCategories: MutableLiveData<List<Category>> = MutableLiveData()
 
     override fun setFlashcard(flashcard: Flashcard) {
         randomFlashcard.value = flashcard
@@ -44,5 +47,13 @@ class RandomFlashcardViewModel : ViewModel(), RandomFlashcardContract.ViewModel 
 
     override fun getFlashcardSide(): FlashcardSide? {
         return flashcardSide.value
+    }
+
+    override fun setSpinnerCategories(categories: List<Category>) {
+        spinnerCategories.value = categories
+    }
+
+    override fun getSpinnerCategories(): List<Category>? {
+        return spinnerCategories.value
     }
 }

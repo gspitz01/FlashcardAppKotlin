@@ -18,6 +18,7 @@ package com.gregspitz.flashcardappkotlin.randomflashcard
 
 import com.gregspitz.flashcardappkotlin.BasePresenter
 import com.gregspitz.flashcardappkotlin.BaseView
+import com.gregspitz.flashcardappkotlin.data.model.Category
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardSide
@@ -33,7 +34,11 @@ interface RandomFlashcardContract {
 
         fun showFailedToLoadFlashcard()
 
-        fun isActive() : Boolean
+        fun showFailedToLoadCategories()
+
+        fun getCategoryName(): String?
+
+        fun isActive(): Boolean
     }
 
     interface Presenter : BasePresenter {
@@ -51,8 +56,12 @@ interface RandomFlashcardContract {
 
         fun setFlashcardSide(flashcardSide: FlashcardSide)
 
-        fun getFlashcard() : Flashcard?
+        fun getFlashcard(): Flashcard?
 
-        fun getFlashcardSide() : FlashcardSide?
+        fun getFlashcardSide(): FlashcardSide?
+
+        fun setSpinnerCategories(categories: List<Category>)
+
+        fun getSpinnerCategories(): List<Category>?
     }
 }

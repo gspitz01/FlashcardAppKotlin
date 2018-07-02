@@ -5,16 +5,22 @@ import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.SaveFlashcard
+import com.gregspitz.flashcardappkotlin.categorylist.domain.usecase.GetCategories
+import com.gregspitz.flashcardappkotlin.data.model.Category
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardSide
 import com.gregspitz.flashcardappkotlin.randomflashcard.domain.usecase.GetRandomFlashcard
 import kotlinx.android.synthetic.main.fragment_random_flashcard.*
 import javax.inject.Inject
+
+private const val CATEGORY_NAME = "category_name"
 
 /**
  * Fragment for showing a random Flashcard
@@ -25,6 +31,8 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
     @Inject
     lateinit var getRandomFlashcard: GetRandomFlashcard
     @Inject
+    lateinit var getCategories: GetCategories
+    @Inject
     lateinit var saveFlashcard: SaveFlashcard
     @Inject
     lateinit var useCaseHandler: UseCaseHandler
@@ -34,14 +42,29 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
 
     // Active onResume; inactive onPause
     private var active = false
+    // Category to make sure only Flashcards of that category are chosen
+    // Null categoryName means all categories
+    private var categoryName: String? = null
+    // Adapter for spinner
+    private var spinnerAdapter: ArrayAdapter<String>? = null
 
     companion object {
         @JvmStatic
-        fun newInstance() = RandomFlashcardFragment()
+        fun newInstance(categoryName: String? = null) =
+                RandomFlashcardFragment().apply {
+                    arguments = Bundle().apply {
+                        if (categoryName != null) {
+                            putString(CATEGORY_NAME, categoryName)
+                        }
+                    }
+                }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        arguments?.let {
+            categoryName = it.getString(CATEGORY_NAME)
+        }
         FlashcardApplication.useCaseComponent.inject(this)
         viewModel = ViewModelProviders.of(this).get(RandomFlashcardViewModel::class.java)
     }
@@ -85,12 +108,32 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
             }
         }
 
+        val spinnerCategoriesObserver = Observer<List<Category>> {
+            if (it != null) {
+                val categoryNames = it.map { it.name }.toMutableList()
+                activity?.let {
+                    categoryNames.add(0, it.getString(R.string.all_flashcards_spinner_text))
+                }
+                spinnerAdapter =
+                        ArrayAdapter(activity, android.R.layout.simple_spinner_item,
+                                categoryNames)
+                spinnerAdapter?.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                categorySpinner.adapter = spinnerAdapter
+                if (categoryName == null) {
+                    categorySpinner.setSelection(0)
+                } else {
+                    categorySpinner.setSelection(spinnerAdapter!!.getPosition(categoryName))
+                }
+            }
+        }
+
         viewModel.randomFlashcard.observe(this, randomFlashcardObserver)
         viewModel.flashcardSide.observe(this, flashcardSideObserver)
+        viewModel.spinnerCategories.observe(this, spinnerCategoriesObserver)
 
         // Create the presenter
         RandomFlashcardPresenter(useCaseHandler, this, viewModel, getRandomFlashcard,
-                saveFlashcard)
+                getCategories, saveFlashcard)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
@@ -133,9 +176,13 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
         flashcardSide.setText(R.string.failed_to_load_flashcard_text)
     }
 
-    override fun isActive(): Boolean {
-        return active
+    override fun showFailedToLoadCategories() {
+        categorySpinner.visibility = View.GONE
     }
+
+    override fun getCategoryName(): String? = categoryName
+
+    override fun isActive(): Boolean = active
 
     /**
      * Set the presenter and the click listeners
@@ -165,6 +212,23 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
 
         flashcardPriorityUrgentButton.setOnClickListener {
             this@RandomFlashcardFragment.presenter.saveFlashcard(FlashcardPriority.URGENT)
+        }
+
+        categorySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?,
+                                        position: Int, id: Long) {
+                if (spinnerAdapter != null) {
+                    // If the first item is selected, category is "All" which is represented by null
+                    categoryName = if (position == 0) {
+                        null
+                    } else {
+                        spinnerAdapter?.getItem(position)
+                    }
+                    this@RandomFlashcardFragment.presenter.loadNewFlashcard()
+                }
+            }
         }
     }
 }

@@ -16,11 +16,13 @@
 
 package com.gregspitz.flashcardappkotlin.randomflashcard
 
+import com.gregspitz.flashcardappkotlin.TestData.CATEGORY_1
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_2
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.SaveFlashcard
+import com.gregspitz.flashcardappkotlin.categorylist.domain.usecase.GetCategories
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardSide
@@ -29,7 +31,6 @@ import com.nhaarman.mockito_kotlin.*
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.mockito.InOrder
 
 /**
  * Tests for the implementation of {@link RandomFlashcardPresenter}
@@ -38,6 +39,8 @@ class RandomFlashcardPresenterTest {
 
     private val response1 = GetRandomFlashcard.ResponseValue(FLASHCARD_1)
     private val response2 = GetRandomFlashcard.ResponseValue(FLASHCARD_2)
+    private val categoriesResponse =
+            GetCategories.ResponseValue(listOf(CATEGORY_1))
 
     // GetRandomFlashcard use case
     private val getRandomFlashcard: GetRandomFlashcard = mock()
@@ -45,6 +48,11 @@ class RandomFlashcardPresenterTest {
             argumentCaptor<UseCase.UseCaseCallback<GetRandomFlashcard.ResponseValue>>()
     private val getRandomFlashcardRequestCaptor =
             argumentCaptor<GetRandomFlashcard.RequestValues>()
+
+    // GetCategories for the spinner
+    private val getCategories: GetCategories = mock()
+    private val getCategoriesUseCaseCallback =
+            argumentCaptor<UseCase.UseCaseCallback<GetCategories.ResponseValue>>()
 
     // SaveFlashcard use case
     private val saveFlashcard: SaveFlashcard = mock()
@@ -57,6 +65,9 @@ class RandomFlashcardPresenterTest {
 
     private val randomFlashcardView: RandomFlashcardContract.View = mock()
 
+    // InOrder to verify setLoadingIndicator on view
+    private val inOrder = inOrder(randomFlashcardView)
+
     private val randomFlashcardViewModel: RandomFlashcardContract.ViewModel = mock()
 
 
@@ -67,6 +78,7 @@ class RandomFlashcardPresenterTest {
     @Before
     fun setup() {
         whenever(randomFlashcardView.isActive()).thenReturn(true)
+        whenever(randomFlashcardView.getCategoryName()).thenReturn(null)
     }
 
     @Test
@@ -76,25 +88,37 @@ class RandomFlashcardPresenterTest {
     }
 
     @Test
-    fun `on start shows front of only flashcard if there is only one`() {
+    fun `on start, no category, shows front of only flashcard if there is only one, sets spinner categories`() {
         createAndStartPresenter()
-        val inOrder = verifyLoadingIndicatorInOrderStart()
+        verifyLoadingIndicator(true)
+
+        // calls getCategoryName on view
+        verify(randomFlashcardView).getCategoryName()
 
         // GetRandomFlashcard use case is called
         verify(useCaseHandler)
-                .execute(eq(getRandomFlashcard), any(), getRandomFlashcardUseCaseCallbackCaptor.capture())
+                .execute(eq(getRandomFlashcard), any(),
+                        getRandomFlashcardUseCaseCallbackCaptor.capture())
         getRandomFlashcardUseCaseCallbackCaptor.firstValue.onSuccess(response1)
-        inOrder.verify(randomFlashcardView).setLoadingIndicator(false)
+        verifyLoadingIndicator(false)
+
+        // GetCategories use case called
+        verify(useCaseHandler)
+                .execute(eq(getCategories), any(), getCategoriesUseCaseCallback.capture())
+        getCategoriesUseCaseCallback.firstValue.onSuccess(categoriesResponse)
 
         verify(randomFlashcardViewModel).setFlashcard(FLASHCARD_1)
         verify(randomFlashcardViewModel).setFlashcardSide(FlashcardSide.FRONT)
+        verify(randomFlashcardViewModel).setSpinnerCategories(categoriesResponse.categories)
     }
 
     @Test
-    fun `on new flashcard loads different flashcard`() {
+    fun `on new flashcard, no category, loads different flashcard`() {
         createAndStartPresenter()
-        val inOrder = verifyLoadingIndicatorInOrderStart()
+        verifyLoadingIndicator(true)
         val useCaseHandlerInOrder = inOrder(useCaseHandler)
+
+        verify(randomFlashcardView).getCategoryName()
 
         // GetRandomFlashcard use case is called
         useCaseHandlerInOrder.verify(useCaseHandler).execute(eq(getRandomFlashcard),
@@ -102,22 +126,28 @@ class RandomFlashcardPresenterTest {
 
         // First time the presenter should send a request value with null for the flashcardId
         assertNull(getRandomFlashcardRequestCaptor.firstValue.flashcardId)
+        // And null for categoryName
+        assertNull(getRandomFlashcardRequestCaptor.firstValue.categoryName)
 
         // Use case responds successful with a Flashcard
         getRandomFlashcardUseCaseCallbackCaptor.firstValue.onSuccess(response1)
-        inOrder.verify(randomFlashcardView).setLoadingIndicator(false)
+        verifyLoadingIndicator(false)
 
         presenter.loadNewFlashcard()
-        inOrder.verify(randomFlashcardView).setLoadingIndicator(true)
+        verifyLoadingIndicator(true)
+
+        verify(randomFlashcardView, times(2)).getCategoryName()
         useCaseHandlerInOrder.verify(useCaseHandler).execute(eq(getRandomFlashcard),
                 getRandomFlashcardRequestCaptor.capture(), getRandomFlashcardUseCaseCallbackCaptor.capture())
 
         // Second call to GetRandomFlashcard, presenter sends the flashcardId of the
         // previously attained Flashcard
         assertEquals(FLASHCARD_1.id, getRandomFlashcardRequestCaptor.secondValue.flashcardId)
+        // But categoryName should still be null
+        assertNull(getRandomFlashcardRequestCaptor.secondValue.categoryName)
 
         getRandomFlashcardUseCaseCallbackCaptor.secondValue.onSuccess(response2)
-        inOrder.verify(randomFlashcardView).setLoadingIndicator(false)
+        verifyLoadingIndicator(false)
 
         // ViewModel should have been called twice
         verify(randomFlashcardViewModel, times(2))
@@ -126,6 +156,34 @@ class RandomFlashcardPresenterTest {
         val secondFlashcardShown = flashcardCaptor.secondValue
         // Two Flashcards should be different
         assertNotEquals(firstFlashcardShown, secondFlashcardShown)
+    }
+
+    @Test
+    fun `on start with category, shows front of flashcard from that category, sets spinner categories`() {
+        whenever(randomFlashcardView.getCategoryName()).thenReturn(CATEGORY_1.name)
+        createAndStartPresenter()
+        verifyLoadingIndicator(true)
+
+        verify(randomFlashcardView).getCategoryName()
+
+        verify(useCaseHandler).execute(eq(getRandomFlashcard),
+                getRandomFlashcardRequestCaptor.capture(),
+                getRandomFlashcardUseCaseCallbackCaptor.capture())
+
+        // Verify use case called with correct category
+        assertEquals(CATEGORY_1.name, getRandomFlashcardRequestCaptor.firstValue.categoryName)
+
+        // Response1 needs to be a flashcard with Category1
+        getRandomFlashcardUseCaseCallbackCaptor.firstValue.onSuccess(response1)
+
+        // GetCategories use case called
+        verify(useCaseHandler)
+                .execute(eq(getCategories), any(), getCategoriesUseCaseCallback.capture())
+        getCategoriesUseCaseCallback.firstValue.onSuccess(categoriesResponse)
+
+        verify(randomFlashcardViewModel).setFlashcard(response1.flashcard)
+        verify(randomFlashcardViewModel).setFlashcardSide(FlashcardSide.FRONT)
+        verify(randomFlashcardViewModel).setSpinnerCategories(categoriesResponse.categories)
     }
 
 
@@ -155,10 +213,20 @@ class RandomFlashcardPresenterTest {
     @Test
     fun `on data not available shows failed to load flashcard in view`() {
         createAndStartPresenter()
+        verify(randomFlashcardView).getCategoryName()
         verify(useCaseHandler)
                 .execute(eq(getRandomFlashcard), any(), getRandomFlashcardUseCaseCallbackCaptor.capture())
         getRandomFlashcardUseCaseCallbackCaptor.firstValue.onError()
         verify(randomFlashcardView).showFailedToLoadFlashcard()
+    }
+
+    @Test
+    fun `on categories not available, calls show failed to load categories on view`() {
+        createAndStartPresenter()
+        verify(useCaseHandler)
+                .execute(eq(getCategories), any(), getCategoriesUseCaseCallback.capture())
+        getCategoriesUseCaseCallback.firstValue.onError()
+        verify(randomFlashcardView).showFailedToLoadCategories()
     }
 
     @Test
@@ -250,15 +318,14 @@ class RandomFlashcardPresenterTest {
 
     private fun createStartAndGetFlashcard() {
         createAndStartPresenter()
+        verify(randomFlashcardView).getCategoryName()
         verify(useCaseHandler)
                 .execute(eq(getRandomFlashcard), any(), getRandomFlashcardUseCaseCallbackCaptor.capture())
         getRandomFlashcardUseCaseCallbackCaptor.firstValue.onSuccess(response1)
     }
 
-    private fun verifyLoadingIndicatorInOrderStart() : InOrder {
-        val inOrder = inOrder(randomFlashcardView)
-        inOrder.verify(randomFlashcardView).setLoadingIndicator(true)
-        return inOrder
+    private fun verifyLoadingIndicator(active: Boolean) {
+        inOrder.verify(randomFlashcardView).setLoadingIndicator(active)
     }
 
     private fun createAndStartPresenter() {
@@ -268,6 +335,6 @@ class RandomFlashcardPresenterTest {
 
     private fun createPresenter() {
         presenter = RandomFlashcardPresenter(useCaseHandler, randomFlashcardView,
-                randomFlashcardViewModel, getRandomFlashcard, saveFlashcard)
+                randomFlashcardViewModel, getRandomFlashcard, getCategories, saveFlashcard)
     }
 }

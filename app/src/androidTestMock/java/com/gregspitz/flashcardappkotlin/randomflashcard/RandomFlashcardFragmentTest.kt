@@ -17,12 +17,12 @@
 package com.gregspitz.flashcardappkotlin.randomflashcard
 
 import android.content.pm.ActivityInfo
+import android.support.test.espresso.Espresso.onData
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.matcher.BoundedMatcher
-import android.support.test.espresso.matcher.ViewMatchers.withId
-import android.support.test.espresso.matcher.ViewMatchers.withText
+import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.filters.MediumTest
 import android.support.test.runner.AndroidJUnit4
 import android.view.View
@@ -33,6 +33,7 @@ import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_2
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
+import org.hamcrest.CoreMatchers.*
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.junit.Assert.assertEquals
@@ -50,16 +51,41 @@ class RandomFlashcardFragmentTest : BaseSingleFragmentTest() {
     private var firstCategory = ""
 
     @Test
-    fun atStart_showsFrontOfOneFlashcardAndClickTurnsFlashcard() {
+    fun atStart_noCategory_showsFrontOfOneFlashcard_ClickTurnsFlashcard_spinnerShowsAll() {
         addFlashcardsToDataSource(FLASHCARD_1)
 
         launchActivity()
 
-        onView(withId(R.id.flashcardCategory)).check(matches(withText(FLASHCARD_1.category)))
-        onView(withId(R.id.flashcardSide))
-                .check(matches(withText(FLASHCARD_1.front)))
-                .perform(click())
-                .check(matches(withText(FLASHCARD_1.back)))
+        verifyFlashcardShown(FLASHCARD_1)
+
+        onView(withId(R.id.categorySpinner))
+                .check(matches(withSpinnerText(R.string.all_flashcards_spinner_text)))
+    }
+
+    @Test
+    fun atStart_withCategory_showsFrontOfCardFromThatCategory_ClickTurnsFlashcard_spinnerShowsCategory() {
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
+
+        launchActivity(FLASHCARD_1.category)
+
+        verifyFlashcardShown(FLASHCARD_1)
+
+        onView(withId(R.id.categorySpinner)).check(matches(withSpinnerText(FLASHCARD_1.category)))
+    }
+
+    @Test
+    fun onSpinnerClick_showsFlashcardFromThatCategory() {
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
+
+        launchActivity(FLASHCARD_1.category)
+
+        verifyFlashcardShown(FLASHCARD_1)
+
+        onView(withId(R.id.categorySpinner)).perform(click())
+        onData(allOf(instanceOf(String::class.java), equalTo(FLASHCARD_2.category))).perform(click())
+
+        verifyFlashcardShown(FLASHCARD_2)
+
     }
 
     @Test
@@ -68,6 +94,15 @@ class RandomFlashcardFragmentTest : BaseSingleFragmentTest() {
 
         onView(withId(R.id.flashcardSide))
                 .check(matches(withText(R.string.failed_to_load_flashcard_text)))
+    }
+
+    @Test
+    fun failedToLoadCategories_removesSpinner() {
+        localDataSource.setFailure(true)
+
+        launchActivity()
+
+        onView(withId(R.id.categorySpinner)).check(matches(not(isDisplayed())))
     }
 
     @Test
@@ -159,7 +194,7 @@ class RandomFlashcardFragmentTest : BaseSingleFragmentTest() {
     }
 
     private fun withCategoryOfOneOf(category1: String, category2: String): Matcher<in View>? {
-        return object: BoundedMatcher<View, TextView>(TextView::class.java) {
+        return object : BoundedMatcher<View, TextView>(TextView::class.java) {
             override fun describeTo(description: Description?) {
                 description?.appendText("with possible text: $category1 -- or -- $category2")
             }
@@ -173,7 +208,7 @@ class RandomFlashcardFragmentTest : BaseSingleFragmentTest() {
     }
 
     private fun withTextOfOneOf(text1: String, text2: String): Matcher<in View>? {
-        return object: BoundedMatcher<View, TextView>(TextView::class.java) {
+        return object : BoundedMatcher<View, TextView>(TextView::class.java) {
             override fun describeTo(description: Description?) {
                 description?.appendText("with possible text: $text1 -- or -- $text2")
             }
@@ -196,12 +231,20 @@ class RandomFlashcardFragmentTest : BaseSingleFragmentTest() {
         assertFlashcardSavedWithPriority(priority)
     }
 
+    private fun verifyFlashcardShown(flashcard: Flashcard) {
+        onView(withId(R.id.flashcardCategory)).check(matches(withText(flashcard.category)))
+        onView(withId(R.id.flashcardSide))
+                .check(matches(withText(flashcard.front)))
+                .perform(click())
+                .check(matches(withText(flashcard.back)))
+    }
+
     private fun assertFlashcardSavedWithPriority(priority: FlashcardPriority) {
         val savedFlashcard = getFlashcardFromRepoById(FLASHCARD_1.id)
         assertEquals(priority, savedFlashcard!!.priority)
     }
 
-    private fun launchActivity() {
-        launchActivity(RandomFlashcardFragment.newInstance())
+    private fun launchActivity(categoryName: String? = null) {
+        launchActivity(RandomFlashcardFragment.newInstance(categoryName))
     }
 }
