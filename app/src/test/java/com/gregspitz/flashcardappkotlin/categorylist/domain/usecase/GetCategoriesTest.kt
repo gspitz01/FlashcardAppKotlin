@@ -1,6 +1,7 @@
 package com.gregspitz.flashcardappkotlin.categorylist.domain.usecase
 
 import com.gregspitz.flashcardappkotlin.TestData.CATEGORY_LIST
+import com.gregspitz.flashcardappkotlin.TestData.CATEGORY_LIST_SORTED
 import com.gregspitz.flashcardappkotlin.TestUseCaseScheduler
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
@@ -39,10 +40,10 @@ class GetCategoriesTest {
     }
 
     @Test
-    fun `success from repository, calls success on callback with category list`() {
+    fun `success from repository, calls success on callback with sorted category list`() {
         repositoryCallbackCaptor.firstValue.onCategoriesLoaded(CATEGORY_LIST)
         verify(callback).onSuccess(responseCaptor.capture())
-        assertEquals(CATEGORY_LIST, responseCaptor.firstValue.categories)
+        assertEquals(CATEGORY_LIST_SORTED, responseCaptor.firstValue.categories)
     }
 
     @Test

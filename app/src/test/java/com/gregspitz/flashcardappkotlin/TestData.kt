@@ -5,10 +5,11 @@ import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
 
 object TestData {
-    val CATEGORY_1 = Category("Data Structure: Behavioral")
+    val CATEGORY_1 = Category("Different Category")
     val CATEGORY_2 = Category("Data Structure: Whatever")
-    val CATEGORY_3 = Category("Different Category")
+    val CATEGORY_3 = Category("Data Structure: Behavioral")
     val CATEGORY_LIST = listOf(CATEGORY_1, CATEGORY_2, CATEGORY_3)
+    val CATEGORY_LIST_SORTED = listOf(CATEGORY_3, CATEGORY_2, CATEGORY_1)
     val FLASHCARD_1 =
             Flashcard("0", CATEGORY_1.name, "Front", "Back", FlashcardPriority.NEW)
     val FLASHCARD_2 =

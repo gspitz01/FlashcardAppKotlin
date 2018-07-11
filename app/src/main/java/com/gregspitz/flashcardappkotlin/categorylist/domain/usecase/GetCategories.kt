@@ -9,9 +9,9 @@ class GetCategories(private val repository: FlashcardRepository)
     : UseCase<GetCategories.RequestValues, GetCategories.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues) {
-        repository.getCategories(object: FlashcardDataSource.GetCategoriesCallback {
+        repository.getCategories(object : FlashcardDataSource.GetCategoriesCallback {
             override fun onCategoriesLoaded(categories: List<Category>) {
-                getUseCaseCallback().onSuccess(ResponseValue(categories))
+                getUseCaseCallback().onSuccess(ResponseValue(sortCategories(categories)))
             }
 
             override fun onDataNotAvailable() {
@@ -19,6 +19,9 @@ class GetCategories(private val repository: FlashcardRepository)
             }
         })
     }
+
+    fun sortCategories(categories: List<Category>): List<Category> =
+            categories.sortedWith(compareBy { it.name })
 
     class RequestValues : UseCase.RequestValues
 

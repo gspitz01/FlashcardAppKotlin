@@ -16,12 +16,15 @@
 
 package com.gregspitz.flashcardappkotlin.flashcardlist.domain.usecase
 
-import com.gregspitz.flashcardappkotlin.TestData
+import com.gregspitz.flashcardappkotlin.TestData.CATEGORY_1
+import com.gregspitz.flashcardappkotlin.TestData.CATEGORY_2
 import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_1
-import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_LIST_WITH_CATEGORIES
+import com.gregspitz.flashcardappkotlin.TestData.FLASHCARD_2
 import com.gregspitz.flashcardappkotlin.TestUseCaseScheduler
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
+import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
 import com.nhaarman.mockito_kotlin.argumentCaptor
@@ -36,6 +39,10 @@ import org.junit.Test
  * Tests for {@link GetFlashcards}
  */
 class GetFlashcardsTest {
+
+    // Another Flashcard with the same category as FLASHCARD_1 and a front which sorts to before FLASHCARD_1's
+    private val flashcard7 = Flashcard("7", FLASHCARD_1.category, "A front", "Back",
+            FlashcardPriority.NEW)
 
     private val noCategoryRequest = GetFlashcards.RequestValues()
     private val categoryRequest =
@@ -60,11 +67,15 @@ class GetFlashcardsTest {
     }
 
     @Test
-    fun `gets flashcards without category from repository and on success calls success on callback`() {
+    fun `gets flashcards without category from repository and on success calls success on callback with sorted flashcards`() {
         executeUseCaseWithoutCategory()
-        repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(TestData.FLASHCARD_LIST)
+        val unsortedFlashcardList = listOf(FLASHCARD_1, FLASHCARD_2,
+                flashcard7)
+        val sortedFlashcardListWithCategories = listOf(CATEGORY_1, flashcard7,
+                FLASHCARD_1, CATEGORY_2, FLASHCARD_2)
+        repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(unsortedFlashcardList)
         verify(callback).onSuccess(responseCaptor.capture())
-        assertEquals(FLASHCARD_LIST_WITH_CATEGORIES, responseCaptor.firstValue.flashcards)
+        assertEquals(sortedFlashcardListWithCategories, responseCaptor.firstValue.flashcards)
     }
 
     @Test
@@ -75,11 +86,14 @@ class GetFlashcardsTest {
     }
 
     @Test
-    fun `gets flashcards with category from repository and on success calls success on callback`() {
+    fun `gets flashcards with category from repository and on success calls success on callback with sorted flashcards`() {
         executeUseCaseWithCategory()
-        repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(TestData.FLASHCARD_LIST)
+        val unsortedFlashcardList = listOf(FLASHCARD_1, flashcard7)
+        val sortedFlashcardListWithCategories =
+                listOf(CATEGORY_1, flashcard7, FLASHCARD_1)
+        repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(unsortedFlashcardList)
         verify(callback).onSuccess(responseCaptor.capture())
-        assertEquals(FLASHCARD_LIST_WITH_CATEGORIES, responseCaptor.firstValue.flashcards)
+        assertEquals(sortedFlashcardListWithCategories, responseCaptor.firstValue.flashcards)
     }
 
     @Test

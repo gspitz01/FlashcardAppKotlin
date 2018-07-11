@@ -26,19 +26,18 @@ import javax.inject.Inject
 
 /**
  * A use case for retrieving all available flashcards
+ * or all flashcards in a particular category
  */
 class GetFlashcards @Inject constructor(private val flashcardRepository: FlashcardRepository)
     : UseCase<GetFlashcards.RequestValues, GetFlashcards.ResponseValue>() {
 
     override fun executeUseCase(requestValues: RequestValues) {
         if (requestValues.categoryName == null) {
-            flashcardRepository.getFlashcards(object: FlashcardDataSource.GetFlashcardsCallback {
+            flashcardRepository.getFlashcards(object : FlashcardDataSource.GetFlashcardsCallback {
                 override fun onFlashcardsLoaded(flashcards: List<Flashcard>) {
-                    // TODO: sort the list of Flashcards by category before translation here
-                    // Turn the list of Flashcards into a list of FlashcardListItems with
-                    // Category headers
+                    val sortedFlashcards = sortFlashcards(flashcards)
                     getUseCaseCallback()
-                            .onSuccess(ResponseValue(createListWithCategories(flashcards)))
+                            .onSuccess(ResponseValue(createListWithCategories(sortedFlashcards)))
                 }
 
                 override fun onDataNotAvailable() {
@@ -48,11 +47,12 @@ class GetFlashcards @Inject constructor(private val flashcardRepository: Flashca
             })
         } else {
             flashcardRepository.getFlashcardsByCategoryName(requestValues.categoryName,
-                    object: FlashcardDataSource.GetFlashcardsCallback {
+                    object : FlashcardDataSource.GetFlashcardsCallback {
                         override fun onFlashcardsLoaded(flashcards: List<Flashcard>) {
-                            // TODO: see note above
+                            val sortedFlashcards = sortFlashcards(flashcards)
                             getUseCaseCallback()
-                                    .onSuccess(ResponseValue(createListWithCategories(flashcards)))
+                                    .onSuccess(ResponseValue(
+                                            createListWithCategories(sortedFlashcards)))
                         }
 
                         override fun onDataNotAvailable() {
@@ -72,6 +72,13 @@ class GetFlashcards @Inject constructor(private val flashcardRepository: Flashca
         }
         return listWithCategories
     }
+
+    /**
+     * Sort Flashcards by category and front
+     * @param flashcards List of Flashcards to be sorted
+     */
+    fun sortFlashcards(flashcards: List<Flashcard>): List<Flashcard> =
+            flashcards.sortedWith(compareBy({ it.category }, { it.front }))
 
     class RequestValues(val categoryName: String? = null) : UseCase.RequestValues
 
