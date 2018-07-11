@@ -6,6 +6,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.LinearLayoutManager
 import android.view.*
@@ -261,6 +262,9 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
      * Show message if Flashcards failed to load
      */
     override fun showFailedToLoadFlashcards() {
+        activity?.let {
+            flashcardListMessages.setTextColor(ContextCompat.getColor(it, R.color.colorError))
+        }
         flashcardListMessages.visibility = View.VISIBLE
         flashcardListMessages.setText(R.string.failed_to_load_flashcard_text)
     }
@@ -269,6 +273,9 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
      * Show message if there are no Flashcards to show
      */
     override fun showNoFlashcardsToLoad() {
+        activity?.let {
+            flashcardListMessages.setTextColor(ContextCompat.getColor(it, R.color.colorWarning))
+        }
         flashcardListMessages.visibility = View.VISIBLE
         flashcardListMessages.setText(R.string.no_flashcards_to_show_text)
     }

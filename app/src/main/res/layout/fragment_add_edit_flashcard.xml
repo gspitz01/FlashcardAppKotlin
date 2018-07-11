@@ -14,6 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/failed_to_load_flashcard_text"
+        android:textColor="@color/colorError"
         android:visibility="gone"/>
 
     <EditText
