@@ -71,8 +71,8 @@ class GetFlashcardsTest {
         executeUseCaseWithoutCategory()
         val unsortedFlashcardList = listOf(FLASHCARD_1, FLASHCARD_2,
                 flashcard7)
-        val sortedFlashcardListWithCategories = listOf(CATEGORY_1, flashcard7,
-                FLASHCARD_1, CATEGORY_2, FLASHCARD_2)
+        val sortedFlashcardListWithCategories = listOf(CATEGORY_2, FLASHCARD_2,
+                CATEGORY_1, flashcard7, FLASHCARD_1)
         repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(unsortedFlashcardList)
         verify(callback).onSuccess(responseCaptor.capture())
         assertEquals(sortedFlashcardListWithCategories, responseCaptor.firstValue.flashcards)
