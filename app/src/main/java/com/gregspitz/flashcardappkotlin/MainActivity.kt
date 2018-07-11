@@ -35,9 +35,6 @@ private const val RC_SIGN_IN = 1
  */
 class MainActivity : AppCompatActivity(), MainFragmentRouter {
 
-    // TODO: Add tests for login
-    // TODO: show something in display when user is logged in
-
     // Start with a AddEditFlashcardFragment
     private var addEditFlashcardFragment =
             AddEditFlashcardFragment.newInstance(AddEditFlashcardFragment.newFlashcardId)

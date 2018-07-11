@@ -95,7 +95,6 @@ class RandomFlashcardPresenter(
                         }
 
                         override fun onError() {
-                            // TODO: put log statement here
                             loadNewFlashcard()
                         }
                     })
