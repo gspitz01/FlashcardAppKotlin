@@ -89,8 +89,8 @@ class UseCaseModule {
     @Provides
     fun provideGetRandomFlashcard(flashcardRepository: FlashcardRepository) : GetRandomFlashcard {
         return GetRandomFlashcard(flashcardRepository,
-                FlashcardPriorityProbabilityDistribution(0.3, 0.25,
-                        0.2, 0.15, 0.1))
+                FlashcardPriorityProbabilityDistribution(0.48, 0.23,
+                        0.15, 0.09, 0.05))
     }
 
     @Provides
