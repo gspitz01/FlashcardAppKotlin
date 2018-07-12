@@ -4,8 +4,9 @@
 /.idea/workspace.xml
 /.idea/vcs.xml
 /.idea/modules.xml
-/.idea/misc.xml
 /.idea/libraries
+/.idea/caches
+/.idea/assetWizardSettings.xml
 .DS_Store
 /build
 /captures
