@@ -1,6 +1,7 @@
 package com.gregspitz.flashcardappkotlin
 
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -8,6 +9,7 @@ import android.support.v4.view.GravityCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -158,6 +160,7 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         return when (item?.itemId) {
             android.R.id.home -> {
+                closeSoftKeyboard()
                 drawerLayout.openDrawer(GravityCompat.START)
                 true
             }
@@ -172,6 +175,7 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
     }
 
     private fun replaceFragment(fragment: Fragment) {
+        closeSoftKeyboard()
         supportFragmentManager.beginTransaction()
                 .replace(R.id.contentFrame, fragment)
                 .addToBackStack(null)
@@ -242,6 +246,17 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
     override fun showRandomFlashcard(categoryName: String?) {
         randomFlashcardFragment = RandomFlashcardFragment.newInstance(categoryName)
         replaceFragment(randomFlashcardFragment)
+    }
+
+    private fun closeSoftKeyboard() {
+        val inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE)
+                as InputMethodManager
+        var currentView = currentFocus
+        if (currentView == null) {
+            // In case there is no currently focused view, create one
+            currentView = View(this)
+        }
+        inputMethodManager.hideSoftInputFromWindow(currentView.windowToken, 0)
     }
 
     /**
