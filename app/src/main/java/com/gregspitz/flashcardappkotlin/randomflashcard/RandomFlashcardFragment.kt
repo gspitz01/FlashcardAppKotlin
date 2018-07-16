@@ -47,6 +47,8 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
     private var categoryName: String? = null
     // Adapter for spinner
     private var spinnerAdapter: ArrayAdapter<String>? = null
+    // Keep tracking of when user is making a spinner selection
+    private var userSpinnerTouch = false
 
     companion object {
         @JvmStatic
@@ -78,6 +80,11 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Restore instance state
+        savedInstanceState?.let {
+            categoryName = it.getString(CATEGORY_NAME)
+        }
 
         // Observe the Flashcard on the ViewModel
         val randomFlashcardObserver = Observer<Flashcard> {
@@ -164,6 +171,14 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
         active = false
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        // Save the category name
+        if (categoryName != null) {
+            outState.putString(CATEGORY_NAME, categoryName)
+        }
+    }
+
     override fun setLoadingIndicator(active: Boolean) {
         // TODO: fill this in
     }
@@ -226,9 +241,19 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
                     } else {
                         spinnerAdapter?.getItem(position)
                     }
-                    this@RandomFlashcardFragment.presenter.loadNewFlashcard()
+                    if (userSpinnerTouch) {
+                        // Only load a new Flashcard if the user actually changed the spinner,
+                        // avoid loading a new Flashcard when the spinner selected programmatically
+                        userSpinnerTouch = false
+                        this@RandomFlashcardFragment.presenter.loadNewFlashcard()
+                    }
                 }
             }
+        }
+
+        categorySpinner.setOnTouchListener { _, _ ->
+            userSpinnerTouch = true
+            false
         }
     }
 }
