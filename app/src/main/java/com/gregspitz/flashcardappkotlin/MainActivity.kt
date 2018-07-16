@@ -124,6 +124,15 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
         }
     }
 
+    override fun onBackPressed() {
+        // If nav drawer is open, close it
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawers()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 

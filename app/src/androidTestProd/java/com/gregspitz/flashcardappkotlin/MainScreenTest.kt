@@ -23,6 +23,8 @@ import android.support.test.espresso.Espresso.pressBack
 import android.support.test.espresso.action.ViewActions.*
 import android.support.test.espresso.assertion.ViewAssertions.doesNotExist
 import android.support.test.espresso.assertion.ViewAssertions.matches
+import android.support.test.espresso.contrib.DrawerMatchers.isClosed
+import android.support.test.espresso.contrib.DrawerMatchers.isOpen
 import android.support.test.espresso.contrib.NavigationViewActions.navigateTo
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.filters.LargeTest
@@ -52,15 +54,18 @@ class MainScreenTest {
 
     private val database = FlashcardApplication.repoComponent.exposeRepository()
 
-    @Rule @JvmField
+    @Rule
+    @JvmField
     val testRule = ActivityTestRule<MainActivity>(MainActivity::class.java)
 
     @Before
     fun setup() {
-        database.deleteAllFlashcards(object: FlashcardDataSource.DeleteAllFlashcardsCallback {
-            override fun onDeleteSuccessful() { /* ignore */ }
+        database.deleteAllFlashcards(object : FlashcardDataSource.DeleteAllFlashcardsCallback {
+            override fun onDeleteSuccessful() { /* ignore */
+            }
 
-            override fun onDeleteFailed() { /* ignore */ }
+            override fun onDeleteFailed() { /* ignore */
+            }
         })
     }
 
@@ -80,6 +85,20 @@ class MainScreenTest {
 
         navigateToCategoryListViaNavDrawer()
         verifyCategoryListViewVisible()
+    }
+
+    @Test
+    fun backPressedWithNavDrawerOpen_closesNavDrawer() {
+        verifyAddEditViewVisible()
+
+        // Open nav drawer
+        onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(click())
+        onView(withId(R.id.drawerLayout)).check(matches(isOpen()))
+
+        pressBack()
+
+        onView(withId(R.id.drawerLayout)).check(matches(isClosed()))
+        verifyAddEditViewVisible()
     }
 
     @Test
