@@ -70,47 +70,69 @@
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"/>
 
-    <LinearLayout
+    <android.support.constraint.ConstraintLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp" android:layout_marginStart="8dp"
-        android:orientation="horizontal" app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent">
 
         <Button
             android:id="@+id/flashcardPriorityLowButton"
             style="?android:attr/buttonBarButtonStyle"
-            android:textColor="@color/colorPrimary"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/flashcard_priority_low_button_text"/>
+            android:layout_weight="1"
+            android:text="@string/flashcard_priority_low_button_text"
+            android:textColor="@color/colorPrimary"
+            app:layout_constraintEnd_toStartOf="@+id/flashcardPriorityMediumButton"
+            app:layout_constraintHorizontal_bias="0.5" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <Button
             android:id="@+id/flashcardPriorityMediumButton"
             style="?android:attr/buttonBarButtonStyle"
-            android:textColor="@color/colorPrimary"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/flashcard_priority_medium_button_text"/>
+            android:layout_weight="1"
+            android:text="@string/flashcard_priority_medium_button_text"
+            android:textColor="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="@+id/flashcardPriorityLowButton"
+            app:layout_constraintEnd_toStartOf="@+id/flashcardPriorityHighButton"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/flashcardPriorityLowButton"
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <Button
             android:id="@+id/flashcardPriorityHighButton"
             style="?android:attr/buttonBarButtonStyle"
-            android:textColor="@color/colorPrimary"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/flashcard_priority_high_button_text"/>
+            android:layout_weight="1"
+            android:text="@string/flashcard_priority_high_button_text"
+            android:textColor="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="@+id/flashcardPriorityMediumButton"
+            app:layout_constraintEnd_toStartOf="@+id/flashcardPriorityUrgentButton"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/flashcardPriorityMediumButton"
+            app:layout_constraintTop_toTopOf="parent"/>
 
         <Button
             android:id="@+id/flashcardPriorityUrgentButton"
             style="?android:attr/buttonBarButtonStyle"
-            android:textColor="@color/colorPrimary"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/flashcard_priority_urgent_button_text"/>
+            android:layout_weight="1"
+            android:text="@string/flashcard_priority_urgent_button_text"
+            android:textColor="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/flashcardPriorityHighButton"
+            app:layout_constraintTop_toTopOf="parent"/>
 
-    </LinearLayout>
+    </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>
 
