@@ -204,9 +204,11 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
      * Change view to FlashcardListFragment for a particular Category
      * @param categoryName the name of the Category
      */
-    override fun showCategoryFlashcardList(categoryName: String) {
+    override fun showCategoryFlashcardList(categoryName: String, flashcardId: String?) {
         flashcardListFragment = FlashcardListFragment
-                .newInstance(FlashcardListFragment.noParticularFlashcardExtra, categoryName)
+                .newInstance(
+                        flashcardId ?: FlashcardListFragment.noParticularFlashcardExtra,
+                        categoryName)
         replaceFragment(flashcardListFragment)
     }
 

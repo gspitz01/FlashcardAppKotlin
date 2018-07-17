@@ -114,7 +114,7 @@ class AddEditFlashcardPresenterTest {
 
         // Trigger successful save
         saveFlashcardCallbackCaptor.firstValue.onSuccess(saveResponse)
-        verify(view).showSaveSuccessful()
+        verify(view).showSaveSuccessful(eq(FLASHCARD_1.id), eq(FLASHCARD_1.category))
     }
 
     @Test

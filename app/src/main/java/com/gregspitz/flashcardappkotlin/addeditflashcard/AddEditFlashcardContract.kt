@@ -41,7 +41,7 @@ interface AddEditFlashcardContract {
 
         fun showFailedToLoadFlashcard()
 
-        fun showSaveSuccessful()
+        fun showSaveSuccessful(flashcardId: String, categoryName: String)
 
         fun showSaveFailed()
 

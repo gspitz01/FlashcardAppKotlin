@@ -84,7 +84,7 @@ class AddEditFlashcardPresenter (
                 object: UseCase.UseCaseCallback<SaveFlashcard.ResponseValue> {
                     override fun onSuccess(response: SaveFlashcard.ResponseValue) {
                         if (view.isActive()) {
-                            view.showSaveSuccessful()
+                            view.showSaveSuccessful(flashcard.id, flashcard.category)
                         }
                     }
 

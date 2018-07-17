@@ -197,10 +197,12 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
 
     /**
      * Show a toast for a successful save attempt
+     * And then move to FlashcardList view
      */
-    override fun showSaveSuccessful() {
+    override fun showSaveSuccessful(flashcardId: String, categoryName: String) {
         toast = Toast.makeText(activity, R.string.save_successful_toast_text, Toast.LENGTH_LONG)
         toast?.show()
+        (activity as MainFragmentRouter).showCategoryFlashcardList(categoryName, flashcardId)
     }
 
     /**

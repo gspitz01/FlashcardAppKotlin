@@ -39,9 +39,11 @@ class SingleFragmentActivity : AppCompatActivity(), MainFragmentRouter {
         replaceFragment(FlashcardListFragment.newInstance(flashcardId))
     }
 
-    override fun showCategoryFlashcardList(categoryName: String) {
+    override fun showCategoryFlashcardList(categoryName: String, flashcardId: String?) {
         replaceFragment(FlashcardListFragment
-                .newInstance(FlashcardListFragment.noParticularFlashcardExtra, categoryName))
+                .newInstance(
+                        flashcardId ?: FlashcardListFragment.noParticularFlashcardExtra,
+                        categoryName))
     }
 
     override fun showAddEditFlashcard(flashcardId: String) {

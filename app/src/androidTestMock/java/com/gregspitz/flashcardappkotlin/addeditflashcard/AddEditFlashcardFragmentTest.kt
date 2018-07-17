@@ -19,14 +19,17 @@ package com.gregspitz.flashcardappkotlin.addeditflashcard
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.action.ViewActions.replaceText
+import android.support.test.espresso.assertion.ViewAssertions.doesNotExist
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.filters.MediumTest
 import android.support.test.runner.AndroidJUnit4
 import com.gregspitz.flashcardappkotlin.BaseSingleFragmentTest
 import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_1
+import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_2
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
+import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
 import org.hamcrest.Matchers
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -80,12 +83,24 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
     }
 
     @Test
-    fun saveFlashcardButtonClick_savesChangesToExistingFlashcard() {
+    fun saveFlashcardButtonClick_savesChangesToExistingFlashcard_movesToFlashcardListOfThatCategoryWithDetailOfThatFlashcard() {
+        val newCategory = "Category1"
+        val sortBeforeFront = "Mew Front"
+        val someOtherBack = "Some other back"
+        val flashcardSortsBeforeNewFlashcard = Flashcard("whatever", newCategory, sortBeforeFront,
+                someOtherBack, FlashcardPriority.NEW)
+        // Add to data source a flashcard that sorts before the new flashcard so that the detail
+        // view in CategoryFlashcardList is actually checked that it moves to newFlashcard correctly
+        // Also add FLASHCARD_2, which is in a different category to prove that only the correct
+        // category is shown when it moves to FlashcardList
+        addFlashcardsToDataSource(flashcardSortsBeforeNewFlashcard, FLASHCARD_2)
+
         launchActivity(FLASHCARD_1.id)
 
-        val newCategory = "Category1"
         val newFront = "New Front"
         val newBack = "New Back"
+        val newFlashcard = Flashcard(FLASHCARD_1.id, newCategory, newFront, newBack,
+                FlashcardPriority.NEW)
         onView(withId(R.id.flashcardEditCategory)).perform(replaceText(newCategory))
         onView(withId(R.id.flashcardEditFront)).perform(replaceText(newFront))
         onView(withId(R.id.flashcardEditBack)).perform(replaceText(newBack))
@@ -94,10 +109,18 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
         // Successful save shows save success toast
         checkForToast(R.string.save_successful_toast_text)
 
-        val savedFlashcard = getFlashcardFromRepoById(FLASHCARD_1.id)
+        val savedFlashcard = getFlashcardFromRepoById(newFlashcard.id)
         assertEquals(newCategory, savedFlashcard?.category)
         assertEquals(newFront, savedFlashcard?.front)
         assertEquals(newBack, savedFlashcard?.back)
+
+        // Check FlashcardList shows with correct detail view
+        checkDetailViewMatchesFlashcard(newFlashcard)
+
+        // Also check that there's no view shown for FLASHCARD_2 or its category because it's
+        // in a different category
+        onView(withText(FLASHCARD_2.category)).check(doesNotExist())
+        onView(withText(FLASHCARD_2.front)).check(doesNotExist())
     }
 
     @Test

@@ -7,7 +7,7 @@ interface MainFragmentRouter {
 
     fun showFlashcardList(flashcardId: String)
 
-    fun showCategoryFlashcardList(categoryName: String)
+    fun showCategoryFlashcardList(categoryName: String, flashcardId: String? = null)
 
     fun showCategoryList()
 
