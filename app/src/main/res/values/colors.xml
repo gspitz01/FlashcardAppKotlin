@@ -4,5 +4,5 @@
     <color name="colorPrimaryDark">#BA000D</color>
     <color name="colorAccent">#FFD600</color>
     <color name="colorError">#BA000D</color>
-    <color name="colorWarning">#FFD600</color>
+    <color name="colorWarning">#F57C00</color>
 </resources>

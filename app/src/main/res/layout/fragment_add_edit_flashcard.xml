@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="?attr/actionBarSize"
@@ -14,6 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/failed_to_load_flashcard_text"
+        android:textAlignment="center"
         android:textColor="@color/colorError"
         android:visibility="gone"/>
 
@@ -36,7 +38,8 @@
         android:hint="@string/flashcard_front_hint_text"
         android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/flashcardEditCategory"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/flashcardEditCategory"/>
 
     <EditText
         android:id="@+id/flashcardEditBack"
@@ -47,6 +50,7 @@
         android:hint="@string/flashcard_back_hint_text"
         android:inputType="textMultiLine"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toBottomOf="@+id/flashcardEditFront"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/flashcardEditFront"/>
 
 </android.support.constraint.ConstraintLayout>
