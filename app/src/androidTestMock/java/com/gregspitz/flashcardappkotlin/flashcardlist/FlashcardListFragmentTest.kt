@@ -175,14 +175,17 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
 
     @Test
     fun swipingDetailView_recyclerViewFollows() {
+        // These flashcards will sort to this order (because of category):
+        // flashcard3, flashcard4, flashcard5, flashcard6, flashcard7, flashcard8,
+        // FLASHCARD_1, FLASHCARD_2
         addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2, flashcard3, flashcard4, flashcard5,
                 flashcard6, flashcard7, flashcard8)
         launchActivity()
         val viewPagerIdlingResource = registerViewPagerIdlingResource()
         performMultipleSwipes(onView(withId(R.id.detailPager)), 6)
-        checkDetailViewMatchesFlashcard(flashcard7)
+        checkDetailViewMatchesFlashcard(FLASHCARD_1)
         onView(allOf(isDescendantOfA(withId(R.id.flashcardRecyclerView)),
-                withText(flashcard7.front))).check(matches(isDisplayed()))
+                withText(FLASHCARD_1.front))).check(matches(isDisplayed()))
         unregisterViewPagerIdlingResource(viewPagerIdlingResource)
     }
 
