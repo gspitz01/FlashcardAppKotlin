@@ -87,7 +87,15 @@ class RandomFlashcardPresenter(
 
     override fun saveFlashcard(priority: FlashcardPriority) {
         flashcard?.let {
-            val newFlashcard = Flashcard(it.id, it.category, it.front, it.back, priority)
+            // Create the new float priority by multiplying the current priority by a factor
+            val floatPriority = when (priority) {
+                FlashcardPriority.LOW -> it.priority * 2.5f
+                FlashcardPriority.MEDIUM -> it.priority * 2.0f
+                FlashcardPriority.HIGH -> it.priority * 1.6f
+                FlashcardPriority.URGENT -> it.priority * 1.1f
+                FlashcardPriority.NEW -> 2.5f
+            }
+            val newFlashcard = Flashcard(it.id, it.category, it.front, it.back, floatPriority)
             useCaseHandler.execute(saveFlashcard, SaveFlashcard.RequestValues(newFlashcard),
                     object : UseCase.UseCaseCallback<SaveFlashcard.ResponseValue> {
                         override fun onSuccess(response: SaveFlashcard.ResponseValue) {

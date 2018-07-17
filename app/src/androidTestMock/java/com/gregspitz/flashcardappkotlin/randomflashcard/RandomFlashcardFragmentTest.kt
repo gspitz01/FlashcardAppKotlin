@@ -32,7 +32,6 @@ import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_2
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
-import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
 import org.hamcrest.CoreMatchers.*
 import org.hamcrest.Description
 import org.hamcrest.Matcher
@@ -145,26 +144,26 @@ class RandomFlashcardFragmentTest : BaseSingleFragmentTest() {
 
     @Test
     fun clickLowPriorityButton_savesFlashcardWithLowPriority() {
-        verifyPriorityButtonClickSavesWithThatPriority(R.id.flashcardPriorityLowButton,
-                FlashcardPriority.LOW)
+        // NEW * LOW = 2.5 * 2.5 = 6.25
+        verifyPriorityButtonClickSavesWithThatPriority(R.id.flashcardPriorityLowButton, 6.25f)
     }
 
     @Test
     fun clickMediumPriorityButton_savesFlashcardWithLowPriority() {
-        verifyPriorityButtonClickSavesWithThatPriority(R.id.flashcardPriorityMediumButton,
-                FlashcardPriority.MEDIUM)
+        // NEW * MEDIUM = 2.5 * 2.0 = 5.0
+        verifyPriorityButtonClickSavesWithThatPriority(R.id.flashcardPriorityMediumButton, 5.0f)
     }
 
     @Test
     fun clickHighPriorityButton_savesFlashcardWithLowPriority() {
-        verifyPriorityButtonClickSavesWithThatPriority(R.id.flashcardPriorityHighButton,
-                FlashcardPriority.HIGH)
+        // NEW * HIGH = 2.5 * 1.6 = 4.0
+        verifyPriorityButtonClickSavesWithThatPriority(R.id.flashcardPriorityHighButton, 4.0f)
     }
 
     @Test
     fun clickUrgentPriorityButton_savesFlashcardWithLowPriority() {
-        verifyPriorityButtonClickSavesWithThatPriority(R.id.flashcardPriorityUrgentButton,
-                FlashcardPriority.URGENT)
+        // NEW * URGENT = 2.5 * 1.1 = 2.75
+        verifyPriorityButtonClickSavesWithThatPriority(R.id.flashcardPriorityUrgentButton, 2.75f)
     }
 
     private fun verifyFirstCategoryAndText(flashcard1: Flashcard, flashcard2: Flashcard) {
@@ -222,7 +221,7 @@ class RandomFlashcardFragmentTest : BaseSingleFragmentTest() {
     }
 
     private fun verifyPriorityButtonClickSavesWithThatPriority(buttonId: Int,
-                                                               priority: FlashcardPriority) {
+                                                               priority: Float) {
         addFlashcardsToDataSource(FLASHCARD_1)
         launchActivity()
 
@@ -239,7 +238,7 @@ class RandomFlashcardFragmentTest : BaseSingleFragmentTest() {
                 .check(matches(withText(flashcard.back)))
     }
 
-    private fun assertFlashcardSavedWithPriority(priority: FlashcardPriority) {
+    private fun assertFlashcardSavedWithPriority(priority: Float) {
         val savedFlashcard = getFlashcardFromRepoById(FLASHCARD_1.id)
         assertEquals(priority, savedFlashcard!!.priority)
     }

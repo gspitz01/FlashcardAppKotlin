@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "c7a690338a2238590d2873525fd4a1a4",
+    "identityHash": "b2bd7998afd03af5a19c8f7fe84591cd",
     "entities": [
       {
         "tableName": "flashcard",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `category` TEXT NOT NULL, `front` TEXT NOT NULL, `back` TEXT NOT NULL, `priority` INTEGER NOT NULL, `mostRecentlyView` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `category` TEXT NOT NULL, `front` TEXT NOT NULL, `back` TEXT NOT NULL, `priority` REAL NOT NULL, `mostRecentlyView` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -35,7 +35,7 @@
           {
             "fieldPath": "priority",
             "columnName": "priority",
-            "affinity": "INTEGER",
+            "affinity": "REAL",
             "notNull": true
           },
           {
@@ -57,7 +57,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"c7a690338a2238590d2873525fd4a1a4\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"b2bd7998afd03af5a19c8f7fe84591cd\")"
     ]
   }
 }

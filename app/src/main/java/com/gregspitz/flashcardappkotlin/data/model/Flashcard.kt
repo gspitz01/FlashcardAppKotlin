@@ -33,5 +33,5 @@ import java.util.*
 @TypeConverters(FlashcardPriorityTypeConverter::class, FlashcardDateTypeConverter::class)
 data class Flashcard(@PrimaryKey val id: String = UUID.randomUUID().toString(),
                      val category: String, val front: String, val back: String,
-                     val priority: FlashcardPriority, val mostRecentlyView: Date = Date())
+                     val priority: Float = 2.5f, val mostRecentlyView: Date = Date())
     : Parcelable, FlashcardListItem

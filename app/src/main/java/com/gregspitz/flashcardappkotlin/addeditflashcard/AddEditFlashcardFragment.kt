@@ -15,7 +15,6 @@ import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.DeleteFl
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.GetFlashcard
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.SaveFlashcard
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
-import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
 import kotlinx.android.synthetic.main.fragment_add_edit_flashcard.*
 import javax.inject.Inject
 
@@ -93,11 +92,10 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
                 val back = flashcardEditBack.text.toString()
                 flashcard = if (flashcard != null) {
                     // If changing an existing flashcard, create a new one with the same id
-                    Flashcard(flashcard!!.id, category, front, back, FlashcardPriority.NEW)
+                    Flashcard(flashcard!!.id, category, front, back)
                 } else {
                     // If no existing flashcard, create a new one with new id
-                    Flashcard(category = category, front = front, back = back,
-                            priority = FlashcardPriority.NEW)
+                    Flashcard(category = category, front = front, back = back)
                 }
                 // flashcard will definitely not be null
                 this@AddEditFlashcardFragment.presenter.saveFlashcard(flashcard!!)

@@ -38,7 +38,6 @@ import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.R.id.detailPager
 import com.gregspitz.flashcardappkotlin.TestUtils.recyclerViewScrollToAndVerifyPosition
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
-import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.not
 import org.junit.Assert.assertTrue
@@ -52,18 +51,12 @@ import org.junit.runner.RunWith
 @MediumTest
 class FlashcardListFragmentTest : BaseSingleFragmentTest() {
 
-    private val flashcard3 = Flashcard("2", "Category2", "Front2", "Back2",
-            FlashcardPriority.NEW)
-    private val flashcard4 = Flashcard("3", "Category3", "Front3", "Back3",
-            FlashcardPriority.NEW)
-    private val flashcard5 = Flashcard("4", "Category4", "Front4", "Back4",
-            FlashcardPriority.NEW)
-    private val flashcard6 = Flashcard("5", "Category5", "Front5", "Back5",
-            FlashcardPriority.NEW)
-    private val flashcard7 = Flashcard("6", "Category6", "Front6", "Back6",
-            FlashcardPriority.NEW)
-    private val flashcard8 = Flashcard("7", "Category7", "Front7", "Back7",
-            FlashcardPriority.NEW)
+    private val flashcard3 = Flashcard("2", "Category2", "Front2", "Back2")
+    private val flashcard4 = Flashcard("3", "Category3", "Front3", "Back3")
+    private val flashcard5 = Flashcard("4", "Category4", "Front4", "Back4")
+    private val flashcard6 = Flashcard("5", "Category5", "Front5", "Back5")
+    private val flashcard7 = Flashcard("6", "Category6", "Front6", "Back6")
+    private val flashcard8 = Flashcard("7", "Category7", "Front7", "Back7")
 
     @Test
     fun flashcardRecyclerView_showsFlashcardFronts() {

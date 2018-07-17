@@ -29,7 +29,6 @@ import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_2
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
-import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
 import org.hamcrest.Matchers
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -88,7 +87,7 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
         val sortBeforeFront = "Mew Front"
         val someOtherBack = "Some other back"
         val flashcardSortsBeforeNewFlashcard = Flashcard("whatever", newCategory, sortBeforeFront,
-                someOtherBack, FlashcardPriority.NEW)
+                someOtherBack)
         // Add to data source a flashcard that sorts before the new flashcard so that the detail
         // view in CategoryFlashcardList is actually checked that it moves to newFlashcard correctly
         // Also add FLASHCARD_2, which is in a different category to prove that only the correct
@@ -99,8 +98,7 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
 
         val newFront = "New Front"
         val newBack = "New Back"
-        val newFlashcard = Flashcard(FLASHCARD_1.id, newCategory, newFront, newBack,
-                FlashcardPriority.NEW)
+        val newFlashcard = Flashcard(FLASHCARD_1.id, newCategory, newFront, newBack)
         onView(withId(R.id.flashcardEditCategory)).perform(replaceText(newCategory))
         onView(withId(R.id.flashcardEditFront)).perform(replaceText(newFront))
         onView(withId(R.id.flashcardEditBack)).perform(replaceText(newBack))

@@ -24,7 +24,6 @@ import com.gregspitz.flashcardappkotlin.TestUseCaseScheduler
 import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
-import com.gregspitz.flashcardappkotlin.data.model.FlashcardPriority
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
 import com.nhaarman.mockito_kotlin.argumentCaptor
@@ -41,8 +40,7 @@ import org.junit.Test
 class GetFlashcardsTest {
 
     // Another Flashcard with the same category as FLASHCARD_1 and a front which sorts to before FLASHCARD_1's
-    private val flashcard7 = Flashcard("7", FLASHCARD_1.category, "A front", "Back",
-            FlashcardPriority.NEW)
+    private val flashcard7 = Flashcard("7", FLASHCARD_1.category, "A front", "Back")
 
     private val noCategoryRequest = GetFlashcards.RequestValues()
     private val categoryRequest =

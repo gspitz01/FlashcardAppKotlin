@@ -305,9 +305,10 @@ class RandomFlashcardPresenterTest {
         verify(useCaseHandler).execute(eq(saveFlashcard), saveFlashcardRequestCaptor.capture(),
                 saveFlashcardUseCaseCallbackCaptor.capture())
 
-        // Saved flashcard should have same data as retrieved flashcard with new priority
+        // Saved flashcard should have same data as retrieved flashcard with different priority
+        // Priority should be 2.5 * 1.1 = 2.75
         val expectedFlashcard = Flashcard(FLASHCARD_1.id, FLASHCARD_1.category, FLASHCARD_1.front,
-                FLASHCARD_1.back, FlashcardPriority.URGENT)
+                FLASHCARD_1.back, 2.75f)
         val actualFlashcard = saveFlashcardRequestCaptor.firstValue.flashcard
         assertEquals(expectedFlashcard.id, actualFlashcard.id)
         assertEquals(expectedFlashcard.front, actualFlashcard.front)
