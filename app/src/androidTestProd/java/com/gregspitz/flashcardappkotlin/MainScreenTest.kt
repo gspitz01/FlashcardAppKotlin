@@ -105,9 +105,9 @@ class MainScreenTest {
     fun orientationChangeOnAddEditViewWithPreviouslySaveFlashcard_maintainsCurrentViewWithFlashcardData() {
         // Initial orientation portrait
         requestOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
-        // Save the flashcard
+        // Save the flashcard which moves to list view
         saveFlashcard(FLASHCARD_1)
-        // Move away from edit view
+        // Move to list of all
         navigateToFlashcardListViaNavDrawer()
         // Move back to edit view of that flashcard
         clickOnEditButtonInListView()

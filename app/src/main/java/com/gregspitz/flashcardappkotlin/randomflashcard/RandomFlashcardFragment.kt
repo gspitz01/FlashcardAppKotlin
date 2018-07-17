@@ -91,11 +91,9 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
             flashcardCategory.text = it?.category
             when (viewModel.flashcardSide.value) {
                 FlashcardSide.FRONT -> {
-                    flashcardSide.textAlignment = View.TEXT_ALIGNMENT_CENTER
                     flashcardSide.text = it?.front
                 }
                 FlashcardSide.BACK -> {
-                    flashcardSide.textAlignment = View.TEXT_ALIGNMENT_VIEW_START
                     flashcardSide.text = it?.back
                 }
             }
@@ -105,11 +103,9 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
         val flashcardSideObserver = Observer<FlashcardSide> {
             when (it) {
                 FlashcardSide.FRONT -> {
-                    flashcardSide.textAlignment = View.TEXT_ALIGNMENT_CENTER
                     flashcardSide.text = viewModel.randomFlashcard.value?.front
                 }
                 FlashcardSide.BACK -> {
-                    flashcardSide.textAlignment = View.TEXT_ALIGNMENT_VIEW_START
                     flashcardSide.text = viewModel.randomFlashcard.value?.back
                 }
             }
@@ -187,7 +183,6 @@ class RandomFlashcardFragment : Fragment(), RandomFlashcardContract.View {
      * Show message if the Flashcard could not be loaded
      */
     override fun showFailedToLoadFlashcard() {
-        flashcardSide.textAlignment = View.TEXT_ALIGNMENT_CENTER
         flashcardSide.setText(R.string.failed_to_load_flashcard_text)
     }
 
