@@ -34,6 +34,7 @@ import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -41,8 +42,6 @@ import org.junit.Test
  * Tests for {@link GetRandomFlashcard}
  */
 class GetRandomFlashcardTest {
-
-    // TODO: Add tests for sorting and probability
 
     // Request values represents the id of the previous Flashcard
     // Null means there was no previous Flashcard
@@ -68,10 +67,21 @@ class GetRandomFlashcardTest {
             argumentCaptor<GetRandomFlashcard.ResponseValue>()
 
     private lateinit var getRandomFlashcard: GetRandomFlashcard
+    private lateinit var randomGet: GetRandomFlashcard.RandomFlashcardRepoGet
 
     @Before
     fun setup() {
         getRandomFlashcard = GetRandomFlashcard(flashcardRepository)
+        randomGet =
+                getRandomFlashcard.RandomFlashcardRepoGet("Doesn't Matter",
+                        object : UseCase.UseCaseCallback<GetRandomFlashcard.ResponseValue> {
+                            override fun onSuccess(response: GetRandomFlashcard.ResponseValue) {
+                                /* Doesn't matter */
+                            }
+
+                            override fun onError() { /* Doesn't matter */
+                            }
+                        })
     }
 
     @Test
@@ -153,5 +163,30 @@ class GetRandomFlashcardTest {
         repositoryCallbackCaptor.firstValue.onFlashcardsLoaded(listOfCategoryOne)
         verify(callback).onSuccess(responseCaptor.capture())
         assertEquals(notPreviousCard, responseCaptor.firstValue.flashcard)
+    }
+
+    @Test
+    fun `index selection never goes out of list size bounds`() {
+        val listSize = 100
+        for (i in 0..1_000_000) {
+            val index = randomGet.getRandomDistributedSelection(listSize)
+            assertTrue(index < listSize)
+            assertTrue(index >= 0)
+        }
+    }
+
+    @Test
+    fun `sort flashcards sorts by priority`() {
+        val flashcard1 = Flashcard("0", "Whatever", "Front", "Back",
+                2.5f)
+        val flashcard2 = Flashcard("1", "Whatever", "Front", "Back",
+                2.4f)
+        val flashcard3 = Flashcard("2", "Whatever", "Front", "Back",
+                2.6f)
+        val flashcard4 = Flashcard("3", "Whatever", "Front", "Back",
+                2.1f)
+        val unsortedFlashcards = listOf(flashcard1, flashcard2, flashcard3, flashcard4)
+        val sortedFlashcards = listOf(flashcard4, flashcard2, flashcard1, flashcard3)
+        assertEquals(sortedFlashcards, randomGet.sortFlashcards(unsortedFlashcards))
     }
 }

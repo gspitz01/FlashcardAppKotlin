@@ -20,8 +20,11 @@ import com.gregspitz.flashcardappkotlin.UseCase
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardDataSource
 import com.gregspitz.flashcardappkotlin.data.source.FlashcardRepository
+import org.uncommons.maths.random.ExponentialGenerator
 import java.util.*
 import javax.inject.Inject
+
+private const val EXPONENTIAL_DISTRIBUTION_RATE = 0.5
 
 /**
  * Use case for retrieving a random flashcard while avoiding returning the previously seen card
@@ -53,24 +56,26 @@ class GetRandomFlashcard @Inject constructor(
             private val useCaseCallback: UseCaseCallback<ResponseValue>
     ) : FlashcardDataSource.GetFlashcardsCallback {
 
-        private val random = Random()
+        // Use an exponential distribution to prioritize Flashcards with lower priority number
+        private val exponentialGenerator =
+                ExponentialGenerator(EXPONENTIAL_DISTRIBUTION_RATE, Random())
 
         override fun onFlashcardsLoaded(flashcards: List<Flashcard>) {
-            // TODO: sort flashcards by priority then select
 
             when {
                 flashcards.size > 1 -> {
+                    // Sort the Flashcards by priority
+                    val sortedFlashcards = sortFlashcards(flashcards)
 
                     var flashcard: Flashcard?
                     // Keep track of number attempts just in case (see below)
                     var attempts = 0
                     var broke = false
                     do {
-
-                        // If more than one Flashcard of that priority, choose randomly between them
+                        // Select a random Flashcard based on distribution
                         // while avoiding the previously retrieved Flashcard
-                        val index = random.nextInt(flashcards.size)
-                        flashcard = flashcards[index]
+                        val index = getRandomDistributedSelection(sortedFlashcards.size)
+                        flashcard = sortedFlashcards[index]
                         attempts++
                         // In case somehow all flashcards have the same id, which shouldn't happen,
                         // but don't want to end up in an infinite loop
@@ -97,6 +102,19 @@ class GetRandomFlashcard @Inject constructor(
 
         override fun onDataNotAvailable() {
             useCaseCallback.onError()
+        }
+
+        fun sortFlashcards(flashcards: List<Flashcard>): List<Flashcard> =
+                flashcards.sortedWith(compareBy { it.priority })
+
+        fun getRandomDistributedSelection(size: Int): Int {
+            var randomDouble = 1.0
+            // Basically just truncating the distribution so it doesn't go out of bounds
+            while (randomDouble >= 1.0) {
+                randomDouble = exponentialGenerator.nextValue()
+            }
+            val inverseSize = 1.0 / size
+            return Math.floor(randomDouble / inverseSize).toInt()
         }
     }
 }

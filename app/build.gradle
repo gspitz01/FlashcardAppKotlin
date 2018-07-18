@@ -103,12 +103,14 @@ dependencies {
     kapt "android.arch.persistence.room:compiler:$rootProject.archRoomVersion"
 
     // Flexible Adapter
-
     // https://github.com/davideas/FlexibleAdapter
     implementation "eu.davidea:flexible-adapter:$rootProject.flexibleAdapterVersion"
     implementation "eu.davidea:flexible-adapter-ui:$rootProject.flexibleAdapterUiVersion"
     implementation "eu.davidea:flexible-adapter-livedata:$rootProject.flexibleAdapterLiveDataVersion"
     implementation "eu.davidea:flexible-adapter-databinding:$rootProject.flexibleAdapterDataBindingVersion"
+
+    // Uncommon maths for probability distribution
+    implementation files('libs/uncommons-maths-1.2.3.jar')
 
     // Dagger
     implementation "com.google.dagger:dagger-android:$rootProject.daggerVersion"

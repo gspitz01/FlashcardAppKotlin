@@ -46,7 +46,8 @@ Technologies used:
 - JUnit
 - MockitoKotlin
 - Espresso
-- Flexible Adapter https://github.com/davideas/FlexibleAdapter
+- Flexible Adapter - https://github.com/davideas/FlexibleAdapter
 - Firebase Realtime Database
 - Google Sign-In
 - Picasso
+- Uncommon Maths ExponentialGenerator - https://maths.uncommons.org/
