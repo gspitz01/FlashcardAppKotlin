@@ -3,10 +3,8 @@ package com.gregspitz.flashcardappkotlin.addeditflashcard
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.support.annotation.VisibleForTesting
 import android.support.v4.app.Fragment
 import android.view.*
-import android.widget.Toast
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.MainFragmentRouter
 import com.gregspitz.flashcardappkotlin.R
@@ -43,10 +41,6 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
 
     // Becomes active onResume; inactive onPause
     private var active = false
-
-    // Reference to toast for testing purposes
-    // Toast shows response for save success or failure
-    private var toast: Toast? = null
 
     companion object {
         // If no Flashcard id was given, use this to mean creation of a new Flashcard
@@ -194,29 +188,26 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
     }
 
     /**
-     * Show a toast for a successful save attempt
+     * Show a message for a successful save attempt
      * And then move to FlashcardList view
      */
     override fun showSaveSuccessful(flashcardId: String, categoryName: String) {
-        toast = Toast.makeText(activity, R.string.save_successful_toast_text, Toast.LENGTH_LONG)
-        toast?.show()
+        (activity as MainFragmentRouter).showSnackbar(R.string.save_successful_message_text)
         (activity as MainFragmentRouter).showCategoryFlashcardList(categoryName, flashcardId)
     }
 
     /**
-     * Show a toast for a failed save attempt
+     * Show a message for a failed save attempt
      */
     override fun showSaveFailed() {
-        toast = Toast.makeText(activity, R.string.save_failed_toast_text, Toast.LENGTH_LONG)
-        toast?.show()
+        (activity as MainFragmentRouter).showSnackbar(R.string.save_failed_message_text)
     }
 
     /**
-     * Show a toast to say the deletion attempt failed
+     * Show a message to say the deletion attempt failed
      */
     override fun showDeleteFailed() {
-        toast = Toast.makeText(activity, R.string.delete_failed_toast_text, Toast.LENGTH_LONG)
-        toast?.show()
+        (activity as MainFragmentRouter).showSnackbar(R.string.delete_failed_message_text)
     }
 
     override fun isActive(): Boolean {
@@ -230,10 +221,5 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
      */
     override fun setPresenter(presenter: AddEditFlashcardContract.Presenter) {
         this.presenter = presenter
-    }
-
-    @VisibleForTesting
-    fun getToast(): Toast? {
-        return toast
     }
 }

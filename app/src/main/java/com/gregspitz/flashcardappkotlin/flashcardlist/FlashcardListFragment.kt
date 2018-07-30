@@ -10,7 +10,6 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.LinearLayoutManager
 import android.view.*
-import android.widget.Toast
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
 import com.gregspitz.flashcardappkotlin.MainFragmentRouter
 import com.gregspitz.flashcardappkotlin.R
@@ -330,14 +329,14 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
      * Show that a deletion was successful
      */
     override fun showDeleteSuccess() {
-        Toast.makeText(activity, R.string.delete_succeeded_toast_text, Toast.LENGTH_LONG).show()
+        (activity as MainFragmentRouter).showSnackbar(R.string.delete_succeeded_message_text)
     }
 
     /**
      * Show that a deletion failed
      */
     override fun showDeleteFailed() {
-        Toast.makeText(activity, R.string.delete_failed_toast_text, Toast.LENGTH_LONG).show()
+        (activity as MainFragmentRouter).showSnackbar(R.string.delete_failed_message_text)
     }
 
     override fun isActive(): Boolean {

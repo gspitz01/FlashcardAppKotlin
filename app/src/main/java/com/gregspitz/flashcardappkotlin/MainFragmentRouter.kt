@@ -16,4 +16,6 @@ interface MainFragmentRouter {
     fun showRandomFlashcard(categoryName: String?)
 
     fun showFlashcardDownload()
+
+    fun showSnackbar(stringId: Int)
 }

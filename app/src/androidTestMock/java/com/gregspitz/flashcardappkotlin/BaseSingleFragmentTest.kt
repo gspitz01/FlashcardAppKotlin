@@ -67,8 +67,8 @@ open class BaseSingleFragmentTest {
         testRule.activity.requestedOrientation = orientation
     }
 
-    protected fun checkForToast(text: Int) {
-        TestUtils.checkForToast(testRule, text)
+    protected fun checkForSnackbar(text: Int) {
+        TestUtils.checkForSnackbar(text)
     }
 
     protected fun clickOnDeleteDialog(responseStringId: Int) {

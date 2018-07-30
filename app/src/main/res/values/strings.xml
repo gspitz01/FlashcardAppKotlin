@@ -10,14 +10,14 @@
     <string name="flashcard_game_button_text">Flashcard Game</string>
     <string name="next_flashcard_button_text">Next Flashcard</string>
     <string name="show_flashcard_list_button_text">Show List</string>
-    <string name="save_successful_toast_text">Save Successful</string>
-    <string name="save_failed_toast_text">Save Failed!</string>
+    <string name="save_successful_message_text">Save Successful</string>
+    <string name="save_failed_message_text">Save Failed!</string>
     <string name="nav_game_title">Play Game</string>
     <string name="nav_list_title">All Flashcards</string>
     <string name="nav_new_flashcard_title">New Flashcard</string>
     <string name="flashcard_category_hint_text">Category</string>
     <string name="delete_flashcard_button_text">Delete</string>
-    <string name="delete_failed_toast_text">Delete failed!</string>
+    <string name="delete_failed_message_text">Delete failed!</string>
     <string name="confirm_delete_title_text">Delete Flashcard?</string>
     <string name="confirm_delete_message_text">Are you sure you want to delete this flashcard?
     </string>
@@ -47,7 +47,7 @@
     <string name="failed_to_load_categories_text">Failed to load categories</string>
     <string name="nav_category_list_title">Categories</string>
     <string name="delete_flashcards_button_title">Delete flashcards</string>
-    <string name="delete_succeeded_toast_text">Delete Succeeded!</string>
+    <string name="delete_succeeded_message_text">Delete Succeeded!</string>
     <string name="confirm_delete_multiple_title_text">Delete multiple flashcards?</string>
     <string name="confirm_delete_all_flashcards_text">Are you sure you want to delete all
         flashcards?

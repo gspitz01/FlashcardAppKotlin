@@ -9,19 +9,25 @@
     android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
-    <FrameLayout
-        android:id="@+id/contentFrame"
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/mainCoordinator"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
+        <FrameLayout
+            android:id="@+id/contentFrame"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary">
+            android:layout_height="match_parent">
 
-        </android.support.v7.widget.Toolbar>
-    </FrameLayout>
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary">
+
+            </android.support.v7.widget.Toolbar>
+        </FrameLayout>
+    </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.NavigationView
         android:id="@+id/navDrawer"

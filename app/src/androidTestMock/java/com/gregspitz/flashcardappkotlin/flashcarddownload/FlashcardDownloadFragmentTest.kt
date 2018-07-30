@@ -83,24 +83,24 @@ class FlashcardDownloadFragmentTest : BaseSingleFragmentTest() {
     }
 
     @Test
-    fun selectCategoryAndClickDownloadButton_showsSuccessToast() {
+    fun selectCategoryAndClickDownloadButton_showsSuccessMessage() {
         addCategoriesToDownloadService(downloadCategories)
         launchActivity()
         scrollToAndClickPosition(1)
         clickDownloadFlashcardButton()
         assertEquals(downloadCategories[1], downloadService.attemptedDownloadCategory)
-        checkForToast(R.string.download_flashcards_successful)
+        checkForSnackbar(R.string.download_flashcards_successful)
     }
 
     @Test
-    fun failedDownloadFromService_showsFailedToast() {
+    fun failedDownloadFromService_showsFailedMessage() {
         downloadService.flashcardFailure = true
         addCategoriesToDownloadService(downloadCategories)
         launchActivity()
         scrollToAndClickPosition(1)
         clickDownloadFlashcardButton()
         assertEquals(downloadCategories[1], downloadService.attemptedDownloadCategory)
-        checkForToast(R.string.download_flashcards_failed)
+        checkForSnackbar(R.string.download_flashcards_failed)
     }
 
     private fun launchActivity() {

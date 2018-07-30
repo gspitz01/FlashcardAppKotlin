@@ -49,16 +49,6 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
         addFlashcardsToDataSource(FLASHCARD_1)
     }
 
-    @After
-    fun tearDown() {
-        try {
-            (testRule.activity.supportFragmentManager.fragments[0] as AddEditFlashcardFragment)
-                    .getToast()?.cancel()
-        } catch (ex: ClassCastException) {
-            // Ignore. This just means the fragment was switched to a different one. That's fine.
-        }
-    }
-
     @Test
     fun startWithFlashcardId_showsFlashcardInfo() {
         launchActivity(FLASHCARD_1.id)
@@ -104,8 +94,8 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
         onView(withId(R.id.flashcardEditBack)).perform(replaceText(newBack))
         clickSaveFlashcardButton()
 
-        // Successful save shows save success toast
-        checkForToast(R.string.save_successful_toast_text)
+        // Successful save shows save success message
+        checkForSnackbar(R.string.save_successful_message_text)
 
         val savedFlashcard = getFlashcardFromRepoById(newFlashcard.id)
         assertEquals(newCategory, savedFlashcard?.category)
@@ -122,11 +112,11 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
     }
 
     @Test
-    fun saveFailed_showsSaveFailedToast() {
+    fun saveFailed_showsSaveFailedMessage() {
         localDataSource.setFailure(true)
         launchActivity(FLASHCARD_1.id)
         clickSaveFlashcardButton()
-        checkForToast(R.string.save_failed_toast_text)
+        checkForSnackbar(R.string.save_failed_message_text)
     }
 
     @Test
@@ -143,7 +133,7 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
     }
 
     @Test
-    fun deleteFailure_showsDeleteFailedToast() {
+    fun deleteFailure_showsDeleteFailedMessage() {
         localDataSource.setDeleteFailure(true)
         launchActivity(FLASHCARD_1.id)
 
@@ -152,7 +142,7 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
         // Alert dialog for confirmation
         clickOnDeleteDialog(android.R.string.yes)
 
-        checkForToast(R.string.delete_failed_toast_text)
+        checkForSnackbar(R.string.delete_failed_message_text)
     }
 
     @Test

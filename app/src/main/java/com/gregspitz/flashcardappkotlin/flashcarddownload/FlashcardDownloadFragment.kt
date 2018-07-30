@@ -6,8 +6,8 @@ import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.view.*
-import android.widget.Toast
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
+import com.gregspitz.flashcardappkotlin.MainFragmentRouter
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.UseCaseHandler
 import com.gregspitz.flashcardappkotlin.flashcarddownload.domain.usecase.DownloadFlashcards
@@ -156,11 +156,11 @@ class FlashcardDownloadFragment : Fragment(), FlashcardDownloadContract.View,
     }
 
     override fun showFlashcardDownloadSuccessful() {
-        Toast.makeText(activity, R.string.download_flashcards_successful, Toast.LENGTH_LONG).show()
+        (activity as MainFragmentRouter).showSnackbar(R.string.download_flashcards_successful)
     }
 
     override fun showFlashcardDownloadFailure() {
-        Toast.makeText(activity, R.string.download_flashcards_failed, Toast.LENGTH_LONG).show()
+        (activity as MainFragmentRouter).showSnackbar(R.string.download_flashcards_failed)
     }
 
     override fun isActive(): Boolean = active

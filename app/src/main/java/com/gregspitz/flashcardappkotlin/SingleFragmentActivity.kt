@@ -2,6 +2,7 @@ package com.gregspitz.flashcardappkotlin
 
 import android.os.Bundle
 import android.support.annotation.RestrictTo
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardFragment
@@ -60,5 +61,9 @@ class SingleFragmentActivity : AppCompatActivity(), MainFragmentRouter {
 
     override fun showCategoryList() {
         replaceFragment(CategoryListFragment.newInstance())
+    }
+
+    override fun showSnackbar(stringId: Int) {
+        Snackbar.make(mainCoordinator, stringId, Snackbar.LENGTH_LONG).show()
     }
 }

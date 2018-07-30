@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.AppCompatActivity
@@ -13,7 +14,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -153,7 +153,7 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
         } catch (ex: ApiException) {
             // Failed sign in, show AddEditFlashcard
             showAddEditFlashcard(AddEditFlashcardFragment.newFlashcardId)
-            Toast.makeText(this, R.string.sign_in_failed_text, Toast.LENGTH_LONG).show()
+            showSnackbar(R.string.sign_in_failed_text)
         }
     }
 
@@ -248,6 +248,10 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
     override fun showRandomFlashcard(categoryName: String?) {
         randomFlashcardFragment = RandomFlashcardFragment.newInstance(categoryName)
         replaceFragment(randomFlashcardFragment)
+    }
+
+    override fun showSnackbar(stringId: Int) {
+        Snackbar.make(mainCoordinator, stringId, Snackbar.LENGTH_LONG).show()
     }
 
     private fun closeSoftKeyboard() {
