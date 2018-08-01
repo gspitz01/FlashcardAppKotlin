@@ -7,4 +7,5 @@
     <dimen name="category_holder_text_size">18sp</dimen>
     <dimen name="user_profile_img_nav_width">175px</dimen>
     <dimen name="user_profile_img_nav_height">175px</dimen>
+    <dimen name="toolbarElevation">4dp</dimen>
 </resources>
