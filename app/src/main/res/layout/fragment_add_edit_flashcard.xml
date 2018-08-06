@@ -10,15 +10,6 @@
     android:padding="@dimen/edit_flashcard_view_padding"
     tools:context="com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardFragment">
 
-    <TextView
-        android:id="@+id/failedToLoadFlashcard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/failed_to_load_flashcard_text"
-        android:textAlignment="center"
-        android:textColor="@color/colorError"
-        android:visibility="gone"/>
-
     <EditText
         android:id="@+id/flashcardEditCategory"
         android:layout_width="match_parent"

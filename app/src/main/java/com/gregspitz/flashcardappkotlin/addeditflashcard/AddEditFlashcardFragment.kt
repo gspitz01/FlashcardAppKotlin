@@ -154,7 +154,6 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
      * @param flashcard the Flashcard to be shown
      */
     override fun showFlashcard(flashcard: Flashcard) {
-        failedToLoadFlashcard.visibility = View.GONE
         this.flashcard = flashcard
         flashcardEditCategory.setText(flashcard.category)
         flashcardEditFront.setText(flashcard.front)
@@ -165,7 +164,6 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
      * Show blank fields for a new Flashcard
      */
     override fun showNewFlashcard() {
-        failedToLoadFlashcard.visibility = View.GONE
         flashcardEditCategory.setText("")
         flashcardEditFront.setText("")
         flashcardEditBack.setText("")
@@ -184,7 +182,7 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
      * If Flashcard failed to load, show the failed to load text
      */
     override fun showFailedToLoadFlashcard() {
-        failedToLoadFlashcard.visibility = View.VISIBLE
+        (activity as MainFragmentRouter).showSnackbar(R.string.failed_to_load_flashcard_text)
     }
 
     /**

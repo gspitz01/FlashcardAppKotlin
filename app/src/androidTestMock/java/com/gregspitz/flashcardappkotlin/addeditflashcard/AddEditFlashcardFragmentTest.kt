@@ -60,15 +60,15 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
     @Test
     fun startWithNewFlashcardIntent_showsBlankFields() {
         launchActivity(AddEditFlashcardFragment.newFlashcardId)
-        onView(withId(R.id.flashcardEditCategory)).check(matches(withText("")))
-        onView(withId(R.id.flashcardEditFront)).check(matches(withText("")))
-        onView(withId(R.id.flashcardEditBack)).check(matches(withText("")))
+        verifyEditTextsBlank()
     }
 
     @Test
     fun startWithBadFlashcardId_showsFailedToLoad() {
         launchActivity("Bad ID")
-        onView(withId(R.id.failedToLoadFlashcard)).check(matches(isDisplayed()))
+        verifyEditTextsBlank()
+        checkForSnackbar(R.string.failed_to_load_flashcard_text)
+        verifyEditTextsBlank()
     }
 
     @Test
@@ -174,6 +174,12 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
         onView(Matchers.allOf(withId(R.id.flashcardBack), isDescendantOfA(withId(R.id.detailPager)),
                 isCompletelyDisplayed()))
                 .check(matches(withText(flashcard.back)))
+    }
+
+    private fun verifyEditTextsBlank() {
+        onView(withId(R.id.flashcardEditCategory)).check(matches(withText("")))
+        onView(withId(R.id.flashcardEditFront)).check(matches(withText("")))
+        onView(withId(R.id.flashcardEditBack)).check(matches(withText("")))
     }
 
 

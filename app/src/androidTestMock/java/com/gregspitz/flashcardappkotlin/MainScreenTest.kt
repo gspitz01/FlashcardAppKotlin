@@ -60,7 +60,6 @@ class MainScreenTest {
                 .check(matches(withText(MockTestData.FLASHCARD_1.front)))
         onView(withId(R.id.flashcardEditBack))
                 .check(matches(withText(MockTestData.FLASHCARD_1.back)))
-        onView(withId(R.id.failedToLoadFlashcard)).check(matches(not(isDisplayed())))
 
         // Move back to list
         onView(withId(R.id.showFlashcardListButton)).perform(click())
@@ -72,6 +71,5 @@ class MainScreenTest {
         onView(withId(R.id.flashcardEditCategory)).check(matches(withText("")))
         onView(withId(R.id.flashcardEditFront)).check(matches(withText("")))
         onView(withId(R.id.flashcardEditBack)).check(matches(withText("")))
-        onView(withId(R.id.failedToLoadFlashcard)).check(matches(not(isDisplayed())))
     }
 }
