@@ -39,7 +39,6 @@ import com.gregspitz.flashcardappkotlin.R.id.detailPager
 import com.gregspitz.flashcardappkotlin.TestUtils.recyclerViewScrollToAndVerifyPosition
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import org.hamcrest.Matchers.allOf
-import org.hamcrest.Matchers.not
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -65,7 +64,6 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
         verifyRecyclerViewShownAndNotShown(listOf(FLASHCARD_1.category, FLASHCARD_1.front,
                 FLASHCARD_2.category, FLASHCARD_2.front),
                 listOf())
-        onView(withId(R.id.flashcardListMessages)).check(matches(not(isDisplayed())))
     }
 
     @Test
@@ -74,7 +72,6 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
         launchActivity(categoryName = CATEGORY_1.name)
         verifyRecyclerViewShownAndNotShown(listOf(FLASHCARD_1.category, FLASHCARD_1.front),
                 listOf(FLASHCARD_2.category, FLASHCARD_2.front))
-        onView(withId(R.id.flashcardListMessages)).check(matches(not(isDisplayed())))
     }
 
     @Test
@@ -111,16 +108,14 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
     @Test
     fun noFlashcardsToShow_showsNoFlashcardsMessage() {
         launchActivity()
-        onView(withId(R.id.flashcardListMessages))
-                .check(matches(withText(R.string.no_flashcards_to_show_text)))
+        checkForSnackbar(R.string.no_flashcards_to_show_text)
     }
 
     @Test
     fun failedToLoadFlashcards_showsFailedToLoadMessage() {
         localDataSource.setFailure(true)
         launchActivity()
-        onView(withId(R.id.flashcardListMessages))
-                .check(matches(withText(R.string.failed_to_load_flashcard_text)))
+        checkForSnackbar(R.string.failed_to_load_flashcard_text)
     }
 
     @Test
