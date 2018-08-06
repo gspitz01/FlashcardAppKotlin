@@ -5,7 +5,6 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
@@ -65,7 +64,6 @@ class CategoryListFragment : Fragment(), CategoryListContract.View {
         // Observe ViewModel
         val categoriesObserver = Observer<List<Category>> {
             if (it != null) {
-                categoryListMessages.visibility = View.GONE
                 recyclerAdapter.updateCategories(it)
             }
         }
@@ -90,19 +88,11 @@ class CategoryListFragment : Fragment(), CategoryListContract.View {
     }
 
     override fun showFailedToLoadCategories() {
-        activity?.let {
-            categoryListMessages.setTextColor(ContextCompat.getColor(it, R.color.colorError))
-        }
-        categoryListMessages.visibility = View.VISIBLE
-        categoryListMessages.setText(R.string.failed_to_load_categories_text)
+        (activity as MainFragmentRouter).showSnackbar(R.string.failed_to_load_categories_text)
     }
 
     override fun showNoCategoriesToLoad() {
-        activity?.let {
-            categoryListMessages.setTextColor(ContextCompat.getColor(it, R.color.colorWarning))
-        }
-        categoryListMessages.visibility = View.VISIBLE
-        categoryListMessages.setText(R.string.no_categories_to_show_text)
+        (activity as MainFragmentRouter).showSnackbar(R.string.no_categories_to_show_text)
     }
 
     override fun showFlashcardList(recyclerPosition: Int) {

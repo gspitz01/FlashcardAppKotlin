@@ -20,8 +20,6 @@ import com.gregspitz.flashcardappkotlin.TestUtils.recyclerViewScrollToAndVerifyP
 import com.gregspitz.flashcardappkotlin.data.model.Category
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import com.gregspitz.flashcardappkotlin.data.model.FlashcardListItem
-import org.hamcrest.CoreMatchers.allOf
-import org.hamcrest.CoreMatchers.not
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -36,23 +34,23 @@ class CategoryListFragmentTest : BaseSingleFragmentTest() {
 
         recyclerViewScrollToAndVerifyPosition(R.id.categoryRecyclerView, 0, CATEGORY_1.name)
         recyclerViewScrollToAndVerifyPosition(R.id.categoryRecyclerView, 1, CATEGORY_2.name)
-
-        onView(withId(R.id.categoryListMessages)).check(matches(not(isDisplayed())))
     }
 
     @Test
     fun noCategoriesToShow_showsNoCategoriesMessage() {
         launchActivity()
-        onView(withId(R.id.categoryListMessages)).check(matches(allOf(isDisplayed(),
-                withText(R.string.no_categories_to_show_text))))
+        onView(withId(R.id.categoryRecyclerView)).check(matches(isDisplayed()))
+        checkForSnackbar(R.string.no_categories_to_show_text)
+        onView(withId(R.id.categoryRecyclerView)).check(matches(isDisplayed()))
     }
 
     @Test
     fun failedToLoadCategories_showsFailedToLoadMessage() {
         localDataSource.setFailure(true)
         launchActivity()
-        onView(withId(R.id.categoryListMessages)).check(matches(allOf(isDisplayed(),
-                withText(R.string.failed_to_load_categories_text))))
+        onView(withId(R.id.categoryRecyclerView)).check(matches(isDisplayed()))
+        checkForSnackbar(R.string.failed_to_load_categories_text)
+        onView(withId(R.id.categoryRecyclerView)).check(matches(isDisplayed()))
     }
 
     @Test
