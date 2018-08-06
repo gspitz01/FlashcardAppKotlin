@@ -7,15 +7,6 @@
     android:layout_marginTop="?attr/actionBarSize"
     tools:context="com.gregspitz.flashcardappkotlin.flashcarddownload.FlashcardDownloadFragment">
 
-    <TextView
-        android:id="@+id/downloadCategoriesMessage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp" android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp" android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/categoriesRecyclerView"
         android:layout_width="match_parent"
@@ -23,8 +14,7 @@
         android:layout_marginEnd="8dp" android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/downloadCategoriesMessage">
+        app:layout_constraintStart_toStartOf="parent" app:layout_constraintTop_toTopOf="parent">
 
     </android.support.v7.widget.RecyclerView>
 

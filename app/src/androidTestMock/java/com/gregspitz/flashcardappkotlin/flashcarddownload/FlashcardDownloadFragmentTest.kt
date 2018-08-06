@@ -59,8 +59,7 @@ class FlashcardDownloadFragmentTest : BaseSingleFragmentTest() {
     fun noDownloadCategories_showsFailedToGetDownloadCategories() {
         downloadService.categoriesFailure = true
         launchActivity()
-        onView(withId(R.id.downloadCategoriesMessage))
-                .check(matches(withText(R.string.failed_to_load_download_categories_text)))
+        checkForSnackbar(R.string.failed_to_load_download_categories_text)
     }
 
     @Test

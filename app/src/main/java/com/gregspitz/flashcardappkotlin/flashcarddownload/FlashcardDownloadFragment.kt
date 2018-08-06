@@ -3,7 +3,6 @@ package com.gregspitz.flashcardappkotlin.flashcarddownload
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.view.*
 import com.gregspitz.flashcardappkotlin.FlashcardApplication
@@ -147,12 +146,8 @@ class FlashcardDownloadFragment : Fragment(), FlashcardDownloadContract.View,
     }
 
     override fun showFailedToGetDownloadCategories() {
-        activity?.let {
-            downloadCategoriesMessage
-                    .setTextColor(ContextCompat.getColor(it, R.color.colorError))
-        }
-        downloadCategoriesMessage.visibility = View.VISIBLE
-        downloadCategoriesMessage.setText(R.string.failed_to_load_download_categories_text)
+        (activity as MainFragmentRouter)
+                .showSnackbar(R.string.failed_to_load_download_categories_text)
     }
 
     override fun showFlashcardDownloadSuccessful() {
