@@ -50,4 +50,5 @@ Technologies used:
 - Firebase Realtime Database
 - Google Sign-In
 - Picasso
+- Picasso Transformations - https://github.com/wasabeef/picasso-transformations
 - Uncommon Maths ExponentialGenerator - https://maths.uncommons.org/
