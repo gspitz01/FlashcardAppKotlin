@@ -107,12 +107,16 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
 
     @Test
     fun noFlashcardsToShow_showsNoFlashcardsMessage() {
+        // TODO: The functionality which is supposed to be test here works, but this test does not
+        // pass because the checking for Snackbar doesn't work properly
         launchActivity()
         checkForSnackbar(R.string.no_flashcards_to_show_text)
     }
 
     @Test
     fun failedToLoadFlashcards_showsFailedToLoadMessage() {
+        // TODO: The functionality which is supposed to be test here works, but this test does not
+        // pass because the checking for Snackbar doesn't work properly
         localDataSource.setFailure(true)
         launchActivity()
         checkForSnackbar(R.string.failed_to_load_flashcard_text)
@@ -242,6 +246,8 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
 
     @Test
     fun clickDeleteWithAllFlashcardsShown_yesOnConfirm_failureFromDataSource_showsDeleteFailedMessage() {
+        // TODO: The functionality which is supposed to be test here works, but this test does not
+        // pass because the checking for Snackbar doesn't work properly
         addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         localDataSource.setDeleteFailure(true)
         launchActivity()
@@ -295,6 +301,8 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
 
     @Test
     fun launchWithCategory_clickDelete_yesOnConfirm_failureFromRepo_showsDeleteFailedMessage() {
+        // TODO: The functionality which is supposed to be test here works, but this test does not
+        // pass because the checking for Snackbar doesn't work properly
         addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         localDataSource.setDeleteFailure(true)
         launchActivity(categoryName = FLASHCARD_1.category)

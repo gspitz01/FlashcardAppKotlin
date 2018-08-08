@@ -73,6 +73,8 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
 
     @Test
     fun saveFlashcardButtonClick_savesChangesToExistingFlashcard_movesToFlashcardListOfThatCategoryWithDetailOfThatFlashcard() {
+        // TODO: The functionality which is supposed to be test here works, but this test does not
+        // pass because the checking for Snackbar doesn't work properly
         val newCategory = "Category1"
         val sortBeforeFront = "Mew Front"
         val someOtherBack = "Some other back"
