@@ -5,6 +5,8 @@ import android.app.AlertDialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
+import android.support.design.widget.CoordinatorLayout
+import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.LinearLayoutManager
@@ -44,6 +46,9 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
     private lateinit var recyclerAdapter: FlashcardRecyclerAdapter
     private lateinit var pagerAdapter: FlashcardDetailPagerAdapter
 
+    // Specially create the FAB so it can be added to the MainActivity's CoordinatorLayout
+    private lateinit var addFlashcardFab: FloatingActionButton
+
     // A map to figure out the recycler position from the pager position for auto-scrolling
     private val pagerPositionToRecyclerPositionMap: MutableMap<Int, Int> = mutableMapOf()
     // And vice versa
@@ -81,8 +86,23 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
+        createFab()
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_flashcard_list, container, false)
+    }
+
+    private fun createFab() {
+        activity?.let {
+            val inflater = LayoutInflater.from(it)
+            val coordinatorLayout = inflater.inflate(R.layout.fab_flashcard_list,
+                    it.findViewById(R.id.mainCoordinator), true) as CoordinatorLayout
+            addFlashcardFab = coordinatorLayout.findViewById(R.id.addFlashcardFab)
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        (addFlashcardFab.parent as ViewGroup).removeView(addFlashcardFab)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -9,42 +9,25 @@
     android:padding="@dimen/flashcard_list_view_padding"
     tools:context="com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListFragment">
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/flashcardRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:paddingEnd="2dp"
+        android:paddingStart="2dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/detailPager">
 
-    <android.support.constraint.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/flashcardRecyclerView"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:paddingEnd="2dp"
-            android:paddingStart="2dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/detailPager">
-
-        </android.support.v7.widget.RecyclerView>
-        <android.support.v4.view.ViewPager
-            android:id="@+id/detailPager"
-            android:layout_width="0dp"
-            android:layout_height="187dp"
-            android:padding="4dp" app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="1.0" app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-        </android.support.v4.view.ViewPager>
-    </android.support.constraint.ConstraintLayout>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/addFlashcardFab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/add_flashcard_fab_margin"
-        android:src="@drawable/ic_add_black_24dp"
-        app:layout_anchor="@id/flashcardRecyclerView"
-        app:layout_anchorGravity="bottom|end"/>
-
-</android.support.design.widget.CoordinatorLayout>
+    </android.support.v7.widget.RecyclerView>
+    <android.support.v4.view.ViewPager
+        android:id="@+id/detailPager"
+        android:layout_width="0dp"
+        android:layout_height="187dp"
+        android:padding="4dp" app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0" app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+    </android.support.v4.view.ViewPager>
+</android.support.constraint.ConstraintLayout>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.FloatingActionButton
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/addFlashcardFab"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/add_flashcard_fab_margin"
+    android:src="@drawable/ic_add_black_24dp"
+    app:layout_anchor="@id/contentFrame"
+    app:layout_anchorGravity="bottom|end"/>
