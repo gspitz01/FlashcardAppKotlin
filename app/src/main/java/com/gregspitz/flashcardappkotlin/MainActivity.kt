@@ -20,6 +20,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthProvider
 import com.gregspitz.flashcardappkotlin.addeditflashcard.AddEditFlashcardFragment
 import com.gregspitz.flashcardappkotlin.categorylist.CategoryListFragment
 import com.gregspitz.flashcardappkotlin.flashcarddownload.FlashcardDownloadFragment
@@ -52,6 +55,8 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
 
     private lateinit var googleSignInClient: GoogleSignInClient
     private var googleSignInAccount: GoogleSignInAccount? = null
+    private lateinit var firebaseAuth: FirebaseAuth
+    private var firebaseUser: FirebaseUser? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Switch from launcher theme to main theme
@@ -113,15 +118,18 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
         // Google Sign-In
         val googleSignInOptions = GoogleSignInOptions
                 .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build()
         googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions)
+        firebaseAuth = FirebaseAuth.getInstance()
     }
 
     override fun onStart() {
         super.onStart()
         googleSignInAccount = GoogleSignIn.getLastSignedInAccount(this)
-        if (googleSignInAccount != null) {
+        firebaseUser = firebaseAuth.currentUser
+        if (googleSignInAccount != null && firebaseUser != null) {
             updateNavViewForSignedIn()
         }
     }
@@ -147,13 +155,16 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
     private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>?) {
         try {
             googleSignInAccount = completedTask?.getResult(ApiException::class.java)
-            // Successful sign in, update nav view and show FlashcardDownload
-            updateNavViewForSignedIn()
-            showFlashcardDownload()
+            if (googleSignInAccount != null) {
+                firebaseAuthWithGoogle(googleSignInAccount!!)
+            } else {
+                signInFailed()
+            }
         } catch (ex: ApiException) {
             // Failed sign in, show AddEditFlashcard
-            showAddEditFlashcard(AddEditFlashcardFragment.newFlashcardId)
-            showSnackbar(R.string.sign_in_failed_text)
+            signInFailed()
+        } catch (ex: NullPointerException) {
+            signInFailed()
         }
     }
 
@@ -166,6 +177,26 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun signInFailed() {
+        showAddEditFlashcard(AddEditFlashcardFragment.newFlashcardId)
+        showSnackbar(R.string.sign_in_failed_text)
+    }
+
+    private fun firebaseAuthWithGoogle(account: GoogleSignInAccount) {
+        val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+        firebaseAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this) {
+                    if (it.isSuccessful) {
+                        firebaseUser = firebaseAuth.currentUser
+                        // Successful sign in, update nav view and show FlashcardDownload
+                        updateNavViewForSignedIn()
+                        showFlashcardDownload()
+                    } else {
+                        signInFailed()
+                    }
+                }
     }
 
     private fun setFragment(fragment: Fragment) {
@@ -225,7 +256,7 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
      */
     override fun showFlashcardDownload() {
         // Download requires sign-in so check before changing fragments
-        if (googleSignInAccount == null) {
+        if (firebaseUser == null) {
             AlertDialog.Builder(this)
                     .setMessage(R.string.download_requires_sign_in_message)
                     .setTitle(R.string.sign_in_dialog_title)
@@ -273,15 +304,15 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
     }
 
     private fun signOut() {
+        firebaseAuth.signOut()
+        firebaseUser = null
         googleSignInClient.signOut()
-                .addOnCompleteListener(this) {
-                    googleSignInAccount = null
-                    updateNavViewForSignedOut()
-                }
+        googleSignInAccount = null
+        updateNavViewForSignedOut()
     }
 
     private fun updateNavViewForSignedIn() {
-        googleSignInAccount?.let {
+        firebaseUser?.let {
             it.displayName?.let {
                 navHeaderText.text = it
             }
