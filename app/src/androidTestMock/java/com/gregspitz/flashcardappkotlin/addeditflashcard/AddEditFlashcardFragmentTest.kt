@@ -30,7 +30,6 @@ import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_2
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import org.hamcrest.Matchers
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -161,7 +160,7 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
         clickDeleteFlashcardButton()
 
         // Alert dialog for confirmation
-        clickOnDeleteDialog(android.R.string.yes)
+        clickOnDialog(android.R.string.yes)
 
         assertTrue(verifyFlashcardNotInRepo(FLASHCARD_1))
         onView(withId(R.id.detailPager)).check(matches(isDisplayed()))
@@ -175,7 +174,7 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
         clickDeleteFlashcardButton()
 
         // Alert dialog for confirmation
-        clickOnDeleteDialog(android.R.string.yes)
+        clickOnDialog(android.R.string.yes)
 
         checkForSnackbar(R.string.delete_failed_message_text)
     }
@@ -184,7 +183,7 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
     fun clickNoOnDeleteDialog_returnsToEditView() {
         launchActivity(FLASHCARD_1.id)
         clickDeleteFlashcardButton()
-        clickOnDeleteDialog(android.R.string.no)
+        clickOnDialog(android.R.string.no)
         onView(withId(R.id.flashcardEditCategory)).check(matches(isDisplayed()))
     }
 

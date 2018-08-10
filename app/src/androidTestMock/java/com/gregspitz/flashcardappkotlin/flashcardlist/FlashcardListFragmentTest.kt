@@ -36,7 +36,6 @@ import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_2
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.R.id.detailPager
-import com.gregspitz.flashcardappkotlin.R.id.withText
 import com.gregspitz.flashcardappkotlin.TestUtils.recyclerViewScrollToAndVerifyPosition
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import org.hamcrest.Matchers.allOf
@@ -231,7 +230,7 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
 
         clickDeleteButton()
         // Click yes on confirmation dialog
-        clickOnDeleteDialog(android.R.string.yes)
+        clickOnDialog(android.R.string.yes)
 
         assertTrue(verifyFlashcardNotInRepo(FLASHCARD_1))
         assertTrue(verifyFlashcardNotInRepo(FLASHCARD_2))
@@ -249,7 +248,7 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
 
         clickDeleteButton()
         // Click no on confirmation dialog
-        clickOnDeleteDialog(android.R.string.no)
+        clickOnDialog(android.R.string.no)
 
         assertTrue(verifyFlashcardInInRepo(FLASHCARD_1))
         assertTrue(verifyFlashcardInInRepo(FLASHCARD_2))
@@ -266,7 +265,7 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
         launchActivity()
 
         clickDeleteButton()
-        clickOnDeleteDialog(android.R.string.yes)
+        clickOnDialog(android.R.string.yes)
 
         checkForSnackbar(R.string.delete_failed_message_text)
         verifyRecyclerViewShownAndNotShown(listOf(FLASHCARD_1.category,
@@ -284,7 +283,7 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
                 listOf(FLASHCARD_2.category, FLASHCARD_2.front))
 
         clickDeleteButton()
-        clickOnDeleteDialog(android.R.string.yes)
+        clickOnDialog(android.R.string.yes)
 
         assertTrue(verifyFlashcardNotInRepo(FLASHCARD_1))
         assertTrue(verifyFlashcardInInRepo(FLASHCARD_2))
@@ -304,7 +303,7 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
                 listOf(FLASHCARD_2.category, FLASHCARD_2.front))
 
         clickDeleteButton()
-        clickOnDeleteDialog(android.R.string.no)
+        clickOnDialog(android.R.string.no)
 
         assertTrue(verifyFlashcardInInRepo(FLASHCARD_1))
         assertTrue(verifyFlashcardInInRepo(FLASHCARD_2))
@@ -325,7 +324,7 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
                 listOf(FLASHCARD_2.category, FLASHCARD_2.front))
 
         clickDeleteButton()
-        clickOnDeleteDialog(android.R.string.yes)
+        clickOnDialog(android.R.string.yes)
 
         assertTrue(verifyFlashcardInInRepo(FLASHCARD_1))
         assertTrue(verifyFlashcardInInRepo(FLASHCARD_2))

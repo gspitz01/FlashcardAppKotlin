@@ -71,7 +71,7 @@ open class BaseSingleFragmentTest {
         TestUtils.checkForSnackbar(text)
     }
 
-    protected fun clickOnDeleteDialog(responseStringId: Int) {
+    protected fun clickOnDialog(responseStringId: Int) {
         Espresso.onView(ViewMatchers.withText(responseStringId))
                 .inRoot(RootMatchers.isDialog())
                 .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
