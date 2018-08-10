@@ -79,6 +79,7 @@ open class BaseSingleFragmentTest {
     }
 
     protected fun verifyFlashcardNotInRepo(flashcard: Flashcard): Boolean {
+        // This function only works properly because the mock UseCaseScheduler is synchronous
         var returnValue = false
         dataSource.getFlashcard(flashcard.id, object : FlashcardDataSource.GetFlashcardCallback {
             override fun onDataNotAvailable() {
@@ -94,6 +95,7 @@ open class BaseSingleFragmentTest {
     }
 
     protected fun verifyFlashcardInInRepo(flashcard: Flashcard): Boolean {
+        // This function only works properly because the mock UseCaseScheduler is synchronous
         var returnValue = false
         dataSource.getFlashcard(flashcard.id, object : FlashcardDataSource.GetFlashcardCallback {
             override fun onDataNotAvailable() {
@@ -105,6 +107,19 @@ open class BaseSingleFragmentTest {
             }
         })
 
+        return returnValue
+    }
+
+    protected fun numberOfFlashcardsInRepo(): Int {
+        // This function only works properly because the mock UseCaseScheduler is synchronous
+        var returnValue = 0
+        dataSource.getFlashcards(object: FlashcardDataSource.GetFlashcardsCallback {
+            override fun onFlashcardsLoaded(flashcards: List<Flashcard>) {
+                returnValue = flashcards.size
+            }
+
+            override fun onDataNotAvailable() {}
+        })
         return returnValue
     }
 }

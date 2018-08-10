@@ -57,4 +57,7 @@
     </string>
     <string name="all_flashcards_spinner_text">All</string>
     <string name="play_button_title">Play</string>
+    <string name="flashcard_must_have_category_message_text">Flashcard must have a category</string>
+    <string name="flashcard_must_have_front_message_text">Flashcard must have a front</string>
+    <string name="flashcard_must_have_back_message_text">Flashcard must have a back</string>
 </resources>

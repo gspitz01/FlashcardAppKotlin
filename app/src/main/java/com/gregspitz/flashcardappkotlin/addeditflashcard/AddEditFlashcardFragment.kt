@@ -84,6 +84,20 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
                 val category = flashcardEditCategory.text.toString()
                 val front = flashcardEditFront.text.toString()
                 val back = flashcardEditBack.text.toString()
+                // Input validation
+                if (category.isEmpty()) {
+                    (activity as MainFragmentRouter).showSnackbar(
+                            R.string.flashcard_must_have_category_message_text)
+                    return true
+                } else if (front.isEmpty()) {
+                    (activity as MainFragmentRouter)
+                            .showSnackbar(R.string.flashcard_must_have_front_message_text)
+                    return true
+                } else if (back.isEmpty()) {
+                    (activity as MainFragmentRouter)
+                            .showSnackbar(R.string.flashcard_must_have_back_message_text)
+                    return true
+                }
                 flashcard = if (flashcard != null) {
                     // If changing an existing flashcard, create a new one with the same id
                     Flashcard(flashcard!!.id, category, front, back)

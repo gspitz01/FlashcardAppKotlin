@@ -122,6 +122,39 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
     }
 
     @Test
+    fun tryToSaveWithoutCategory_showsMustHaveCategoryMessage() {
+        launchActivity(AddEditFlashcardFragment.newFlashcardId)
+        clickSaveFlashcardButton()
+        checkForSnackbar(R.string.flashcard_must_have_category_message_text)
+        // Still only one Flashcard in the repo
+        assertEquals(numberOfFlashcardsInRepo(), 1)
+    }
+
+    @Test
+    fun tryToSaveWithoutFront_showsMustHaveFrontMessage() {
+        launchActivity(AddEditFlashcardFragment.newFlashcardId)
+        val newCategory = "NewCategory"
+        onView(withId(R.id.flashcardEditCategory)).perform(replaceText(newCategory))
+        clickSaveFlashcardButton()
+        checkForSnackbar(R.string.flashcard_must_have_front_message_text)
+        // Still only 1 Flashcard in the repo
+        assertEquals(numberOfFlashcardsInRepo(), 1)
+    }
+
+    @Test
+    fun tryToSaveWithoutBack_showsMustHaveBackMessage() {
+        launchActivity(AddEditFlashcardFragment.newFlashcardId)
+        val newCategory = "NewCategory"
+        val newFront = "NewFront"
+        onView(withId(R.id.flashcardEditCategory)).perform(replaceText(newCategory))
+        onView(withId(R.id.flashcardEditFront)).perform(replaceText(newFront))
+        clickSaveFlashcardButton()
+        checkForSnackbar(R.string.flashcard_must_have_back_message_text)
+        // Still only 1 Flashcard in the repo
+        assertEquals(numberOfFlashcardsInRepo(), 1)
+    }
+
+    @Test
     fun deleteSuccess_deletesFlashcardAndShowsFlashcardListView() {
         launchActivity(FLASHCARD_1.id)
 
