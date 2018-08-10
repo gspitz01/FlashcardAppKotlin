@@ -291,8 +291,13 @@ class FlashcardListFragment : Fragment(), FlashcardListContract.View {
      * Tell router (containing Activity) to move to the add Flashcard view
      */
     override fun showAddFlashcard() {
-        (activity as MainFragmentRouter)
-                .showAddEditFlashcard(AddEditFlashcardFragment.newFlashcardId)
+        if (categoryName.isNullOrEmpty()) {
+            (activity as MainFragmentRouter)
+                    .showAddEditFlashcard(AddEditFlashcardFragment.newFlashcardId)
+
+        } else {
+            (activity as MainFragmentRouter).showAddEditFlashcardWithCategory(categoryName!!)
+        }
     }
 
     /**

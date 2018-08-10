@@ -223,6 +223,16 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
     }
 
     /**
+     * Change view to AddEditFlashcardFragment and prefill category field
+     * @param categoryName category to be filled into field
+     */
+    override fun showAddEditFlashcardWithCategory(categoryName: String) {
+        addEditFlashcardFragment = AddEditFlashcardFragment.newInstance(
+                AddEditFlashcardFragment.newFlashcardId, categoryName)
+        replaceFragment(addEditFlashcardFragment)
+    }
+
+    /**
      * Change view to FlashcardListFragment
      * @param flashcardId id of Flashcard to be shown in detail view
      */

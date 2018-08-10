@@ -18,6 +18,7 @@ import javax.inject.Inject
 
 
 private const val FLASHCARD_ID = "flashcard_id"
+private const val CATEGORY_NAME = "category_name"
 
 /**
  * View for adding a new or editing an existing Flashcard
@@ -37,6 +38,7 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
     private lateinit var presenter: AddEditFlashcardContract.Presenter
 
     private var flashcardId: String? = null
+    private var categoryName: String? = null
     private var flashcard: Flashcard? = null
 
     // Becomes active onResume; inactive onPause
@@ -46,17 +48,22 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
         // If no Flashcard id was given, use this to mean creation of a new Flashcard
         const val newFlashcardId = "-1"
 
-        fun newInstance(flashcardId: String) = AddEditFlashcardFragment().apply {
-            arguments = Bundle().apply {
-                putString(FLASHCARD_ID, flashcardId)
-            }
-        }
+        fun newInstance(flashcardId: String, categoryName: String? = null) =
+                AddEditFlashcardFragment().apply {
+                    arguments = Bundle().apply {
+                        putString(FLASHCARD_ID, flashcardId)
+                        if (categoryName != null) {
+                            putString(CATEGORY_NAME, categoryName)
+                        }
+                    }
+                }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             flashcardId = it.getString(FLASHCARD_ID)
+            categoryName = it.getString(CATEGORY_NAME)
         }
         FlashcardApplication.useCaseComponent.inject(this)
     }
@@ -69,6 +76,11 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        // Fill in category name if it's there
+        categoryName?.let {
+            flashcardEditCategory.setText(it)
+        }
         // Create the presenter
         AddEditFlashcardPresenter(useCaseHandler, this, getFlashcard, saveFlashcard, deleteFlashcard)
     }
@@ -178,7 +190,9 @@ class AddEditFlashcardFragment : Fragment(), AddEditFlashcardContract.View {
      * Show blank fields for a new Flashcard
      */
     override fun showNewFlashcard() {
-        flashcardEditCategory.setText("")
+        if (categoryName.isNullOrEmpty()) {
+            flashcardEditCategory.setText("")
+        }
         flashcardEditFront.setText("")
         flashcardEditBack.setText("")
     }

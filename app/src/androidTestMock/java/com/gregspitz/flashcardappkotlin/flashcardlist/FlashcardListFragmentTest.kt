@@ -36,6 +36,7 @@ import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_1
 import com.gregspitz.flashcardappkotlin.MockTestData.FLASHCARD_2
 import com.gregspitz.flashcardappkotlin.R
 import com.gregspitz.flashcardappkotlin.R.id.detailPager
+import com.gregspitz.flashcardappkotlin.R.id.withText
 import com.gregspitz.flashcardappkotlin.TestUtils.recyclerViewScrollToAndVerifyPosition
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
 import org.hamcrest.Matchers.allOf
@@ -84,6 +85,18 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
         requestOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
         verifyRecyclerViewShownAndNotShown(listOf(FLASHCARD_1.category, FLASHCARD_1.front),
                 listOf(FLASHCARD_2.category, FLASHCARD_2.front))
+    }
+
+    @Test
+    fun launchWithCategory_addFABClick_showsAddEditWithCategoryFilledIn() {
+        addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
+        launchActivity(categoryName = CATEGORY_1.name)
+        verifyRecyclerViewShownAndNotShown(listOf(FLASHCARD_1.category, FLASHCARD_1.front),
+                listOf(FLASHCARD_2.category, FLASHCARD_2.front))
+        clickAddFab()
+        onView(withId(R.id.flashcardEditCategory)).check(matches(withText(CATEGORY_1.name)))
+        onView(withId(R.id.flashcardEditFront)).check(matches(withText("")))
+        onView(withId(R.id.flashcardEditBack)).check(matches(withText("")))
     }
 
     @Test
@@ -347,7 +360,7 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
     fun clickAddFlashcardFab_showsAddEditFlashcardView() {
         addFlashcardsToDataSource(FLASHCARD_1, FLASHCARD_2)
         launchActivity()
-        onView(withId(R.id.addFlashcardFab)).perform(click())
+        clickAddFab()
         checkForAddEditFlashcardFragment("", "")
     }
 
@@ -373,6 +386,10 @@ class FlashcardListFragmentTest : BaseSingleFragmentTest() {
 
     private fun clickPlayButton() {
         onView(withId(R.id.playButton)).perform(click())
+    }
+
+    private fun clickAddFab() {
+        onView(withId(R.id.addFlashcardFab)).perform(click())
     }
 
     private fun clickRecyclerViewHolderWithText(text: String) {
