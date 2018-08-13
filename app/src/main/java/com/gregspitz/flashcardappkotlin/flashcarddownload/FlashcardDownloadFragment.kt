@@ -138,7 +138,11 @@ class FlashcardDownloadFragment : Fragment(), FlashcardDownloadContract.View,
     }
 
     override fun setLoadingIndicator(active: Boolean) {
-        // TODO: implement this
+        if (active) {
+            categoriesProgressBar.visibility = View.VISIBLE
+        } else {
+            categoriesProgressBar.visibility = View.GONE
+        }
     }
 
     override fun showDownloadCategories(downloadCategories: List<DownloadCategoryFlexItem>) {
