@@ -139,7 +139,13 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawers()
         } else {
-            super.onBackPressed()
+            if (addEditFlashcardFragment.isVisible &&
+                    addEditFlashcardFragment.unsavedChangesExist()) {
+                val positiveListener = { -> super.onBackPressed() }
+                addEditFlashcardFragment.displayDiscardChangesDialog(positiveListener)
+            } else {
+                super.onBackPressed()
+            }
         }
     }
 

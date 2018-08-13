@@ -29,7 +29,7 @@ interface AddEditFlashcardContract {
 
         fun setLoadingIndicator(active: Boolean)
 
-        fun getIdFromArguments() : String
+        fun getIdFromArguments(): String
 
         fun setFlashcard(flashcardId: String)
 
@@ -37,7 +37,7 @@ interface AddEditFlashcardContract {
 
         fun showNewFlashcard()
 
-        fun showFlashcardList(flashcardId: String)
+        fun showFlashcardList()
 
         fun showFailedToLoadFlashcard()
 
@@ -47,7 +47,7 @@ interface AddEditFlashcardContract {
 
         fun showDeleteFailed()
 
-        fun isActive() : Boolean
+        fun isActive(): Boolean
     }
 
     interface Presenter : BasePresenter {

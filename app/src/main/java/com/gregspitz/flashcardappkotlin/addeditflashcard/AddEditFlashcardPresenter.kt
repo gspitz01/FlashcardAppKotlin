@@ -22,12 +22,11 @@ import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.DeleteFl
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.GetFlashcard
 import com.gregspitz.flashcardappkotlin.addeditflashcard.domain.usecase.SaveFlashcard
 import com.gregspitz.flashcardappkotlin.data.model.Flashcard
-import com.gregspitz.flashcardappkotlin.flashcardlist.FlashcardListFragment
 
 /**
  * Presenter for AddEditFlashcard view
  */
-class AddEditFlashcardPresenter (
+class AddEditFlashcardPresenter(
         private val useCaseHandler: UseCaseHandler,
         private val view: AddEditFlashcardContract.View,
         private val getFlashcard: GetFlashcard,
@@ -57,7 +56,7 @@ class AddEditFlashcardPresenter (
     override fun loadFlashcard(flashcardId: String) {
         view.setLoadingIndicator(true)
         useCaseHandler.execute(getFlashcard, GetFlashcard.RequestValues(flashcardId),
-                object: UseCase.UseCaseCallback<GetFlashcard.ResponseValue> {
+                object : UseCase.UseCaseCallback<GetFlashcard.ResponseValue> {
                     override fun onSuccess(response: GetFlashcard.ResponseValue) {
                         if (view.isActive()) {
                             view.setLoadingIndicator(false)
@@ -81,7 +80,7 @@ class AddEditFlashcardPresenter (
      */
     override fun saveFlashcard(flashcard: Flashcard) {
         useCaseHandler.execute(saveFlashcard, SaveFlashcard.RequestValues(flashcard),
-                object: UseCase.UseCaseCallback<SaveFlashcard.ResponseValue> {
+                object : UseCase.UseCaseCallback<SaveFlashcard.ResponseValue> {
                     override fun onSuccess(response: SaveFlashcard.ResponseValue) {
                         if (view.isActive()) {
                             view.showSaveSuccessful(flashcard.id, flashcard.category)
@@ -98,10 +97,10 @@ class AddEditFlashcardPresenter (
 
     override fun deleteFlashcard(flashcardId: String) {
         useCaseHandler.execute(deleteFlashcard, DeleteFlashcard.RequestValues(flashcardId),
-                object: UseCase.UseCaseCallback<DeleteFlashcard.ResponseValue> {
+                object : UseCase.UseCaseCallback<DeleteFlashcard.ResponseValue> {
                     override fun onSuccess(response: DeleteFlashcard.ResponseValue) {
                         if (view.isActive()) {
-                            view.showFlashcardList(FlashcardListFragment.noParticularFlashcardExtra)
+                            view.showFlashcardList()
                         }
                     }
 
@@ -115,7 +114,7 @@ class AddEditFlashcardPresenter (
 
     override fun showList() {
         if (view.isActive()) {
-            view.showFlashcardList(flashcardId)
+            view.showFlashcardList()
         }
     }
 }

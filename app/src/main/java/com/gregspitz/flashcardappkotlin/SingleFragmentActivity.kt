@@ -71,4 +71,21 @@ class SingleFragmentActivity : AppCompatActivity(), MainFragmentRouter {
     override fun showSnackbar(stringId: Int) {
         Snackbar.make(mainCoordinator, stringId, Snackbar.LENGTH_LONG).show()
     }
+
+    override fun onBackPressed() {
+        val addEditFlashcardFragment = supportFragmentManager.fragments.filter {
+            it is AddEditFlashcardFragment
+        }
+                .map {
+                    it as AddEditFlashcardFragment
+                }.firstOrNull()
+        if (addEditFlashcardFragment != null &&
+                addEditFlashcardFragment.isVisible &&
+                addEditFlashcardFragment.unsavedChangesExist()) {
+            val positiveListener = { -> super.onBackPressed() }
+            addEditFlashcardFragment.displayDiscardChangesDialog(positiveListener)
+        } else {
+            super.onBackPressed()
+        }
+    }
 }

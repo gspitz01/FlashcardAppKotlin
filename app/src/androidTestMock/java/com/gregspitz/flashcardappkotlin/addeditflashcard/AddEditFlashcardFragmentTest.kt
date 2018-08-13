@@ -16,9 +16,11 @@
 
 package com.gregspitz.flashcardappkotlin.addeditflashcard
 
+import android.content.pm.ActivityInfo
+import android.support.test.espresso.Espresso
 import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.action.ViewActions.click
-import android.support.test.espresso.action.ViewActions.replaceText
+import android.support.test.espresso.NoActivityResumedException
+import android.support.test.espresso.action.ViewActions.*
 import android.support.test.espresso.assertion.ViewAssertions.doesNotExist
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.matcher.ViewMatchers.*
@@ -43,6 +45,10 @@ import org.junit.runner.RunWith
 @MediumTest
 class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
 
+    private val newCategory = "New Category"
+    private val newFront = "New Front"
+    private val newBack = "New Back"
+
     @Before
     fun setupTests() {
         addFlashcardsToDataSource(FLASHCARD_1)
@@ -63,6 +69,38 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
     }
 
     @Test
+    fun startWithNewFlashcardIntent_typeInFields_orientationChangeStillShowsText() {
+        launchActivity(AddEditFlashcardFragment.newFlashcardId)
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+
+        onView(withId(R.id.flashcardEditCategory)).perform(typeText(newCategory))
+        onView(withId(R.id.flashcardEditFront)).perform(typeText(newFront))
+        onView(withId(R.id.flashcardEditBack)).perform(typeText(newBack))
+
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+
+        onView(withId(R.id.flashcardEditCategory)).check(matches(withText(newCategory)))
+        onView(withId(R.id.flashcardEditFront)).check(matches(withText(newFront)))
+        onView(withId(R.id.flashcardEditBack)).check(matches(withText(newBack)))
+    }
+
+    @Test
+    fun startWithFlashcardId_replaceText_orientationChangeStillShowsReplacedText() {
+        launchActivity(FLASHCARD_1.id)
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+
+        replaceEditTextText(newCategory, R.id.flashcardEditCategory)
+        replaceEditTextText(newFront, R.id.flashcardEditFront)
+        replaceEditTextText(newBack, R.id.flashcardEditBack)
+
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+
+        onView(withId(R.id.flashcardEditCategory)).check(matches(withText(newCategory)))
+        onView(withId(R.id.flashcardEditFront)).check(matches(withText(newFront)))
+        onView(withId(R.id.flashcardEditBack)).check(matches(withText(newBack)))
+    }
+
+    @Test
     fun startWithBadFlashcardId_showsFailedToLoad() {
         launchActivity("Bad ID")
         verifyEditTextsBlank()
@@ -74,7 +112,6 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
     fun saveFlashcardButtonClick_savesChangesToExistingFlashcard_movesToFlashcardListOfThatCategoryWithDetailOfThatFlashcard() {
         // TODO: The functionality which is supposed to be test here works, but this test does not
         // pass because the checking for Snackbar doesn't work properly
-        val newCategory = "Category1"
         val sortBeforeFront = "Mew Front"
         val someOtherBack = "Some other back"
         val flashcardSortsBeforeNewFlashcard = Flashcard("whatever", newCategory, sortBeforeFront,
@@ -87,8 +124,6 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
 
         launchActivity(FLASHCARD_1.id)
 
-        val newFront = "New Front"
-        val newBack = "New Back"
         val newFlashcard = Flashcard(FLASHCARD_1.id, newCategory, newFront, newBack)
         onView(withId(R.id.flashcardEditCategory)).perform(replaceText(newCategory))
         onView(withId(R.id.flashcardEditFront)).perform(replaceText(newFront))
@@ -132,7 +167,6 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
     @Test
     fun tryToSaveWithoutFront_showsMustHaveFrontMessage() {
         launchActivity(AddEditFlashcardFragment.newFlashcardId)
-        val newCategory = "NewCategory"
         onView(withId(R.id.flashcardEditCategory)).perform(replaceText(newCategory))
         clickSaveFlashcardButton()
         checkForSnackbar(R.string.flashcard_must_have_front_message_text)
@@ -143,8 +177,6 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
     @Test
     fun tryToSaveWithoutBack_showsMustHaveBackMessage() {
         launchActivity(AddEditFlashcardFragment.newFlashcardId)
-        val newCategory = "NewCategory"
-        val newFront = "NewFront"
         onView(withId(R.id.flashcardEditCategory)).perform(replaceText(newCategory))
         onView(withId(R.id.flashcardEditFront)).perform(replaceText(newFront))
         clickSaveFlashcardButton()
@@ -163,7 +195,7 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
         clickOnDialog(android.R.string.yes)
 
         assertTrue(verifyFlashcardNotInRepo(FLASHCARD_1))
-        onView(withId(R.id.detailPager)).check(matches(isDisplayed()))
+        verifyListViewShown()
     }
 
     @Test
@@ -198,7 +230,120 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
     fun showListButtonClickNewFlashcard_showsFlashcardListViewWithNoParticularFlashcard() {
         launchActivity(AddEditFlashcardFragment.newFlashcardId)
         clickShowListButton()
-        onView(withId(R.id.detailPager)).check(matches(isDisplayed()))
+        verifyListViewShown()
+    }
+
+    @Test
+    fun launchWithNewFlashcard_typeInFront_clickListViewButton_yesOnConfirmation_movesAway() {
+        launchChangeEditTextClickListViewAndClickDialog(AddEditFlashcardFragment.newFlashcardId,
+                newFront, R.id.flashcardEditFront, android.R.string.yes)
+        verifyListViewShown()
+    }
+
+    @Test
+    fun launchWithNewFlashcard_typeInCategory_clickListViewButton_noOnConfirmation_staysOnView() {
+        launchChangeEditTextClickListViewAndClickDialog(AddEditFlashcardFragment.newFlashcardId,
+                newCategory, R.id.flashcardEditCategory, android.R.string.no)
+        onView(withId(R.id.flashcardEditCategory)).check(matches(withText(newCategory)))
+    }
+
+    @Test
+    fun launchWithNewFlashcard_typeInFront_clickListViewButton_orientationChange_yesOnConfirmation_movesAway() {
+        launchActivity(AddEditFlashcardFragment.newFlashcardId)
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+        replaceEditTextText(newFront, R.id.flashcardEditFront)
+        clickShowListButton()
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+        clickOnDialog(android.R.string.yes)
+        verifyListViewShown()
+    }
+
+    @Test
+    fun launchWithNewFlashcard_typeInCategory_clickListViewButton_orientationChange_noOnConfirmation_staysOnView() {
+        launchActivity(AddEditFlashcardFragment.newFlashcardId)
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+        replaceEditTextText(newCategory, R.id.flashcardEditCategory)
+        clickShowListButton()
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+        clickOnDialog(android.R.string.no)
+        onView(withId(R.id.flashcardEditCategory)).check(matches(withText(newCategory)))
+    }
+
+    @Test
+    fun launchWithNewFlashcard_typeInBack_pressBack_orientationChange_yesOnConfirmation_movesAway() {
+        launchActivity(AddEditFlashcardFragment.newFlashcardId)
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+        replaceEditTextText(newBack, R.id.flashcardEditBack)
+        try {
+            Espresso.pressBackUnconditionally()
+            requestOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+            clickOnDialog(android.R.string.yes)
+        } catch (expectedException: NoActivityResumedException) {
+            // This is apparently the best way to verify the activity has been destroyed because of
+            // a back press, which is exactly what should happen
+        }
+    }
+
+    @Test
+    fun launchWithNewFlashcard_typeInCategory_pressBack_orientationChange_noOnConfirmation_staysOnView() {
+        launchActivity(AddEditFlashcardFragment.newFlashcardId)
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+        replaceEditTextText(newCategory, R.id.flashcardEditCategory)
+        Espresso.pressBack()
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+        clickOnDialog(android.R.string.no)
+    }
+
+    @Test
+    fun launchWithFlashcardId_replaceCategory_clickListViewButton_orientationChange_yesOnConfirmation_movesAway() {
+        launchActivity(FLASHCARD_1.id)
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+        replaceEditTextText(newCategory, R.id.flashcardEditCategory)
+        clickShowListButton()
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+        clickOnDialog(android.R.string.yes)
+        verifyListViewShown()
+    }
+
+    @Test
+    fun launchWithFlashcardId_replaceFront_pressBack_orientationChange_yesOnConfirmation_movesAway() {
+        launchActivity(FLASHCARD_1.id)
+        requestOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+        replaceEditTextText(newFront, R.id.flashcardEditFront)
+        try {
+            Espresso.pressBackUnconditionally()
+            requestOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+            clickOnDialog(android.R.string.yes)
+        } catch (expectedException: NoActivityResumedException) {
+            // This is apparently the best way to verify the activity has been destroyed because of
+            // a back press, which is exactly what should happen
+        }
+    }
+
+    @Test
+    fun launchWithFlashcard_changeBack_clickListViewButton_yesOnConfirmation_movesAway() {
+        launchChangeEditTextClickListViewAndClickDialog(FLASHCARD_1.id, newBack,
+                R.id.flashcardEditBack, android.R.string.yes)
+        verifyListViewShown()
+    }
+
+    @Test
+    fun launchWithFlashcard_typeInFront_clickListViewButton_noOnConfirmation_staysOnView() {
+        launchChangeEditTextClickListViewAndClickDialog(FLASHCARD_1.id,
+                newFront, R.id.flashcardEditFront, android.R.string.no)
+        onView(withId(R.id.flashcardEditFront)).check(matches(withText(newFront)))
+    }
+
+    @Test
+    fun launchWithNewFlashcard_typeInCategory_pressBack_yesOnConfirmation_movesAway() {
+        launchChangeEditTextPressBackAndClickYesOnDialog(AddEditFlashcardFragment.newFlashcardId,
+                newCategory, R.id.flashcardEditCategory)
+    }
+
+    @Test
+    fun launchWithNewFlashcard_typeInBack_pressBack_noOnConfirmation_staysOnView() {
+        launchChangeEditTextPressBackAndClickNoOnDialog(AddEditFlashcardFragment.newFlashcardId,
+                newBack, R.id.flashcardEditBack)
     }
 
     private fun checkDetailViewMatchesFlashcard(flashcard: Flashcard) {
@@ -231,5 +376,43 @@ class AddEditFlashcardFragmentTest : BaseSingleFragmentTest() {
 
     private fun clickShowListButton() {
         onView(withId(R.id.showFlashcardListButton)).perform(click())
+    }
+
+    private fun verifyListViewShown() {
+        onView(withId(R.id.detailPager)).check(matches(isDisplayed()))
+    }
+
+    private fun launchChangeEditTextClickListViewAndClickDialog(
+            launchId: String, textToChange: String, editViewToChange: Int, dialogTextToClick: Int) {
+        launchActivity(launchId)
+        replaceEditTextText(textToChange, editViewToChange)
+        clickShowListButton()
+        clickOnDialog(dialogTextToClick)
+    }
+
+    private fun launchChangeEditTextPressBackAndClickYesOnDialog(
+            launchId: String, textToChange: String, editViewToChange: Int) {
+        launchActivity(launchId)
+        replaceEditTextText(textToChange, editViewToChange)
+        try {
+            Espresso.pressBackUnconditionally()
+            clickOnDialog(android.R.string.yes)
+        } catch (expectedException: NoActivityResumedException) {
+            // This is apparently the best way to verify the activity has been destroyed because of
+            // a back press, which is exactly what should happen
+        }
+    }
+
+    private fun launchChangeEditTextPressBackAndClickNoOnDialog(
+            launchId: String, textToChange: String, editViewToChange: Int) {
+        launchActivity(launchId)
+        replaceEditTextText(textToChange, editViewToChange)
+        Espresso.pressBack()
+        clickOnDialog(android.R.string.no)
+        onView(withId(editViewToChange)).check(matches(withText(textToChange)))
+    }
+
+    private fun replaceEditTextText(text: String, editTextId: Int) {
+        onView(withId(editTextId)).perform(replaceText(text))
     }
 }

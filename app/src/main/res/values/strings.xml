@@ -60,4 +60,8 @@
     <string name="flashcard_must_have_category_message_text">Flashcard must have a category</string>
     <string name="flashcard_must_have_front_message_text">Flashcard must have a front</string>
     <string name="flashcard_must_have_back_message_text">Flashcard must have a back</string>
+    <string name="discard_changes_title_text">Discard Changes?</string>
+    <string name="discard_changes_message_text">You have unsaved changes. Are you sure you want to
+        discard them?
+    </string>
 </resources>
