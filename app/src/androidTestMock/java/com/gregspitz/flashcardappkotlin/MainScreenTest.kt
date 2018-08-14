@@ -1,7 +1,9 @@
 package com.gregspitz.flashcardappkotlin
 
+import android.support.test.espresso.Espresso
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.*
+import android.support.test.espresso.assertion.ViewAssertions.doesNotExist
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.DrawerActions
 import android.support.test.espresso.contrib.NavigationViewActions.navigateTo
@@ -30,10 +32,64 @@ class MainScreenTest {
     }
 
     @Test
-    fun moveToList_pressEdit_backToList_pressAdd_fieldsShouldBeEmpty() {
+    fun listViewIsInBackStack() {
+        // Starts with RandomFlashcardView
+
+        // Move to list
+        moveToFlashcardListViaNavDrawer()
+
         // Move to add
-        onView(withId(R.id.drawerLayout)).perform(DrawerActions.open())
-        onView(withId(R.id.navDrawer)).perform(navigateTo(R.id.newFlashcard))
+        moveToAddViewViaNavDrawer()
+
+        Espresso.pressBack()
+
+        // Should be back at list view
+        onView(withId(R.id.flashcardRecyclerView)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun categoryListIsInBackStack() {
+        // Starts with RandomFlashcardView
+
+        // Move to category list
+        moveToCategoryListViewNavDrawer()
+
+        // Move to add
+        moveToAddViewViaNavDrawer()
+
+        Espresso.pressBack()
+
+        // Should be on category list
+        onView(withId(R.id.categoryRecyclerView)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun addEditIsNotInBackStack() {
+        // Starts with RandomFlashcardView
+
+        // Move to add
+        moveToAddViewViaNavDrawer()
+
+        onView(withId(R.id.flashcardEditCategory)).perform(replaceText(""))
+
+        // Move to list view
+        moveToFlashcardListViaNavDrawer()
+
+        // Press back
+        Espresso.pressBack()
+
+        // EditTexts should not exist
+        onView(withId(R.id.flashcardEditCategory)).check(doesNotExist())
+        // Should be on games view, where we started
+        onView(withId(R.id.flashcardPriorityHighButton)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun moveToList_pressEdit_backToList_pressAdd_fieldsShouldBeEmpty() {
+        // Starts with RandomFlashcardView
+
+        // Move to AddView
+        moveToAddViewViaNavDrawer()
 
         // Type in some data
         onView(withId(R.id.flashcardEditCategory))
@@ -51,7 +107,7 @@ class MainScreenTest {
 
         // Click edit on first view pager item (should be first item from initial data)
         // Need double click to set focus first
-        onView(withId(R.id.editFlashcardButton)).perform(doubleClick())
+        onView(withId(R.id.editFlashcardButton)).perform(click())
 
         // Edit view shows correct fields
         onView(withId(R.id.flashcardEditCategory))
@@ -71,5 +127,22 @@ class MainScreenTest {
         onView(withId(R.id.flashcardEditCategory)).check(matches(withText("")))
         onView(withId(R.id.flashcardEditFront)).check(matches(withText("")))
         onView(withId(R.id.flashcardEditBack)).check(matches(withText("")))
+    }
+
+    private fun moveToAddViewViaNavDrawer() {
+        changeViewViaNavDrawer(R.id.newFlashcard)
+    }
+
+    private fun moveToFlashcardListViaNavDrawer() {
+        changeViewViaNavDrawer(R.id.navList)
+    }
+
+    private fun moveToCategoryListViewNavDrawer() {
+        changeViewViaNavDrawer(R.id.navCategoryList)
+    }
+
+    private fun changeViewViaNavDrawer(navigateToId: Int) {
+        onView(withId(R.id.drawerLayout)).perform(DrawerActions.open())
+        onView(withId(R.id.navDrawer)).perform(navigateTo(navigateToId))
     }
 }

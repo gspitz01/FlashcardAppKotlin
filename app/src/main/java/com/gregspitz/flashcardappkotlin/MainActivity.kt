@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
@@ -33,6 +34,11 @@ import jp.wasabeef.picasso.transformations.CropCircleTransformation
 import kotlinx.android.synthetic.main.activity_main.*
 
 private const val RC_SIGN_IN = 1
+private const val RANDOM_FLASHCARD_FRAGMENT_TAG = "random_flashcard_fragment_tag"
+private const val ADD_EDIT_FRAGMENT_TAG = "add_edit_fragment_tag"
+private const val FLASHCARD_LIST_FRAGMENT_TAG = "flashcard_list_fragment_tag"
+private const val CATEGORY_LIST_FRAGMENT_TAG = "category_list_fragment_tag"
+private const val DOWNLOAD_FRAGMENT_TAG = "download_fragment_tag"
 
 /**
  * The only Activity which holds all the Fragment views
@@ -40,10 +46,9 @@ private const val RC_SIGN_IN = 1
  */
 class MainActivity : AppCompatActivity(), MainFragmentRouter {
 
-    // Start with a AddEditFlashcardFragment
-    private var addEditFlashcardFragment =
-            AddEditFlashcardFragment.newInstance(AddEditFlashcardFragment.newFlashcardId)
-    private lateinit var randomFlashcardFragment: RandomFlashcardFragment
+    // Start with a RandomFlashcardFragment
+    private var randomFlashcardFragment: RandomFlashcardFragment = RandomFlashcardFragment.newInstance()
+    private lateinit var addEditFlashcardFragment: AddEditFlashcardFragment
     private lateinit var flashcardListFragment: FlashcardListFragment
     private lateinit var categoryListFragment: CategoryListFragment
     private var flashcardDownloadFragment: FlashcardDownloadFragment? = null
@@ -72,7 +77,7 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
 
         // Start with the game
         if (savedInstanceState == null) {
-            setFragment(addEditFlashcardFragment)
+            setFragment(randomFlashcardFragment)
         }
 
         navDrawer.setNavigationItemSelectedListener {
@@ -211,11 +216,14 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
                 .commit()
     }
 
-    private fun replaceFragment(fragment: Fragment) {
+    private fun replaceFragment(fragment: Fragment, fragmentTag: String) {
         closeSoftKeyboard()
+        // Always pop off any AddEdit views
+        supportFragmentManager.popBackStack(ADD_EDIT_FRAGMENT_TAG,
+                FragmentManager.POP_BACK_STACK_INCLUSIVE)
         supportFragmentManager.beginTransaction()
                 .replace(R.id.contentFrame, fragment)
-                .addToBackStack(null)
+                .addToBackStack(fragmentTag)
                 .commit()
     }
 
@@ -225,7 +233,7 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
      */
     override fun showAddEditFlashcard(flashcardId: String) {
         addEditFlashcardFragment = AddEditFlashcardFragment.newInstance(flashcardId)
-        replaceFragment(addEditFlashcardFragment)
+        replaceFragment(addEditFlashcardFragment, ADD_EDIT_FRAGMENT_TAG)
     }
 
     /**
@@ -235,7 +243,7 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
     override fun showAddEditFlashcardWithCategory(categoryName: String) {
         addEditFlashcardFragment = AddEditFlashcardFragment.newInstance(
                 AddEditFlashcardFragment.newFlashcardId, categoryName)
-        replaceFragment(addEditFlashcardFragment)
+        replaceFragment(addEditFlashcardFragment, ADD_EDIT_FRAGMENT_TAG)
     }
 
     /**
@@ -244,7 +252,7 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
      */
     override fun showFlashcardList(flashcardId: String) {
         flashcardListFragment = FlashcardListFragment.newInstance(flashcardId)
-        replaceFragment(flashcardListFragment)
+        replaceFragment(flashcardListFragment, FLASHCARD_LIST_FRAGMENT_TAG)
     }
 
     /**
@@ -256,7 +264,7 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
                 .newInstance(
                         flashcardId ?: FlashcardListFragment.noParticularFlashcardExtra,
                         categoryName)
-        replaceFragment(flashcardListFragment)
+        replaceFragment(flashcardListFragment, CATEGORY_LIST_FRAGMENT_TAG)
     }
 
     /**
@@ -264,7 +272,7 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
      */
     override fun showCategoryList() {
         categoryListFragment = CategoryListFragment.newInstance()
-        replaceFragment(categoryListFragment)
+        replaceFragment(categoryListFragment, CATEGORY_LIST_FRAGMENT_TAG)
     }
 
     /**
@@ -285,7 +293,7 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
                     .create().show()
         } else {
             flashcardDownloadFragment = FlashcardDownloadFragment.newInstance()
-            replaceFragment(flashcardDownloadFragment!!)
+            replaceFragment(flashcardDownloadFragment!!, DOWNLOAD_FRAGMENT_TAG)
         }
     }
 
@@ -294,7 +302,7 @@ class MainActivity : AppCompatActivity(), MainFragmentRouter {
      */
     override fun showRandomFlashcard(categoryName: String?) {
         randomFlashcardFragment = RandomFlashcardFragment.newInstance(categoryName)
-        replaceFragment(randomFlashcardFragment)
+        replaceFragment(randomFlashcardFragment, RANDOM_FLASHCARD_FRAGMENT_TAG)
     }
 
     override fun showSnackbar(stringId: Int) {
